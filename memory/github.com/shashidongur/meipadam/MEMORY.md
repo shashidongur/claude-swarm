@@ -11,6 +11,7 @@
 - [mobile-engineer](agents/mobile-engineer.md) — theme tokens, hand-mirrored types, query invalidation
 
 ## Gotchas
+- [census-suites-are-findings-not-counts](gotchas/census-suites-are-findings-not-counts.md) — never bump an SDET count to go green; the number is a finding
 - [broken-install-hides-typecheck](gotchas/broken-install-hides-typecheck.md) — a failing npm ci skips every later step; expect a second failure when you fix it
 - [validate-tests-against-main](gotchas/validate-tests-against-main.md) — re-run branch-authored suites against main; a green pin can mean the defect was fixed
 - [backend-typecheck-gap](gotchas/backend-typecheck-gap.md) — `tsc --noEmit` is a false green; use `tsconfig.check.json`
