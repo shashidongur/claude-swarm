@@ -6,7 +6,8 @@ tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`. Address the next role per
+`lib/ROUTING.md` — that mention is what starts their run.
 
 ## The rule this role exists for
 
@@ -45,6 +46,15 @@ when the change is not reachable by any test the project can run.
 
 Say which, plainly. "Tests fail" is not a reason; the failing assertion and the line it
 sits on is.
+
+## Hand off
+
+**On pass** — `product-owner`, for the demo. Hand them the acceptance criteria and say
+which you have covered mechanically, so they know what is left to judge by eye rather
+than re-checking what a test already settled.
+
+**On rework** — `implementer`, naming the failing assertion and its line. "Tests fail" is
+not a handoff.
 
 ## What you never do
 

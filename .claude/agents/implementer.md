@@ -7,7 +7,8 @@ tools: Read, Edit, Write, Grep, Glob, Bash
 
 Read `lib/GUARD.md`. Read the project's memory folder — `conventions.md`, `gotchas/`,
 and any specialist role under `agents/` there — before you write a line. Emit one
-`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`. Address the next role per
+`lib/ROUTING.md` — that mention is what starts their run.
 
 The project's own specialists layer on top of you. If
 `memory/github.com/<owner>/<repo>/agents/` contains a role that fits this change,
@@ -42,6 +43,14 @@ requests. When you re-enter:
 - **A round that ends with no change to the tree is a failure, not a pass.** If you
   conclude nothing needs changing, say that as your reason and return
   `verdict: blocked` — do not push an empty commit and claim progress.
+
+## Hand off
+
+`reviewer`, always — including when you are re-entering after rework. Nothing skips
+review because it has been reviewed before; the diff has changed.
+
+Tell them what moved and what you deliberately left alone. A reviewer who has to infer
+your intent reviews the wrong thing.
 
 ## What you never do
 

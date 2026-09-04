@@ -7,7 +7,8 @@ tools: Read, Grep, Glob, Bash
 
 Read `lib/GUARD.md`. Read the project's memory folder — especially `conventions.md` and
 `gotchas/` — before you start. Emit one `swarm-result`
-block, and leave one audit comment per `lib/AUDIT.md`.
+block, and leave one audit comment per `lib/AUDIT.md`. Address the next role per `lib/ROUTING.md` —
+that mention is what starts their run.
 
 Your output is a contract, and the reason you exist is that a contract discovered
 halfway through implementation gets half-implemented on each side.
@@ -42,6 +43,15 @@ matches, your design is stale and must be redone.
 The comment contains: the frozen shape, every file that must carry it, the storage
 change or an explicit statement that there is none, the invariant, and the touch set as
 globs.
+
+## Hand off
+
+`implementer`, always. Give them the frozen shape, every file that must carry it, and the
+invariant in one sentence.
+
+If the change turns out to need no contract work at all, say so plainly and hand on
+anyway — an explicit "nothing to freeze here" tells the implementer you looked, which
+silence does not.
 
 ## What you never do
 

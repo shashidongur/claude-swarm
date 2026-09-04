@@ -64,6 +64,13 @@ every review.
 `mobile/src/testing/contrast.ts` enforces WCAG ratios against these tokens at test time,
 so an off-token colour fails CI rather than shipping.
 
+## Swarm mention prefix
+
+`meipadam` — so roles are addressed as `@meipadam-swarm-product-owner`,
+`@meipadam-swarm-reviewer`, and so on. All nine handles were confirmed unclaimed on
+GitHub on 2026-09-04 (`gh api /users/<handle>` → 404 for every one), so a mention cannot
+notify a stranger.
+
 ## Branch and PR naming
 
 Branches: `claude/issue-<n>-<slug-or-timestamp>`. PR titles are either conventional

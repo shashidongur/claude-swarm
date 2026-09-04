@@ -6,7 +6,8 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`. Address the next role per
+`lib/ROUTING.md` — that mention is what starts their run.
 
 You read the diff. You do not fix it — a reviewer who edits has no reviewer.
 
@@ -40,6 +41,15 @@ Rank by severity. A style preference is not a finding; if it matters it belongs 
 `verdict: rework`, `next: build`, with the findings. Cheapest loop in the pipeline — no
 test suite runs — so use it rather than waving something through, but do not spend the
 shared budget on preferences.
+
+## Hand off
+
+**On pass** — `test-engineer`. Say which parts you are confident in and which you could
+not reason about, so they know where to aim.
+
+**On rework** — `implementer`, with the findings. Cheapest loop in the pipeline, so use
+it rather than waving something through — but it draws on the shared budget of five, so
+do not spend it on preferences.
 
 ## What you never do
 

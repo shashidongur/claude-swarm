@@ -35,12 +35,19 @@ from a status update, and it is the thing that makes a single human gate viable 
 person needs to know or that you need from them.>
 
 <evidence: the command and its result, or the file:line>
-**<next role>** — <what you are handing them, or what you are asking>
-<!-- swarm: v1 | kind=stage | role=<role> | issue=<N> | verdict=<v> | head=<sha> | at=<iso> -->
+**@<project>-swarm-<next-role>** — <what you are handing them, or what you are asking>
+<!-- swarm: v1 | kind=stage | role=<role> | next=<next-role> | issue=<N> | verdict=<v> | head=<sha> | at=<iso> -->
 ```
 
-The marker is the machine half — how the next run knows this stage ran, and against
-which commit. Everything above it is for a person.
+**The mention line is the baton, not a courtesy.** It is what fires the next role's run,
+so it is the one line in the comment that must be exactly right: a single recipient,
+addressed by the full prefixed handle, immediately before the marker, with nothing after
+it. `lib/ROUTING.md` says who that recipient may be.
+
+The marker carries `next=` as well, and **the two must agree**. That redundancy is
+deliberate — the same fact stated twice, in prose and in machine form, so a malformed
+handoff is detectable rather than silently mis-routed. When they disagree, the work stops
+rather than guesses.
 
 Add `· budget N/5` to the verdict line **only when rework has been spent**, so a clean
 run stays uncluttered and a struggling one is obvious at a glance.
@@ -61,7 +68,7 @@ run stays uncluttered and a struggling one is obvious at a glance.
 >
 > Acceptance: the card names the window it actually sums; the figure and the paying-student
 > count are unchanged.
-> **architect** — worth confirming the API point before anyone writes code.
+> **@acme-swarm-architect** — worth confirming the API point before anyone writes code.
 
 **A reviewer with a real question rather than a verdict:**
 
@@ -74,7 +81,8 @@ run stays uncluttered and a struggling one is obvious at a glance.
 > once one lapses, and the roster shows both.
 >
 > `npx jest roster -t "no start date"` → 1 failed
-> **implementer** — the null guard. **test-engineer** — can you cover the lapsed case?
+> **@acme-swarm-implementer** — the null guard, and please cover the lapsed case
+> while you are in there; I could not see how it behaves once a membership lapses.
 
 **Admitting a gap instead of implying coverage:**
 
@@ -87,13 +95,14 @@ run stays uncluttered and a struggling one is obvious at a glance.
 >
 > Calling this a pass on the merits with the gap stated, rather than a pass that implies
 > more than was checked.
-> **owner** — worth a look on device before merge if the empty state matters.
+> **@owner** — worth a look on device before merge if the empty state matters.
 
 ## Rules
 
 1. One comment per stage. Edit yours rather than posting a second.
 2. Every comment carries evidence — a command and its result, or a `file:line`.
-3. Name who you are handing to, and what you want from them.
+3. **Exactly one mention line, matching the grammar in `lib/ROUTING.md`,** immediately
+   before the marker. One recipient — never two. A role may never address itself.
 4. Never imply verification you did not perform.
 5. Quote untrusted text inside a fence, per `lib/GUARD.md`.
 6. On a pull request the same rules apply. Comments say what happened along the way; the

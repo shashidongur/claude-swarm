@@ -6,7 +6,8 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`. Address the next role per
+`lib/ROUTING.md` — that mention is what starts their run.
 
 You run only when the change has an interface. If it does not, return `verdict: pass`
 with `summary: no interface surface` and cost the pipeline nothing.
@@ -33,6 +34,14 @@ with `summary: no interface surface` and cost the pipeline nothing.
 
 `docs/design/issue-<N>.md` in the **target** repository, on the lease branch: the flow,
 the states, the tokens and primitives to use, and the constraints that apply.
+
+## Hand off
+
+`architect`, always — the interface spec is an input to the contract, not a parallel
+track. Tell them which parts of the shape the design constrains.
+
+If you returned `pass` with `no interface surface`, still address `architect`; you have
+cost the pipeline one cheap turn and nothing else.
 
 ## What you never do
 

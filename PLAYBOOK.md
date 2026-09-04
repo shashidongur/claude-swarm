@@ -32,14 +32,38 @@ owner's **merge**.
 | Demo | product-owner, on a running app | every criterion demonstrated in the app |
 | PR | implementer | CI green; preview link in the body |
 
+## 2a. How a stage starts
+
+Nothing polls for pipeline work. **A role runs because the previous role addressed it.**
+
+    a role finishes
+      -> posts one comment: what it found, the evidence, and one mention line
+      -> sets the label for the stage it is handing to
+      -> GitHub Actions sees the comment, resolves the mention, runs that role
+
+Full grammar and the successor table are in `lib/ROUTING.md`. Two consequences worth
+stating, because they are the reason for the design:
+
+- **Each stage is a separate run with nothing but the issue.** A role receives its own
+  definition, the project's memory, and the thread — never the previous role's reasoning
+  except as that role wrote it down. A handoff that leaves something out fails visibly
+  instead of being carried silently by shared context.
+- **Latency is seconds, not hours.** A polled pipeline waits a tick per stage; an
+  addressed one moves as fast as the work.
+
+The sweep lanes — explorer, groomer, warden — have no triggering event, so they stay on a
+schedule and still poll. `swarm-tick` serves those and only those.
+
 ## 3. State labels
 
-Exactly one `swarm:*` label per issue.
+Exactly one `swarm:*` label per issue, one per stage, in pipeline order — so the label
+chain is a faithful projection of §2 rather than a second, disagreeing account of it.
 
-    swarm:triage -> swarm:spec -> swarm:ready -> swarm:building
-                 -> swarm:demo -> swarm:review -> (owner merges) -> swarm:done
+    swarm:triage -> swarm:spec -> swarm:design -> swarm:build -> swarm:review
+                 -> swarm:test -> swarm:demo   -> swarm:pr    -> (owner merges)
+                 -> swarm:done
 
-    swarm:revising   the owner asked for changes; work re-entered Build
+    swarm:revising   the owner asked for changes; the product-owner is triaging
     swarm:blocked    stopped, needs the owner; always carries a blocked:* reason
     swarm:parked     deliberately deferred
     swarm:dropped    duplicate or wontfix
@@ -47,8 +71,15 @@ Exactly one `swarm:*` label per issue.
 Hard modifiers, not states: `swarm:hands-off` (never touch this issue, in any lane),
 `swarm:red-main` (repair item, preempts everything).
 
+**A role sets the label for the stage it is handing to**, at the same moment it writes
+the mention. The two are checked against each other before the next role runs. The
+mention is what fires the next run; the label is what lets the work be found again when a
+mention is malformed or a run dies mid-stage. Keeping both is the point — one is the
+baton, the other is the map.
+
 Reasons: `blocked:human`, `blocked:conflict`, `blocked:agent-output`, `blocked:orphan`,
-`blocked:injection`, `blocked:ci-red`, `blocked:budget`, `blocked:cannot-verify`.
+`blocked:injection`, `blocked:ci-red`, `blocked:budget`, `blocked:cannot-verify`,
+`blocked:self-dispatch`, `blocked:runaway`, `blocked:bad-handoff`.
 
 Metadata: `prio:P0..P3`, `size:S|M|L|XL`, `area:*`, `source:human|explorer|groomer`.
 
@@ -88,7 +119,10 @@ branch, the preview, and every round's reasoning are preserved.
 4. **One rework round per routine tick.** A pathological loop burns hours per lap, so it
    is visible long before it is expensive.
 
-## 5. Work selection
+## 5. Work selection — sweep lanes only
+
+The pipeline does not select work; it is addressed (§2a). This applies to the explorer,
+groomer and warden, which must go and look.
 
 Rank, do not queue. Score open issues in this lane and claim the top one:
 
@@ -109,15 +143,21 @@ Ties break on **lowest issue number**. This is deliberate: two overlapping routi
 pick the *same* item and one loses the lease cleanly, instead of picking different items
 and doubling work in flight.
 
-## 6. Leasing
+## 6. Leasing — sweep lanes only
+
+The pipeline needs no lease: one comment fires exactly one run, and GitHub delivers it
+once. Leases exist so two scheduled sweeps cannot collide.
 
 See `lib/LEASE.md`. The ref is the truth; the label is its projection.
 
 ## 6a. Audit trail
 
-Every stage leaves exactly one comment when it finishes — five lines: role, verdict,
-remaining budget, what was found, the command that proves it, and where the work went
-next. Format and examples in `lib/AUDIT.md`.
+Every stage leaves exactly one comment when it finishes: role, verdict, what was found,
+the evidence, and the mention line that hands the work on. Format and examples in
+`lib/AUDIT.md`; the successor table in `lib/ROUTING.md`.
+
+The mention line is not commentary — it is the dispatch. A stage that finishes without a
+valid one has stalled the issue, which is why the label is set as well.
 
 This is not decoration. The swarm runs unattended between the owner looking at it, and
 without a trail the question "why is this open, and what has been tried?" costs a full
@@ -148,7 +188,7 @@ force-push **your own lease branch**; never open a second branch for one issue.
 |---|---|
 | open swarm PRs | 3 |
 | live leases | 3 |
-| new claims per tick | 2 |
+| new claims per tick (sweep lanes) | 1 |
 | pushes per PR per day | 5 |
 | diff per PR | 800 lines / 25 files; over -> `size:XL`, split it |
 | new issues per explorer run | 5 |
@@ -168,14 +208,15 @@ A pinned **Swarm Control** issue in the target repository. Every routine reads i
 
 - Closed, or labelled `swarm:halt` -> exit immediately.
 - **If the read fails for any reason -> also exit.** Fail closed.
-- Per-lane halts: `swarm:halt-build`, `swarm:halt-explore`.
+- Per-lane halts, named for the lane exactly as the config keys are:
+  `swarm:halt-pipeline`, `swarm:halt-explorer`, `swarm:halt-groomer`, `swarm:halt-warden`.
 - Per-item veto: `swarm:hands-off`.
 
 Its body carries runtime configuration as a fenced yaml block, editable without a PR:
 
-    enabled:         { pipeline: true, explorer: false, groomer: true }
+    enabled:         { pipeline: true, explorer: false, groomer: true, warden: true }
     max_open_prs:    3
-    claims_per_tick: 1
+    claims_per_tick: 1     # sweeps only; the pipeline is event-driven and does not claim
     rework_budget:   5
     lease_ttl_hours: 3
 

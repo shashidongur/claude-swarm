@@ -12,7 +12,7 @@ summary:   <one sentence, plain>
 touches:   <glob>, <glob>          # files this stage may write; required for build
 evidence:  <path:line>, <URL>, <command + result>
 refs:      <requirement ids>
-next:      <stage the work moves to>
+next:      <ROLE the work moves to — a name from lib/ROUTING.md, never a stage>
 reason:    <required when verdict is rework or blocked>
 ```
 
@@ -27,6 +27,10 @@ claim is checked against the tree:
    token.
 4. Every command quoted in `evidence` was actually run this turn.
 5. `verdict: rework` and `verdict: blocked` require a non-empty `reason`.
+6. `next` is **required** on `pass` and `rework`, must be a role named in
+   `lib/ROUTING.md`, must be a legal successor of this role for this verdict, and must
+   not be this role itself. It must also match the mention line in the audit comment.
+   `next` is omitted only on `blocked`, where the work stops.
 
 On failure: retry **once**, feeding back only the validator's structured errors — never
 the bad output itself, which would re-inject whatever went wrong. A second failure sets
