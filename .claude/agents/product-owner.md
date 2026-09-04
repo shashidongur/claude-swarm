@@ -75,7 +75,9 @@ Distinguish the two cases, because they go to different places:
 - **The application does not do what the criterion says** → the criterion was wrong,
   ambiguous, or incomplete. This is yours. Rewrite the criteria, record what was
   actually meant in `decisions.md` so the same ambiguity is not written twice, and
-  return `verdict: rework`, `next: spec`.
+  return `verdict: rework`, `next: architect` — a **role**, never a stage name like `spec`;
+  the contract rejects stages. You rewrite the criteria in this same comment, and the
+  architect re-designs against them.
 - **The application does what the criterion says and the criterion was right, but
   something adjacent is visibly broken** — a crash, a blank screen, a control that does
   nothing. That is a defect, not a specification problem. File it as its own issue and

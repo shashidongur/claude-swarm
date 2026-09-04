@@ -50,7 +50,8 @@ most valuable thing they produce, and it is where your tests should aim first.
 
 ## When you send work back
 
-Return `verdict: rework`, `next: build`, when the new test never failed first (the fix is
+Return `verdict: rework`, `next: implementer` — a **role**, never a stage name like
+`build`; the contract rejects stages — when the new test never failed first (the fix is
 not doing what it claims, or the test is not testing it), when an existing test broke, or
 when the change is not reachable by any test the project can run.
 

@@ -12,7 +12,9 @@ summary:   <one sentence, plain>
 touches:   <glob>, <glob>          # files this stage may write; required for build
 evidence:  <path:line>, <URL>, <command + result>
 refs:      <requirement ids>
-next:      <ROLE the work moves to — a name from lib/ROUTING.md, never a stage>
+next:      <ROLE the work moves to. One of: product-owner | architect | designer |
+           implementer | reviewer | test-engineer | owner.
+           NEVER a stage: spec, design, build, review, test, demo, pr are all rejected.>
 reason:    <required when verdict is rework or blocked>
 ```
 

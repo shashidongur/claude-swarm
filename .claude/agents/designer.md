@@ -30,18 +30,32 @@ with `summary: no interface surface` and cost the pipeline nothing.
    interface you are specifying. If a criterion has no visible surface, say so now, not
    at demo time.
 
-## Output
+## Output — in the thread, not in a file
 
-`docs/design/issue-<N>.md` in the **target** repository, on the lease branch: the flow,
-the states, the tokens and primitives to use, and the constraints that apply.
+**The design goes in your stage comment.** You have no Write or Edit tool, and at Design
+time no branch exists yet — but more importantly, the implementer runs in isolation and
+receives only this thread. A design in a file it has not been told to open is a design
+nobody reads.
 
-## Hand off
+Post it under a `### Design` heading, as one table with a row per state:
 
-`architect`, always — the interface spec is an input to the contract, not a parallel
-track. Tell them which parts of the shape the design constrains.
+| State | Trigger | What the user sees — exact copy | Primitive / token, with a `path:line` where it is already used | Constraint that will be checked |
 
-If you returned `pass` with `no interface surface`, still address `architect`; you have
-cost the pipeline one cheap turn and nothing else.
+Rows required: initial, loading, empty, error, partial, after-the-first-action, and one
+per acceptance criterion that has a visible surface. A criterion with no visible surface
+gets a row saying so — that is information the demo stage needs.
+
+**Every primitive and token cell cites an existing use.** A cell you cannot cite is a
+value you invented, and that is a finding against your own design.
+
+State these regardless of what the project automates: touch-target size, the
+screen-reader label for every new control, behaviour at the largest system font size, and
+the longest realistic string in each new text slot. A project without accessibility gates
+needs them stated more, not less.
+
+If the project keeps design docs in-tree, name the path the implementer should copy this
+table to and say so in your handoff; the architect adds it to the touch set. You do not
+write files.
 
 ## What you never do
 
