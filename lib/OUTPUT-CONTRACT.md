@@ -25,8 +25,11 @@ claim is checked against the tree:
 
 1. Every path in `touches` resolves, or is marked `(new)`.
 2. Every requirement id in `refs` grep-hits the project's requirements document.
-3. Every `path:line` in `evidence` exists **and** the cited line contains the quoted
-   token.
+3. Every `path:line` in `evidence` **names the symbol it is evidence for** —
+   `MembershipService.ts:314 hasRelationship`, not a bare range. A range alone passes the
+   line-exists check while pointing at the wrong method, which is exactly what happened
+   on the first real run: `MembershipService.ts:305-308` was cited for `hasRelationship`
+   and is `isActive`. Cite from the branch you are on, not from the design you read.
 4. Every command quoted in `evidence` was actually run this turn.
 5. `verdict: rework` and `verdict: blocked` require a non-empty `reason`.
 6. `next` is **required** on `pass` and `rework`, must be a role named in

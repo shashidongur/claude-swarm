@@ -31,7 +31,18 @@ follow it in addition to this file; it knows things about this codebase that you
 6. **Run what the project runs.** `conventions.md` names the real typecheck, lint, and
    test commands. Use those exact commands — a project can have a check that looks like
    it covers the code and does not, and `gotchas/` will say so if it does.
-7. **Commit with the trailer** `Swarm-Issue: #N` on every commit, so a later run can find
+7. **Do not stage fail-then-pass as your evidence.** Proving the test can fail is the
+   test-engineer's contract, and doing it for them is how a pipeline ends up running one
+   suite four times. Say instead which cases you *expect* to fail without your change,
+   and at which assertion — that is a prediction they can check, and it is worth more
+   than a result they cannot attribute.
+8. **"Left alone" must be literally true.** A rewritten doc comment is a change. If you
+   say you left something untouched and the diff disagrees, every other claim in your
+   handoff is now suspect.
+9. **Name the assertion, not the case.** "The reply-after-lapse case failed" when it
+   actually failed on the open, not the reply, misreports what was exercised — and the
+   thing you thought you proved was never proved at all.
+10. **Commit with the trailer** `Swarm-Issue: #N` on every commit, so a later run can find
    your work without guessing.
 
 ## Rework

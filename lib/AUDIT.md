@@ -93,6 +93,12 @@ so it is the one line in the comment that must be exactly right: a single recipi
 addressed by the full prefixed handle, immediately before the marker, with nothing after
 it. `lib/ROUTING.md` says who that recipient may be.
 
+`at=` is a fact, not an estimate. Run `date -u +%FT%TZ` and paste what it prints. Three
+markers on the first real run carried a guessed round number *later* than the comment's
+own last edit — one of them eighteen minutes after the stage it triggered had already
+started. A timestamp you rounded is a timestamp you invented, and it is the cheapest
+possible tell that other numbers in the same comment might be too.
+
 The marker carries `next=` as well, and **the two must agree**. That redundancy is
 deliberate — the same fact stated twice, in prose and in machine form, so a malformed
 handoff is detectable rather than silently mis-routed. When they disagree, the work stops
@@ -145,6 +151,16 @@ run stays uncluttered and a struggling one is obvious at a glance.
 > Calling this a pass on the merits with the gap stated, rather than a pass that implies
 > more than was checked.
 > **@owner** — worth a look on device before merge if the empty state matters.
+
+## Do not re-run the stage before you
+
+A stage that repeats the previous stage's commands and reports the same numbers has
+produced no evidence of its own — it has produced theirs, again. On the first real run
+**four of five stages re-ran the same seven-test suite**, and two of them had jobs nobody
+did as a result.
+
+Confirming someone's numbers is one clause: *"confirmed the implementer's 7/7"*. Then
+spend the comment on the thing only you do.
 
 ## Rules
 

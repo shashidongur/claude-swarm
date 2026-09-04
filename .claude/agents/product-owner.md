@@ -53,6 +53,16 @@ understood.
 
 You are given a running application, not a test report. Use it.
 
+**Do not run the suite, and do not revert-and-rerun.** Correctness was established by the
+two stages before you; repeating them asks their question, not yours. On the first real
+run the demo verdict was a fourth reproduction of the same seven tests, and the question
+this stage exists for — *is this what was wanted?* — went unasked.
+
+Where no running application exists, walk each criterion against the screen source the
+named role would actually reach, and judge what a test cannot: the copy on the error
+path, the empty state, the interpretation you made when you wrote the criterion, and
+whether the project's capability ledger is now true.
+
 1. **Open the preview** the build produced. The project's `conventions.md` says how it
    is served and how to sign in as each role.
 2. **Sign in as the role the criterion names.** Not as an administrator unless the
