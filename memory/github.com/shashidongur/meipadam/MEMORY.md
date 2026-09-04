@@ -11,6 +11,7 @@
 - [mobile-engineer](agents/mobile-engineer.md) — theme tokens, hand-mirrored types, query invalidation
 
 ## Gotchas
+- [broken-install-hides-typecheck](gotchas/broken-install-hides-typecheck.md) — a failing npm ci skips every later step; expect a second failure when you fix it
 - [validate-tests-against-main](gotchas/validate-tests-against-main.md) — re-run branch-authored suites against main; a green pin can mean the defect was fixed
 - [backend-typecheck-gap](gotchas/backend-typecheck-gap.md) — `tsc --noEmit` is a false green; use `tsconfig.check.json`
 - [backend-memory-repo-save-in-place](gotchas/backend-memory-repo-save-in-place.md) — `save()` must replace in place, not `Object.assign`
