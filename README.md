@@ -37,22 +37,27 @@ reset the budget to five**. Budget spent → `swarm:blocked`, on your radar, nev
 
 ## Layout
 
-    PLAYBOOK.md      operating policy — routines load this and abort without it
-    lib/             prompt fragments composed into every role
-    agents/          nine PORTABLE roles — no project specifics, ever
-    skills/          swarm-tick (orchestrator), swarm-onboard, swarm-memory
+    PLAYBOOK.md          operating policy — routines load this and abort without it
+    lib/                 prompt fragments composed into every role
+    .claude/agents/      nine PORTABLE roles — no project specifics, ever
+    .claude/skills/      swarm-tick (orchestrator), swarm-onboard, swarm-memory
     memory/github.com/<owner>/<repo>/    everything project-specific
 
-**The split that makes this reusable:** `agents/test-engineer.md` says *prove the test
-fails before you trust it*. A project's `gotchas/` says *the typecheck in this repo is a
-false green because its config excludes the source directory*. Only the second changes
-when you point the swarm somewhere else.
+**The `.claude/` prefix is not cosmetic.** Spikes 3 and 4 put an identical probe in both
+`skills/` and `.claude/skills/`, and in both `agents/` and `.claude/agents/`. Only the
+`.claude/` ones were found; the root-level ones returned *"Unknown skill"* and
+*"Agent type not found"* despite being present on disk. The plugin layout is read only
+when a plugin is installed, which a routine does not do — and a role in the wrong
+directory does not error, it simply is not there.
+
+**The split that makes this reusable:** `.claude/agents/test-engineer.md` says *prove the
+test fails before you trust it*. A project's `gotchas/` says *the typecheck in this repo
+is a false green because its config excludes the source directory*. Only the second
+changes when you point the swarm somewhere else.
 
 There is a test for this. It must stay clean:
 
-    grep -rilE 'meipadam|tsconfig\.check|pglite|react-native|cdk' agents/ lib/ PLAYBOOK.md
-
----
+    grep -rilE 'meipadam|tsconfig\.check|pglite|react-native|cdk' .claude/agents/ lib/ PLAYBOOK.md
 
 ## Onboarding a project
 
@@ -66,42 +71,37 @@ There is a test for this. It must stay clean:
 
 ---
 
-## How it loads
+## How it loads — measured, not assumed
 
-Cross-repository agent discovery does not exist: Claude Code finds agents in the project
-`.claude/agents/`, the user directory, and plugins — and `additionalDirectories` grants
-file access only. **Skills committed to a cloned repository do load**, so the entry point
-is `skills/swarm-tick`, which reads role definitions from disk and passes them as
-subagent prompts.
+A routine clones this repo alongside the target and **discovers both its skills and its
+agents** from `.claude/`. Roles are spawned by name, so their `tools:` lists are enforced
+by the harness. Verified by spikes 3 and 4 rather than inferred; see issue #1.
 
-The consequence, stated plainly: **a role's `tools:` frontmatter is advisory.** The
-enforced perimeter is the routine's own allowed-tools configuration. Do not treat the
-role files as a security boundary.
+Two facts that cost nothing to know and a lot to discover late:
+
+- Root-level `agents/` and `skills/` are **not** discovered. Only `.claude/`.
+- **`gh` is not on PATH** in a routine. GitHub work goes through the GitHub MCP tools.
 
 Claude Code's own auto-memory does not survive a routine run — routines are stateless
-cloud sessions and `~/.claude` dies with the container. That is why memory is git.
-
----
+cloud sessions and `~/.claude` dies with the container. That is why memory is git, and
+why spike 2 mattered: a routine **can** push to the second repo, so learning pools here
+rather than scattering across targets.
 
 ## Status
 
 | | |
 |---|---|
 | Scaffolding | done |
-| meipadam memory seeded | in progress |
-| Hand-run of one issue | not yet |
-| Spikes 1–4 | not yet |
+| meipadam memory seeded | done — 27 gotchas |
+| Spikes 1–4 | **done** — all four answered, see issue #1 |
+| Hand-run of one issue | done — meipadam#44, spec → demo, zero rework rounds |
 | Routines enabled | not yet |
 
-### Spikes to run before scheduling anything
+### What the spikes settled
 
-Enough of the mechanism is undocumented that guessing would be expensive.
-
-| # | Question | Fallback if it fails |
+| # | Question | Answer |
 |---|---|---|
-| 1 | Are both repos cloned, and at what paths? | clone this repo in-run with `gh repo clone` |
-| 2 | Can a routine push to the **second** repo? | memory moves to a `swarm-memory` branch of each target |
-| 3 | Do this repo's skills load in a routine? | inline the orchestrator into the routine prompt |
-| 4 | Are `.claude/agents/` discovered cross-repo? | confirms read-as-text — assume this one fails |
-
-Spike 2 is the one that can force a redesign.
+| 1 | Workspace layout | Both repos cloned side by side under `/home/user/` |
+| 2 | Cross-repo push | **Works** — memory pools in this repo as designed |
+| 3 | Skill discovery | `.claude/skills/` only |
+| 4 | Agent discovery | `.claude/agents/` only — and it **works cross-repo**, so tool restrictions are enforced |

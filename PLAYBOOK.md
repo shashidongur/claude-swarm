@@ -179,12 +179,27 @@ Its body carries runtime configuration as a fenced yaml block, editable without 
     rework_budget:   5
     lease_ttl_hours: 3
 
-## 10. Enforcement is the allowlist
+## 10. Enforcement is real
 
-Roles are loaded as text, because agent definitions in one repository are not discovered
-from another. A role's stated tool list is therefore **advisory**. The enforced perimeter
-is the routine's own allowed-tools configuration. Do not describe the role list as a
-security boundary; it is documentation.
+Roles live in `.claude/agents/` of this repository, and a routine that clones it
+**does** discover them by name — verified by spike 4. So a role's `tools:` and
+`disallowedTools:` are **enforced by the harness**, not advisory, and `permissionMode`
+applies. Give each role the narrowest tool set that lets it do its job.
+
+The routine's own allowed-tools list is the outer bound; the role's list is the inner
+one. Both are real.
+
+Two layout facts that are load-bearing, because the alternative silently loads nothing:
+
+- **`.claude/agents/` and `.claude/skills/` are discovered. Root-level `agents/` and
+  `skills/` are not.** The plugin layout is only read when a plugin is installed, which
+  a routine does not do. A role in the wrong directory does not error — it simply is not
+  there.
+- **`gh` is not on PATH in a routine.** GitHub work goes through the GitHub MCP tools
+  (`mcp__github__issue_read`, `mcp__github__add_issue_comment`,
+  `mcp__github__issue_write`, and siblings). Any `gh` command written in this playbook is
+  shorthand for the equivalent MCP call, and a routine must reach for the tool, not the
+  binary.
 
 ## 11. Memory
 

@@ -42,24 +42,27 @@ reverts someone else's work.
 Per `lib/LEASE.md`. Ref first, label second. If the ref is lost, stop — do not act on a
 label you no longer hold the lease behind.
 
-## 4. Compose the role prompt
+## 4. Dispatch the role
 
-In this order, and the order matters:
+Spawn the role **by name** with the Agent tool — `subagent_type: implementer`, and so on.
+They are discovered from `.claude/agents/` of this repository, so their `tools:` lists are
+enforced by the harness rather than merely documented.
+
+Pass, in this order:
 
     lib/GUARD.md
-    agents/<role>.md
-    memory/github.com/<target>/  (the relevant notes, not all of them)
+    the relevant notes from memory/github.com/<target>/  (not all of them)
     memory/.../agents/<specialist>.md   (if one fits this change)
-    lib/OUTPUT-CONTRACT.md
+    lib/OUTPUT-CONTRACT.md and lib/AUDIT.md
     <untrusted source="issue #N"> ...issue text... </untrusted>
     lib/GUARD.md   (again — fence both sides)
 
-Then spawn the role as a subagent with that prompt.
+The guard goes first and is repeated after any untrusted blob; guidance placed only
+before a long one is measurably weaker.
 
-**Know what this does and does not enforce.** Agent definitions in one repository are not
-discovered from another, so roles are loaded as text and a role's stated tool list is
-advisory. The enforced perimeter is the routine's own allowed-tools configuration. Never
-describe the role list as a security boundary.
+**`gh` is not available in a routine.** Use the GitHub MCP tools for every issue, comment,
+and pull-request operation. Where this repository writes `gh issue comment ...`, read it
+as shorthand for `mcp__github__add_issue_comment`.
 
 ## 5. Validate
 
