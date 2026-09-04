@@ -1,85 +1,100 @@
-# Audit comments
+# Talking on the issue
 
-Every stage leaves exactly one comment when it finishes. Someone opening the issue cold
-must be able to read the whole history in under a minute — who did what, what they
-found, what proved it, and where it went next.
+Every stage leaves one comment when it finishes. Write it as a person on a
+cross-functional team writes a handoff — not as a log line.
 
-**Short by default.** Five lines. The detail lives in the artifacts the comment points
-at; the comment is the index, not the report.
+The test: someone who was not here opens the issue and understands what was decided,
+why, what it cost, and what the next person needs to do. That is a different artifact
+from a status update, and it is the thing that makes a single human gate viable at all.
 
-## Format
+**Short.** Usually four to eight lines. Detail lives in the artifacts you point at.
+
+## Write it like a handoff
+
+- **Answer the person before you.** If they made a call, say whether it held up. If they
+  asked something, answer it. A stage that ignores the one before it reads as a machine
+  taking a turn, not a colleague picking up work.
+- **Say what you decided and what you gave up.** A decision without its trade-off is an
+  assertion. "Relabelled rather than rescoped, because calendar-YTD needs a date param
+  the API does not have yet" tells the next person something; "fixed the label" does not.
+- **Ask, out loud, when it matters.** A real reviewer says "I think this is right but I
+  cannot see how it behaves on a lapsed membership — can QA cover that?" Name who you
+  are asking.
+- **Flag what you could not check.** Especially the demo: if no running application was
+  exercised, say so plainly. Silence reads as coverage.
+- **Be specific about code.** `EarningsService.ts:87` beats "the service".
+- **Skip the ceremony.** No "I have now completed the implementation phase." Say what
+  changed.
+
+## Shape
 
 ```
-**<role>** · <verdict> · <budget note>
+**<role>** · <verdict>
 
-<What happened. One or two sentences, plain. What was found, not what was attempted.>
+<Two to five sentences: what you found or decided, what it cost, anything the next
+person needs to know or that you need from them.>
 
-`<the command that proves it>` → <its result>
-→ <next stage, or what it is waiting on>
+<evidence: the command and its result, or the file:line>
+**<next role>** — <what you are handing them, or what you are asking>
 <!-- swarm: v1 | kind=stage | role=<role> | issue=<N> | verdict=<v> | head=<sha> | at=<iso> -->
 ```
 
-The marker is the machine-readable half: it is how the next run knows this stage already
-ran, and against which commit. The visible half is for a person.
+The marker is the machine half — how the next run knows this stage ran, and against
+which commit. Everything above it is for a person.
 
-`<budget note>` is `budget 5/5` when untouched, `budget 3/5` after two rework rounds, and
-`budget reset by owner` after the owner asks for changes.
+Add `· budget N/5` to the verdict line **only when rework has been spent**, so a clean
+run stays uncluttered and a struggling one is obvious at a glance.
 
-## Examples
+## Worked examples
 
-A stage that passed:
+**A decision with a trade-off, handed on:**
 
-> **test-engineer** · pass · budget 5/5
+> **product-owner** · spec
 >
-> Wrote the roster-row assertions and confirmed each fails against the unfixed
-> commit first. The email column was the only one already covered.
+> Two valid fixes here and they are not equivalent. Relabelling to "Last 12 months" is
+> honest and ships today. Rescoping to calendar-year matches what a master wants at tax
+> time, but the API takes a month *count*, not a date — calendar YTD is not a fixed
+> number of months, so that is an API change, not a query tweak.
 >
-> `npx jest issue39 --verbose` → 6 failed pre-fix, 6 passed post-fix
-> → demo
-> `<!-- swarm: v1 | kind=stage | role=test-engineer | issue=39 | verdict=pass | head=a1b2c3d | at=2026-09-04T04:12:00Z -->`
+> Going with the relabel, and filing the calendar-year view separately so it gets costed
+> on its own rather than smuggled in behind a copy fix.
+>
+> Acceptance: the card names the window it actually sums; the figure and the paying-student
+> count are unchanged.
+> **architect** — worth confirming the API point before anyone writes code.
 
-A stage sending work back — this is the one that has to be legible, because it is where
-someone asks "why is this still open?":
+**A reviewer with a real question rather than a verdict:**
 
 > **reviewer** · rework → build · budget 4/5
 >
-> `RosterService.ts:88` reads `startedAt` before the null guard on line 84, so a
-> student with no start date 500s instead of rendering an em dash.
+> `RosterService.ts:88` reads `startedAt` before the null guard two lines up, so a student
+> with no start date 500s instead of rendering the em dash the design asks for. Small fix.
+>
+> Separately — I can see this is right for a current membership, but not how it behaves
+> once one lapses, and the roster shows both.
 >
 > `npx jest roster -t "no start date"` → 1 failed
-> → build (round 1 of the shared budget)
-> `<!-- swarm: v1 | kind=stage | role=reviewer | issue=39 | verdict=rework | head=a1b2c3d | at=... -->`
+> **implementer** — the null guard. **test-engineer** — can you cover the lapsed case?
 
-A stage that stopped:
+**Admitting a gap instead of implying coverage:**
 
-> **product-owner** · blocked · budget 0/5
+> **product-owner** · demo, partial
 >
-> Three demo rounds all failed on the same criterion, and rewriting it did not
-> converge. The requirement itself is ambiguous about which role sees the column.
+> Walked the four criteria against the rendered tree, not a running app — this project
+> has no web preview yet, so nothing was clicked. Criteria 1–3 hold. Criterion 4 asks
+> what a master sees with zero earnings, and I cannot confirm the empty state without
+> running it.
 >
-> `docs/design/issue-39.md` → criterion 2 unresolved
-> → blocked:budget — needs a decision from the owner
-> `<!-- swarm: v1 | kind=stage | role=product-owner | issue=39 | verdict=blocked | ... -->`
+> Calling this a pass on the merits with the gap stated, rather than a pass that implies
+> more than was checked.
+> **owner** — worth a look on device before merge if the empty state matters.
 
 ## Rules
 
-1. **One comment per stage completion.** Never a running log, never a second comment to
-   correct the first — edit it.
-2. **Say what was found, not what was attempted.** "Ran the suite" is not information.
-   "19 of 21 pass; issue54's pins now pass because the guards landed" is.
-3. **Every comment carries a command and its result.** A stage with no reproducible
-   evidence has not passed; see `lib/OUTPUT-CONTRACT.md`.
-4. **Name the next stage, or the thing being waited on.** A reader should never have to
-   infer where the work went.
-5. **Quote untrusted text inside a fence**, per `lib/GUARD.md`, if it must be quoted at
-   all.
-6. **On a pull request, the same rules apply**, and the PR description carries the
-   accumulated evidence — the fail-then-pass output, the preview link, the verification
-   table. The comments say what happened; the description says what it adds up to.
-
-## What this is for
-
-The swarm runs unattended for hours between the owner looking at it. Without a trail,
-"why is this issue open, and what has already been tried?" costs a full re-read of the
-diff. With one, it costs fifteen seconds. That difference is what makes a single human
-gate viable at all.
+1. One comment per stage. Edit yours rather than posting a second.
+2. Every comment carries evidence — a command and its result, or a `file:line`.
+3. Name who you are handing to, and what you want from them.
+4. Never imply verification you did not perform.
+5. Quote untrusted text inside a fence, per `lib/GUARD.md`.
+6. On a pull request the same rules apply. Comments say what happened along the way; the
+   description says what it adds up to.
