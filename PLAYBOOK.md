@@ -88,6 +88,16 @@ never write them.
 
 ## 4. The rework budget
 
+**Rework is the normal cost of work, not a failure.** Sixteen stages have run across this
+swarm's whole history and produced **sixteen passes and zero reworks** — while an audit of
+one of those changes found a predicate duplicated into five places, a test pinning a
+criterion with the wrong fixture, and an architect asserting a database index that does
+not exist. The findings were there. Nothing sent them back.
+
+Five is a **runaway guard**, not a quota. A stage that spends one is working correctly. A
+pipeline that never spends any is not being read closely enough — and that is the more
+expensive failure, because it ships.
+
 Three loops send work backwards, and they share **one budget of five per issue**:
 
 | Loop | Lands on | Because |

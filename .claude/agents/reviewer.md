@@ -99,9 +99,22 @@ answering any of them is the empty-progress case the playbook's brake exists for
 
 ## Sending work back
 
-`verdict: rework`, `next: implementer`, with the findings ranked. Cheapest loop in the
-pipeline — no suite runs — so use it rather than waving something through. It draws on
-the shared budget of five, so do not spend it on preferences.
+`verdict: rework`, `next: implementer`, with the findings ranked.
+
+**This is the cheapest loop in the pipeline** — nothing re-runs, nobody waits — and it is
+the one you are here to use. Sending work back is not a failure of the change or an
+imposition on the implementer; it is the stage doing its job.
+
+Calibrate against this: across this swarm's entire history, sixteen stages have passed and
+**none has ever sent anything back**, while an audit of one of those changes found a
+predicate duplicated into five places and a database index asserted that does not exist.
+If you find nothing, the likeliest explanation is that you did not read closely enough —
+not that the change is flawless. Most real changes have at least one thing worth raising.
+
+The budget of five is a runaway guard, not a quota you are spending. What it does protect
+against is **preferences**: a naming opinion is not a finding, and neither is a style you
+would have written differently. Correctness, security, a duplicated rule, a contract that
+moved on one side — those are always worth the round.
 
 ## Hand off
 

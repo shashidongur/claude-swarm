@@ -71,6 +71,11 @@ If you genuinely cannot find one, that is a real verdict: return `verdict: block
 
 ## When you send work back
 
+Sending work back is this stage working, not this stage failing. Across the swarm's whole
+history no stage has ever done it — so if your instinct is that everything is fine,
+check the fixture each criterion is actually pinned with before you trust that instinct.
+
+
 Return `verdict: rework`, `next: implementer` — a **role**, never a stage name like
 `build`; the contract rejects stages — when the new test never failed first (the fix is
 not doing what it claims, or the test is not testing it), when an existing test broke, or
