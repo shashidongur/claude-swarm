@@ -26,10 +26,59 @@ from a status update, and it is the thing that makes a single human gate viable 
 - **Skip the ceremony.** No "I have now completed the implementation phase." Say what
   changed.
 
+## Say you have started
+
+**Post a working comment the moment you begin, before you read anything.** A stage takes
+minutes; a silent issue for those minutes is indistinguishable from a stage that never
+fired, and that ambiguity is expensive — it is exactly what a person checks the issue to
+resolve.
+
+```
+⏳ **<role>** · working
+
+<one line: what you are doing right now>
+<!-- swarm: v1 | kind=working | role=<role> | issue=<N> | at=<iso> -->
+```
+
+Then **edit that same comment** as you go, at real milestones — not every tool call.
+Three or four updates across a stage is right; a running log is noise. When you finish,
+edit it one last time into the finished audit comment below. One comment per stage, from
+first breath to last.
+
+**A working comment must never carry a mention line or a `next=`.** The mention is what
+fires the next role, so a half-finished thought carrying one would start the next stage
+against work that does not exist yet. `kind=working` says "in flight"; only `kind=stage`
+with a mention says "your turn."
+
+## Emoji
+
+One per role, one per verdict, at the head of the comment. The point is scanning: an
+issue with twenty comments should let you find the failures and the current stage without
+reading a word.
+
+| Role | | Verdict | |
+|---|---|---|---|
+| product-owner | 🎯 | working | ⏳ |
+| architect | 📐 | pass | ✅ |
+| designer | 🎨 | rework | 🔄 |
+| implementer | 🔨 | blocked | 🚧 |
+| reviewer | 🔍 | | |
+| test-engineer | 🧪 | | |
+| explorer | 🧭 | | |
+| groomer | 🧹 | | |
+| warden | 🛡️ | | |
+
+`🔨 **implementer** · ✅ pass` · `🧪 **test-engineer** · 🔄 rework` ·
+`🎯 **product-owner** · ⏳ working`
+
+Two rules so this stays useful rather than decorative: **only these**, and **only in the
+header line**. Emoji sprinkled through the prose makes a considered comment read as a
+chat message, and the whole point of the trail is that it reads like an engineer wrote it.
+
 ## Shape
 
 ```
-**<role>** · <verdict>
+<role emoji> **<role>** · <verdict emoji> <verdict>
 
 <Two to five sentences: what you found or decided, what it cost, anything the next
 person needs to know or that you need from them.>
@@ -56,7 +105,7 @@ run stays uncluttered and a struggling one is obvious at a glance.
 
 **A decision with a trade-off, handed on:**
 
-> **product-owner** · spec
+> 🎯 **product-owner** · ✅ spec
 >
 > Two valid fixes here and they are not equivalent. Relabelling to "Last 12 months" is
 > honest and ships today. Rescoping to calendar-year matches what a master wants at tax
@@ -72,7 +121,7 @@ run stays uncluttered and a struggling one is obvious at a glance.
 
 **A reviewer with a real question rather than a verdict:**
 
-> **reviewer** · rework → build · budget 4/5
+> 🔍 **reviewer** · 🔄 rework → implementer · budget 4/5
 >
 > `RosterService.ts:88` reads `startedAt` before the null guard two lines up, so a student
 > with no start date 500s instead of rendering the em dash the design asks for. Small fix.
@@ -86,7 +135,7 @@ run stays uncluttered and a struggling one is obvious at a glance.
 
 **Admitting a gap instead of implying coverage:**
 
-> **product-owner** · demo, partial
+> 🎯 **product-owner** · ✅ demo, partial
 >
 > Walked the four criteria against the rendered tree, not a running app — this project
 > has no web preview yet, so nothing was clicked. Criteria 1–3 hold. Criterion 4 asks
@@ -99,7 +148,8 @@ run stays uncluttered and a struggling one is obvious at a glance.
 
 ## Rules
 
-1. One comment per stage. Edit yours rather than posting a second.
+1. One comment per stage — the working comment **becomes** the finished one. Edit
+   yours; never post a second.
 2. Every comment carries evidence — a command and its result, or a `file:line`.
 3. **Exactly one mention line, matching the grammar in `lib/ROUTING.md`,** immediately
    before the marker. One recipient — never two. A role may never address itself.
