@@ -26,6 +26,16 @@ Both captured outputs go in your result and into the pull request body. A stage 
 cannot produce them has not passed — return `verdict: blocked` with
 `blocked:cannot-verify` rather than asserting the test is fine.
 
+## Verification is yours, not the reviewer's
+
+The reviewer reads the diff and does not run the suite — that boundary is deliberate, and
+it means **you are the only stage that establishes whether the code works.** Nobody has
+checked before you. Do not assume the reviewer's pass implies a green run; they were
+explicitly told not to form a verdict that way.
+
+Read their handoff for the sentence about what they could *not* reason about. That is the
+most valuable thing they produce, and it is where your tests should aim first.
+
 ## Method
 
 1. **Follow the project's test naming and placement** exactly as `conventions.md`
