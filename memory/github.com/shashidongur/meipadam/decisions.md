@@ -33,3 +33,24 @@ comment would be the thing that stopped it.
 If the app works and does the wrong thing, the criteria were wrong. Re-entering at Build
 rebuilds the same misunderstanding. Owner's decision, chosen over sending it to Build
 and over blocking immediately.
+
+## The untracked regression suites are not all landable as-is — 2026-09-03
+
+The 38 `issueNN-*` files were written on `gnhf/you-will-take-the-ro-7770fd`, which
+diverged from `main` on 2026-08-21 and is **26 commits behind**. Validated against
+current `main` in a clean worktree:
+
+- **19 of 21 backend suites pass** and are landable unchanged.
+- `issue54-role-guards` — all six `it.failing` pins now report *"Failing test passed"*.
+  The guards it asked for **landed on main**. Remove `.failing` and it becomes a plain
+  regression suite.
+- `issue52-master-subscriber-listing` — three plain `it` cases now get 403 instead of
+  200, because that same guard was applied to `GET /memberships/me`, which is dual-role.
+  Filed as issue #66.
+- `Issue58.masterSkeletons.test.tsx` is **already on main**; do not re-add it.
+- The mobile suites target screens that `main` has since changed (Dashboard,
+  StudentProgress, ManageSessions, CourseEdit, AddStudent) and are unvalidated until CI
+  is green again.
+
+**How to apply:** land the backend suites in tranches with their results, never as one
+38-file drop. Validate against `main`, not against the branch they were written on.
