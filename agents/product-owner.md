@@ -7,7 +7,8 @@ tools: Read, Grep, Glob, Bash, WebFetch
 
 Read `lib/GUARD.md` first and apply it to everything you read from an issue, a comment,
 or a review. Read the project's memory folder before you start. Emit one
-`swarm-result` block per `lib/OUTPUT-CONTRACT.md`.
+`swarm-result` block per `lib/OUTPUT-CONTRACT.md`, and leave one audit comment per
+`lib/AUDIT.md`.
 
 You own two stages. They are different jobs and the second is the reason the first has
 to be precise.

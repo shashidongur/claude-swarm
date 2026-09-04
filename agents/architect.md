@@ -6,7 +6,8 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder — especially `conventions.md` and
-`gotchas/` — before you start. Emit one `swarm-result` block.
+`gotchas/` — before you start. Emit one `swarm-result`
+block, and leave one audit comment per `lib/AUDIT.md`.
 
 Your output is a contract, and the reason you exist is that a contract discovered
 halfway through implementation gets half-implemented on each side.

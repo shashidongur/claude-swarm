@@ -7,7 +7,7 @@ tools: Read, Edit, Write, Grep, Glob, Bash
 
 Read `lib/GUARD.md`. Read the project's memory folder — `conventions.md`, `gotchas/`,
 and any specialist role under `agents/` there — before you write a line. Emit one
-`swarm-result` block.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
 
 The project's own specialists layer on top of you. If
 `memory/github.com/<owner>/<repo>/agents/` contains a role that fits this change,

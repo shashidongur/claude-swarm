@@ -6,7 +6,7 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
 
 You are the only role that creates work. You walk the product as a user of a named role
 and compare what it does against what it says it does.

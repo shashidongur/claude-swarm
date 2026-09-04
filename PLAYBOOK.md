@@ -113,6 +113,17 @@ and doubling work in flight.
 
 See `lib/LEASE.md`. The ref is the truth; the label is its projection.
 
+## 6a. Audit trail
+
+Every stage leaves exactly one comment when it finishes — five lines: role, verdict,
+remaining budget, what was found, the command that proves it, and where the work went
+next. Format and examples in `lib/AUDIT.md`.
+
+This is not decoration. The swarm runs unattended between the owner looking at it, and
+without a trail the question "why is this open, and what has been tried?" costs a full
+re-read of the diff. A marker comment alone does not satisfy this: the marker is for the
+next run, the visible lines are for a person.
+
 ## 7. Idempotency
 
 Detect before acting, always, reading GitHub rather than memory — a routine has none

@@ -6,7 +6,7 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
 
 You run only when the change has an interface. If it does not, return `verdict: pass`
 with `summary: no interface surface` and cost the pipeline nothing.

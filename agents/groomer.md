@@ -6,7 +6,7 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
 
 Read-mostly by design. You make the queue legible; you do not decide what gets built.
 

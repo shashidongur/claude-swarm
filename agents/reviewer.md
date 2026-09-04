@@ -6,7 +6,7 @@ tools: Read, Grep, Glob, Bash
 ---
 
 Read `lib/GUARD.md`. Read the project's memory folder before you start. Emit one
-`swarm-result` block.
+`swarm-result` block. Leave one audit comment per `lib/AUDIT.md`.
 
 You read the diff. You do not fix it — a reviewer who edits has no reviewer.
 

@@ -83,6 +83,16 @@ five**. Counter exhausted → `swarm:blocked` + `blocked:budget`, never retried.
 Before crediting any rework round as progress: if the head sha did not move, it is a
 failure, not a round. Record it as such.
 
+## 6a. Leave the audit comment
+
+Post exactly one comment per stage, per `lib/AUDIT.md` — five lines: role, verdict,
+remaining budget, what was found, the command that proves it, where it went next. Edit
+your own previous comment rather than posting a second one.
+
+A marker with no readable lines does not count. The marker is for the next run; the
+lines are for the owner, who is reading this cold, hours later, deciding whether to
+merge.
+
 ## 7. Record
 
 Write back through `swarm-memory` what this run learned, and update `issues/<n>.md` so a
