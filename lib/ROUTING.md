@@ -39,8 +39,13 @@ A collision means every handoff notifies a stranger.
 | `product-owner` — demo | opens the PR, then `owner` | `architect` *(re-specs first)* |
 | `owner`, commenting on a swarm PR | `product-owner` — **always** | — |
 
-`owner` is you. You are the only address that is not a role, and the only one that is a
-real GitHub account.
+`owner` is the human. It is the only address that is not a role — and it is written as
+**their actual login**, which the dispatch supplies. Never the literal `@owner`: that is a
+real GitHub organisation, and addressing it notifies strangers on every handoff.
+
+The role handles were all checked for collisions before the first run (`gh api /users/<h>`
+→ 404 for each). `@owner` was not, and slipped through. Check every literal handle in a
+template, including the ones that look like placeholders.
 
 **Why your feedback goes to the product-owner rather than straight to the implementer:**
 it is not yet known whether you found an implementation problem or a specification one.

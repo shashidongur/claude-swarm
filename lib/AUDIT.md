@@ -50,6 +50,14 @@ fires the next role, so a half-finished thought carrying one would start the nex
 against work that does not exist yet. `kind=working` says "in flight"; only `kind=stage`
 with a mention says "your turn."
 
+### Addressing the owner
+
+`@owner` is a **real GitHub organisation**, not a placeholder — writing it notifies
+strangers on every handoff. Address the repository owner by their actual login, which the
+dispatch supplies to you. The nine role handles were checked for collisions before this
+swarm ran; `@owner` was not, and that is the mistake to learn from: **every literal
+`@name` in a template is an account until proven otherwise.**
+
 ## Emoji
 
 One per role, one per verdict, at the head of the comment. The point is scanning: an
@@ -150,7 +158,8 @@ run stays uncluttered and a struggling one is obvious at a glance.
 >
 > Calling this a pass on the merits with the gap stated, rather than a pass that implies
 > more than was checked.
-> **@owner** — worth a look on device before merge if the empty state matters.
+> **@<the owner's login>** — worth a look on device before merge if the empty state
+> matters.
 
 ## Do not re-run the stage before you
 
