@@ -50,6 +50,13 @@ fires the next role, so a half-finished thought carrying one would start the nex
 against work that does not exist yet. `kind=working` says "in flight"; only `kind=stage`
 with a mention says "your turn."
 
+**How to post it.** Write the body to a file and hand `gh` the *file*: `gh api -X POST
+"repos/<o>/<r>/issues/<N>/comments" -F body=@/tmp/comment.md`, and `-X PATCH
+".../comments/<id>"` for the edits. Only the capital `-F` expands `@file`; lowercase
+`-f` and `--body`/`-b` send the literal characters. The reviewer on issue #50 made
+exactly that slip — its whole review posted as the single line `@/tmp/final_comment.md`,
+the mention never fired, and the findings had to be dug out of the run log.
+
 ### Addressing the owner
 
 `@owner` is a **real GitHub organisation**, not a placeholder — writing it notifies
