@@ -42,10 +42,16 @@ halfway through implementation gets half-implemented on each side.
 
 ## Output
 
-A design comment marked `<!-- swarm: v1 | kind=stage | stage=design | issue=N | spec=<digest> -->`,
-where `<digest>` is the first 8 characters of a hash of the spec comment's body. That
-digest is how a later run knows whether the spec moved under it — if it no longer
-matches, your design is stale and must be redone.
+A design comment. Its closing marker is the full audit grammar of `lib/AUDIT.md` —
+`role=`, `next=` and `verdict=` are what the dispatch routes on, and a marker without
+them under a mention is a handoff the dispatch refuses (issue #50 stalled exactly
+there) — plus two fields of this stage's own, `stage=design` and `spec=<digest>`:
+
+`<!-- swarm: v1 | kind=stage | role=architect | next=implementer | issue=<N> | verdict=<v> | stage=design | spec=<digest> | head=<sha> | at=<iso> -->`
+
+`<digest>` is the first 8 characters of a hash of the spec comment's body. That digest
+is how a later run knows whether the spec moved under it — if it no longer matches,
+your design is stale and must be redone.
 
 The comment contains: the frozen shape, every file that must carry it, the storage
 change or an explicit statement that there is none, the invariant, and the touch set as

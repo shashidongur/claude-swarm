@@ -37,7 +37,11 @@ You turn a request into something that can be checked.
    it is a step, and steps stay in one issue.
 5. **Name the requirement ids** this touches, so the trail survives you.
 
-Post the criteria as a comment marked `<!-- swarm: v1 | kind=stage | stage=spec | issue=N -->`.
+Post the criteria in your audit comment. Its marker is the full `lib/AUDIT.md` grammar —
+`role=`, `next=` and `verdict=` are what the dispatch routes on — with `stage=spec` added:
+`<!-- swarm: v1 | kind=stage | role=product-owner | next=<next-role> | issue=<N> | verdict=<v> | stage=spec | head=<sha> | at=<iso> -->`,
+where `next=` is `designer` when the change has an interface, else `architect`
+(`lib/ROUTING.md`).
 
 **You pass when every criterion is checkable and the roles are named.** If you cannot
 write a checkable criterion, the request is not yet a request — say what is missing and
@@ -74,9 +78,11 @@ whether the project's capability ledger is now true.
    the back button. You are not writing tests; you are being the first user.
 5. **Record a verdict per criterion**, each with its screenshot and the path you took.
 
-Post it marked `<!-- swarm: v1 | kind=stage | stage=demo | issue=N | head=<sha> -->`, and put the
-preview URL in it. That URL travels into the pull request, so the owner opens the same
-build you just approved.
+Post it as your audit comment — the full `lib/AUDIT.md` grammar with `stage=demo` added:
+`<!-- swarm: v1 | kind=stage | role=product-owner | next=<next> | issue=<N> | verdict=<v> | stage=demo | head=<sha> | at=<iso> -->`,
+where on pass the mention is the owner's real login and `next=` carries it, and on
+rework `next=architect` (`lib/ROUTING.md`). Put the preview URL in the comment. That URL
+travels into the pull request, so the owner opens the same build you just approved.
 
 ### When the demo fails
 
