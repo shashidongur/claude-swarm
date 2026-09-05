@@ -160,8 +160,11 @@ jobs:
           # 4c. circuit breaker — more than 8 swarm comments in an hour is a runaway
           # 12, not 8: a clean pipeline is six stages and #45 did four in sixteen minutes,
           # so 8 tripped on healthy runs. Counts dispatch runs, not comments.
+          # And only runs the gate actually evaluated: counting cheap-gate skips (working
+          # comments, plain chatter) and label-event noise made "12" mean about five real
+          # hops, and the breaker tripped twice on #50's healthy chain in one morning.
           RECENT=$(gh api "repos/$REPO/actions/workflows/swarm-dispatch.yml/runs?per_page=100" \
-                     --jq "[.workflow_runs[] | select(.created_at > \"$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)\")] | length" 2>/dev/null || echo 0)
+                     --jq "[.workflow_runs[] | select(.created_at > \"$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)\" and .conclusion != \"skipped\" and .event != \"issues\")] | length" 2>/dev/null || echo 0)
           if [ "${RECENT:-0}" -gt 12 ]; then say "runaway: $RECENT dispatch runs in the last hour" blocked:runaway; fi
 
           # 4d. rework budget — count rework markers since the owner last spoke
