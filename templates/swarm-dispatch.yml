@@ -1,0 +1,35 @@
+# Swarm dispatch — the whole of a project's half.
+#
+# GitHub only runs workflows that live in the repository receiving the event, so this
+# file has to exist here. It does not have to contain anything: the guards, the routing,
+# the loop brakes and the role delivery all live in the swarm repo and are called below.
+# Copy this file, change `mention_prefix`, and that is the installation.
+#
+# Requires two secrets on this repository:
+#   CLAUDE_CODE_OAUTH_TOKEN  — from `claude setup-token`
+#   SWARM_TOKEN              — a fine-grained PAT with contents:read on the swarm repo only
+
+name: Swarm dispatch
+
+on:
+  issue_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [labeled]
+
+jobs:
+  dispatch:
+    uses: shashidongur/claude-swarm/.github/workflows/dispatch.yml@main
+    with:
+      mention_prefix: CHANGE-ME-swarm      # e.g. acme-swarm → @acme-swarm-reviewer
+    secrets: inherit
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+      actions: read

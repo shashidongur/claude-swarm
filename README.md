@@ -61,6 +61,17 @@ There is a test for this. It must stay clean:
 
 ## Onboarding a project
 
+**The project's half is one file, and it is a stub.** GitHub only runs workflows that
+live in the repository receiving the event, so every project needs *a* dispatch workflow —
+but not *this* one. Copy `templates/swarm-dispatch.yml`, change `mention_prefix`, and the
+260 lines of guards stay here, called once.
+
+That matters because those guards have already needed six corrections. Copied per
+project, that would have been six corrections times the number of projects, discovered
+one silent stall at a time.
+
+
+
 1. Run `swarm-onboard` against it. It explores, **runs** the checks rather than guessing
    at them, and writes `memory/github.com/<owner>/<repo>/`.
 2. Read the memory it produced. Generic filler means the onboarding failed — fix it now,
