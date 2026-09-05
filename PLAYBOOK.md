@@ -181,7 +181,7 @@ across runs.
 
 | Stage | Already done when |
 |---|---|
-| spec | a comment `<!-- swarm: kind=spec \| issue=N -->` exists |
+| spec | a `kind=stage` comment with `stage=spec` exists |
 | design | a `stage=design` comment whose `spec=<digest>` matches the current spec |
 | build | branch `claude/issue-<N>-*` exists with a `Swarm-Issue: #N` commit trailer |
 | test | test files on the branch, zero `it.failing` remaining, fail-then-pass evidence posted |
