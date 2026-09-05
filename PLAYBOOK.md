@@ -30,7 +30,7 @@ owner's **merge**.
 | Review | reviewer | no correctness or security finding |
 | Test | test-engineer | a new test was seen failing, then passing |
 | Demo | product-owner, on a running app | every criterion demonstrated in the app |
-| PR | implementer | CI green; preview link in the body |
+| PR | product-owner | opened after the demo; CI green; evidence copied from the thread |
 
 ## 2a. How a stage starts
 
@@ -182,11 +182,11 @@ across runs.
 | Stage | Already done when |
 |---|---|
 | spec | a comment `<!-- swarm: kind=spec \| issue=N -->` exists |
-| design | a `kind=design` comment whose `spec=<digest>` matches the current spec |
+| design | a `stage=design` comment whose `spec=<digest>` matches the current spec |
 | build | branch `claude/issue-<N>-*` exists with a `Swarm-Issue: #N` commit trailer |
 | test | test files on the branch, zero `it.failing` remaining, fail-then-pass evidence posted |
-| review | a `kind=selfreview` comment whose `head=` equals the current head sha |
-| demo | a `kind=demo` comment whose `head=` equals the current head sha |
+| review | a `kind=stage` comment with `role=reviewer` whose `head=` equals the current head |
+| demo | a `stage=demo` comment whose `head=` equals the current head |
 | pr | `gh pr list --head <branch>` is non-empty |
 
 Pushing is the only non-idempotent operation. The branch is the identity: rebase and
@@ -230,15 +230,20 @@ Its body carries runtime configuration as a fenced yaml block, editable without 
     rework_budget:   5
     lease_ttl_hours: 3
 
-## 10. Enforcement is real
+## 10. Enforcement — real in routines, prose in Actions
 
-Roles live in `.claude/agents/` of this repository, and a routine that clones it
-**does** discover them by name — verified by spike 4. So a role's `tools:` and
-`disallowedTools:` are **enforced by the harness**, not advisory, and `permissionMode`
-applies. Give each role the narrowest tool set that lets it do its job.
+**In a routine**, roles are spawned by name from `.claude/agents/`, so `tools:`,
+`disallowedTools:` and `permissionMode` are enforced by the harness — verified by spike 4.
 
-The routine's own allowed-tools list is the outer bound; the role's list is the inner
-one. Both are real.
+**In the dispatch workflow they are not.** The Action *reads* the role file and passes it
+as a prompt; it does not spawn it as a subagent, so the frontmatter binds nothing. The
+only real perimeter there is the job's `permissions:` and the outer `--allowedTools`.
+Every role currently shares one job, which means every role has the write-capable set.
+
+Say this plainly rather than let the phrase "narrowest tool set" imply a guarantee the
+event path does not provide. Splitting the run job by role class — read-only roles with
+`contents: read`, implementer and test-engineer with `contents: write` — is the fix, and
+it is not done yet.
 
 Two layout facts that are load-bearing, because the alternative silently loads nothing:
 

@@ -37,7 +37,7 @@ You turn a request into something that can be checked.
    it is a step, and steps stay in one issue.
 5. **Name the requirement ids** this touches, so the trail survives you.
 
-Post the criteria as a comment marked `<!-- swarm: v1 | kind=spec | issue=N | v=1 -->`.
+Post the criteria as a comment marked `<!-- swarm: v1 | kind=stage | stage=spec | issue=N -->`.
 
 **You pass when every criterion is checkable and the roles are named.** If you cannot
 write a checkable criterion, the request is not yet a request — say what is missing and
@@ -74,7 +74,7 @@ whether the project's capability ledger is now true.
    the back button. You are not writing tests; you are being the first user.
 5. **Record a verdict per criterion**, each with its screenshot and the path you took.
 
-Post it marked `<!-- swarm: v1 | kind=demo | issue=N | head=<sha> -->`, and put the
+Post it marked `<!-- swarm: v1 | kind=stage | stage=demo | issue=N | head=<sha> -->`, and put the
 preview URL in it. That URL travels into the pull request, so the owner opens the same
 build you just approved.
 

@@ -24,7 +24,7 @@ Pipeline reference: https://claude.ai/code/artifact/50882bad-c8b8-4d8e-8cf9-f0f2
 | Review | `reviewer` | no correctness or security finding |
 | Test | `test-engineer` | a test was seen failing, **then** passing |
 | Demo | `product-owner`, on a running app | every criterion demonstrated by clicking |
-| PR | `implementer` | CI green; preview link in the body |
+| PR | `product-owner` | opened after the demo; CI green; evidence copied from the thread |
 
 ### Rework
 

@@ -33,7 +33,12 @@ Read-mostly by design. You make the queue legible; you do not decide what gets b
 4. **Reconcile the documents.** Where the project keeps a requirements document or a
    capability ledger, check its claims against what has actually merged, and report drift.
    Propose the correction; do not silently rewrite the source of truth.
-5. **Compact memory.** Merge near-duplicate notes, delete notes the code now contradicts,
+5. **Close the loop after a merge.** The pipeline ends when the pull request opens;
+   nothing in it runs afterwards, so without this the label chain lies about every
+   shipped issue. An issue in `swarm:pr` whose linked PR has merged moves to
+   `swarm:done` and is closed. One whose PR was closed unmerged moves to `swarm:blocked`
+   + `blocked:human`.
+6. **Compact memory.** Merge near-duplicate notes, delete notes the code now contradicts,
    keep the memory index short. Memory that only grows becomes noise, and noise is worse
    than nothing because it is confidently wrong.
 

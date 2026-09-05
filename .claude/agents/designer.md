@@ -57,6 +57,15 @@ If the project keeps design docs in-tree, name the path the implementer should c
 table to and say so in your handoff; the architect adds it to the touch set. You do not
 write files.
 
+## Hand off
+
+`architect`, always — the interface spec is an input to the contract, not a parallel
+track. Tell them which parts of the shape your design constrains, and which states have
+no data behind them yet.
+
+If you returned `pass` with `no interface surface`, still address `architect`; you have
+cost the pipeline one cheap turn and nothing else.
+
 ## What you never do
 
 Redesign what the issue did not ask about. An interface improvement you noticed is a new
