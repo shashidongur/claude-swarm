@@ -107,7 +107,7 @@ jobs:
           # `?per_page=100` without --paginate returns the FIRST hundred, so `.[-1]` was
           # comment 100, not the newest — a permanent stall past a hundred comments.
           gh api --paginate "repos/$REPO/issues/$ISSUE/comments" \
-            --jq '{id, user: .user.login, updated_at, body}' 2>/dev/null | jq -s '.' > /tmp/all.json \
+            --jq '.[] | {id, user: .user.login, updated_at, body}' 2>/dev/null | jq -s '.' > /tmp/all.json \
             || { echo "::error::cannot list comments — refusing to guess"; exit 1; }
 
           # ── 2a. An edit only counts on the newest SWARM comment.
