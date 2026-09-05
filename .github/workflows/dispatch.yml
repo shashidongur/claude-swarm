@@ -29,7 +29,7 @@ on:
         description: 'Read access to the swarm repo, to deliver the roles'
         required: true
 
-permissions:permissions:
+permissions:
   contents: write
   issues: write
   pull-requests: write
@@ -248,6 +248,12 @@ jobs:
 
       - name: Run the role
         uses: anthropics/claude-code-action@v1
+        # v1 has no timeout_minutes input — under `with:` it is ignored with a runtime
+        # warning, and a hung stage would then hold the runner for GitHub's six-hour
+        # default. So the 90 minutes live on the step itself. Generous on purpose: the
+        # implementer legitimately took 11 minutes on a small change, and a stage cut
+        # off mid-work is what the died-stage comment below exists to report.
+        timeout-minutes: 90
         env:
           # `gh` is on the runner but needs a token. Without this the role can read the
           # repo and do nothing else — which is exactly how the first run failed.
@@ -283,9 +289,6 @@ jobs:
           # Private repo, single owner: seeing what the role actually did is worth more
           # than hiding it. Debugging blind is what made the first failure expensive.
           show_full_output: true
-          # The implementer took 11 minutes on a small change; the default would cut a
-          # real stage off mid-work, leaving a ⏳ working comment on the issue forever.
-          timeout_minutes: 90
           prompt: |
             You are the **${{ needs.resolve.outputs.role }}** stage of the swarm, running on
             issue #${{ needs.resolve.outputs.issue }} of ${{ github.repository }}.
