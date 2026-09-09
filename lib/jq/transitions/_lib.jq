@@ -19,7 +19,15 @@ def epoch: fromdateiso8601;
 
 def pre(cond; msg): if cond then . else error("precondition: " + msg) end;
 def is_state: (type == "object") and (.v == 2) and ((.issue | type) == "number");
-def state_pre: pre(is_state; "not a v2 state document");
+# `seq` counts transitions and only ever goes up. The signature proves a document was
+# written by us; it cannot prove it is the LATEST one we wrote, so restoring an older
+# signed document to the state branch would otherwise replay cleanly — un-consuming
+# gate approvals, resetting the cost total, rewinding attempt counters. seq makes such
+# a rewind visible: state.sh refuses a re-read that goes backwards, the rendered state
+# comment carries it, and G29(d) no longer excludes the state branch from the activity
+# check. (A signed document restored while nothing else is running still verifies —
+# closing that needs a counter stored off the branch.)
+def state_pre: pre(is_state; "not a v2 state document") | .seq = ((.seq // 0) + 1);
 
 def stage_order: ["triage", "requirements", "design", "architecture", "build", "test", "security", "release", "retro"];
 def stage_index($s): (stage_order | index($s)) // 99;
@@ -37,11 +45,19 @@ def log_event($ev): log_event($ev; opt("by"; null); opt("note"; null));
 
 # dispatches[] is append-only and capped at 60: the oldest records are dropped and
 # counted in totals.folded (their cost/minutes are already in the running totals).
+# What must NOT be lost with them is which roles finished with a pass: V14 builds the
+# "every recorded artifact is on head" census from that, so a folded record would
+# quietly stop being checked — exactly on the long, rework-heavy issues where the
+# release check matters most. Their {role, attempt} pairs are kept instead; the list is
+# bounded by the number of role-attempts on the path, not by the number of dispatches.
 def cap_dispatches:
   if ((.dispatches // []) | length) > 60 then
     (((.dispatches | length) - 60)) as $n
     | .totals.folded = ((.totals.folded // 0) + $n)
     | .totals.folded_cost_usd = ((.totals.folded_cost_usd // 0) + ([.dispatches[:$n][] | .cost_usd // 0] | add))
+    | .totals.folded_passes = (((.totals.folded_passes // [])
+        + [.dispatches[:$n][] | select(.status == "finished" and .verdict == "pass") | {role, attempt: (.attempt // 1)}])
+        | unique)
     | .dispatches = .dispatches[$n:]
   else . end;
 
@@ -107,7 +123,7 @@ def queue($stage; $role; $reason; $not_before):
       key: $k, run_id: 0, stage: $stage, role: $role, attempt: $a, at: ts,
       claimed_at: null, finished_at: null, status: "queued", verdict: null,
       model_requested: opt("model"; null), model_actual: null,
-      cost_usd: 0, turns: 0, duration_s: 0, job_minutes: 0, retry: 0, critic: null,
+      cost_usd: 0, turns: 0, duration_s: 0, job_minutes: 0, overhead_minutes: 0, retry: 0, critic: null,
       base_sha: null, head: null, artifact: null, handoff: null, died_reason: null,
       validation: null, last_text: null, reason: $reason }])
   | cap_dispatches;
@@ -127,8 +143,11 @@ def stats_arg: (opt("stats"; "{}") | if type == "string" then fromjson else . en
 
 # the record fields every terminal status writes
 def record_terminal($st; $status):
+  # overhead_minutes rides on the record as well as in totals: state.sh month-totals
+  # attributes minutes to the month a dispatch ran in, and without it the overhead half
+  # of the figure the monthly brake reads would always be zero.
   . + ($st | with_entries(select(.key | IN("verdict", "model_requested", "model_actual", "cost_usd", "turns", "duration_s",
-                                                "job_minutes", "retry", "critic", "head", "artifact", "handoff",
+                                                "job_minutes", "overhead_minutes", "retry", "critic", "head", "artifact", "handoff",
                                                 "died_reason", "validation", "last_text", "run_attempt", "base_sha"))))
   | .status = $status
   | .finished_at = ts

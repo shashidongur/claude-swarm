@@ -141,7 +141,8 @@
       "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
       "not": {
         "pattern": "\\.\\.|//"
-      }
+      },
+      "description": "Prefix of the integration branch. The dispatcher's cheap event gate carries the default literal; an overridden prefix is still matched through the Swarm-Issue trailer in pull request bodies and the swarm run name, so no event is lost."
     },
     "state_branch": {
       "$ref": "#/definitions/branch"
@@ -178,6 +179,16 @@
       "uniqueItems": true
     },
     "gate_scripts": {
+      "description": "Manifest `scripts` entries the CI gate depends on. The pre<name>/post<name> npm hooks around each, and the install lifecycle, are added automatically.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "gate_blocks": {
+      "description": "Top-level manifest blocks that configure the CI gate — the test runner's own settings, where they live in the manifest rather than a separate file. Changing one moves the gate without touching a gate script, so it is compared like the scripts are.",
       "type": "array",
       "items": {
         "type": "string",

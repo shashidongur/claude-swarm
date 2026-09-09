@@ -311,7 +311,7 @@ cmd_create() {
 cmd_write() {
   need_key
   need_repo
-  local issue=${1:-} t=${2:-} tf docf shaf newf signed err rc conflicts=0 sha before after hook
+  local issue=${1:-} t=${2:-} tf docf shaf newf signed err rc conflicts=0 sha before after hook seen_seq cur_seq
   [ -n "$issue" ] && [ -n "$t" ] || die "write: <issue> <transition> [--arg k v]…"
   shift 2
   parse_transition_args "$@"
@@ -323,6 +323,7 @@ cmd_write() {
   signed=$(tmpf .json) || die "write: no temp dir"
   err=$(tmpf .err) || die "write: no temp dir"
   cleanup() { rm -f "$docf" "$shaf" "$newf" "$signed" "$err"; }
+  seen_seq=-1
   while :; do
     read_state "$issue" "$docf" "$shaf"
     rc=$?
@@ -332,13 +333,27 @@ cmd_write() {
       6) cleanup; exit 6 ;;
       *) cleanup; die "cannot read state #$issue — refusing to guess" ;;
     esac
+    # `seq` only goes up. A re-read after a CAS conflict that comes back with a LOWER
+    # counter is not another writer racing us — it is the state branch being rolled
+    # back to an older (still validly signed) document underneath us. Never merge onto
+    # that: the whole point of the counter is that the signature alone cannot tell an
+    # old document from the current one.
+    cur_seq=$(jq -r '.seq // 0' "$docf" 2>/dev/null)
+    case $cur_seq in ''|*[!0-9]*) cur_seq=0 ;; esac
+    if [ "$cur_seq" -lt "$seen_seq" ]; then
+      cleanup
+      die "state #$issue went backwards (seq $seen_seq → $cur_seq) — the state branch was rewound; nothing written"
+    fi
+    seen_seq=$cur_seq
     sha=$(cat "$shaf")
     apply_transition "$tf" "$docf" "$newf"
     rc=$?
     if [ $rc -eq 5 ]; then cleanup; exit 5; fi
     [ $rc -eq 0 ] || { cleanup; die "transition $t failed on state #$issue"; }
-    before=$(jq -S -c 'del(.sig)' "$docf")
-    after=$(jq -S -c 'del(.sig)' "$newf")
+    # `seq` is excluded from the comparison: state_pre bumps it on every transition, so
+    # counting it would make a genuine no-op look like a change and write every time.
+    before=$(jq -S -c 'del(.sig, .seq)' "$docf")
+    after=$(jq -S -c 'del(.sig, .seq)' "$newf")
     if [ "$before" = "$after" ]; then
       log "state #$issue: $t changed nothing — not written"
       cat "$docf"
@@ -608,12 +623,20 @@ cmd_month_totals() {
       log "month-totals: $p has a bad signature — skipped"
       continue
     fi
+    # Attribute per dispatch, not per issue. Taking the issue's LIFETIME totals whenever
+    # any of its dates touched the month counted an issue that spans a month boundary in
+    # full in both months — and this is the figure the monthly brake (G31) runs on, so it
+    # tripped earlier and more often than the real spend warranted. Records folded out of
+    # dispatches[] (the 60-record cap) are no longer attributable to a month and are left
+    # out; the issue's own totals still carry them.
     jq -c --arg m "$month" '
       select(type == "object")
-      | select(((.created_at // "")[0:7] == $m)
-               or ([(.dispatches // [])[] | (.at // "")[0:7]] | any(. == $m))
-               or (((.log // []) | last | .at // "")[0:7] == $m))
-      | {issue, runner_minutes: (.totals.runner_minutes // 0), overhead_minutes: (.totals.overhead_minutes // 0), cost_usd: (.totals.cost_usd // 0)}' "$docf" >> "$sum"
+      | ([(.dispatches // [])[] | select(((.at // "")[0:7]) == $m)]) as $d
+      | select((($d | length) > 0) or ((.created_at // "")[0:7] == $m))
+      | {issue,
+         runner_minutes: ([$d[] | .job_minutes // 0] | add // 0 | floor),
+         overhead_minutes: ([$d[] | .overhead_minutes // 0] | add // 0 | floor),
+         cost_usd: ([$d[] | .cost_usd // 0] | add // 0)}' "$docf" >> "$sum"
     n=$((n + 1))
   done <<< "$paths"
   jq -s --arg m "$month" '{

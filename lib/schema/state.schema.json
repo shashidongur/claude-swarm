@@ -1163,6 +1163,11 @@
           }
         }
       }
+    },
+    "seq": {
+      "description": "Transition counter, monotonically increasing. A read that goes backwards is a rewind of the state branch.",
+      "type": "integer",
+      "minimum": 0
     }
   },
   "allOf": [

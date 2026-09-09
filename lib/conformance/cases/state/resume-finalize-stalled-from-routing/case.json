@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "resume",
+    "--arg",
+    "mode",
+    "finalize"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "routing",
+      "blocked": null,
+      "current.key": "7:build:dev:app:1"
+    }
+  }
+}

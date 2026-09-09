@@ -6,22 +6,55 @@
   "dispatches": [
     {
       "artifact": "swarm-7-build-dev-api-a1-1",
-      "at": "2026-09-02T10:00:00Z",
+      "at": "2026-08-31T10:00:00Z",
       "attempt": 1,
       "base_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
       "claimed_at": "2026-09-02T10:00:00Z",
-      "cost_usd": 4.12,
+      "cost_usd": 5.0,
       "critic": null,
       "died_reason": null,
       "duration_s": 1180,
       "finished_at": "2026-09-02T10:00:00Z",
       "handoff": "swarm-run-7:build:dev:api:1-1",
       "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
-      "job_minutes": 21,
-      "key": "6:build:dev:api:1",
+      "job_minutes": 15,
+      "key": "6:build:dev:app:1",
       "last_text": "Pushed the lane's changes; tests pass.",
       "model_actual": "claude-sonnet-5",
       "model_requested": "claude-sonnet-5",
+      "overhead_minutes": 2,
+      "retry": 0,
+      "role": "dev:api",
+      "run_attempt": 1,
+      "run_id": 1,
+      "stage": "build",
+      "status": "finished",
+      "turns": 88,
+      "validation": {
+        "errors": [],
+        "ok": true
+      },
+      "verdict": "pass"
+    },
+    {
+      "artifact": "swarm-7-build-dev-api-a1-1",
+      "at": "2026-09-02T10:00:00Z",
+      "attempt": 1,
+      "base_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+      "claimed_at": "2026-09-02T10:00:00Z",
+      "cost_usd": 7.5,
+      "critic": null,
+      "died_reason": null,
+      "duration_s": 1180,
+      "finished_at": "2026-09-02T10:00:00Z",
+      "handoff": "swarm-run-7:build:dev:api:1-1",
+      "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "job_minutes": 25,
+      "key": "6:build:dev:app:2",
+      "last_text": "Pushed the lane's changes; tests pass.",
+      "model_actual": "claude-sonnet-5",
+      "model_requested": "claude-sonnet-5",
+      "overhead_minutes": 3,
       "retry": 0,
       "role": "dev:api",
       "run_attempt": 1,
@@ -171,10 +204,10 @@
       "status": "done"
     },
     "retro": {
-      "status": "done",
       "attempts": {
         "retro": 1
-      }
+      },
+      "status": "done"
     },
     "security": {
       "status": "done"
@@ -214,5 +247,5 @@
     "type": "feature"
   },
   "v": 2,
-  "sig": "4b1bde765c2bad792e5f24d27bb06cfee286df383f1f6ebb6fe4dd360e7d733e"
+  "sig": "def89fbac1e47fe379f30fc30da8d1834171b1c39d9f7656085896684389b91f"
 }

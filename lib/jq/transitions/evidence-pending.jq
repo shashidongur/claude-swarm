@@ -22,6 +22,9 @@ state_pre
     | .status = "evidence"
     | .gate = null
     | .blocked = null
-    | .evidence.pending = { workflow: $w, key: $k, head: $h, fired_at: null, run_id: $rid, consumer: need("consumer") }
+    # fired_at is the clock the watchdog's evidence timeout runs on. Leaving it null
+    # made that timeout depend on an `evidence-wait` log entry surviving the 50-entry
+    # cap; once it aged out the wait could never time out at all.
+    | .evidence.pending = { workflow: $w, key: $k, head: $h, fired_at: ts, run_id: $rid, consumer: need("consumer") }
     | log_event("evidence-wait"; null; "\($w) on \($h[0:7]) → \(need("consumer"))")
   end

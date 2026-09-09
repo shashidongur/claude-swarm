@@ -141,8 +141,15 @@ has_origin=0
 [ $in_git -eq 1 ] && git remote get-url origin >/dev/null 2>&1 && has_origin=1
 
 if [ $in_git -eq 1 ] && [ $has_origin -eq 1 ] && [ -n "$BRANCH" ]; then
-  if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
-    git fetch -q origin "$BRANCH" 2>/dev/null || die "begin: cannot fetch origin/$BRANCH"
+  # Ask git, not the network. The run jobs check the project out with
+  # persist-credentials: false, so `origin` carries no token: on a private repository
+  # every call to it fails, and an ls-remote probe would answer "no such branch" for
+  # every branch — every stage after triage would then run on the default branch and
+  # lose the work of the ones before it. The checkout is fetch-depth: 0, so
+  # actions/checkout has already fetched every branch into refs/remotes/origin/*. The
+  # fetch below is a best-effort refresh for the public case and must not be fatal.
+  git fetch -q origin "$BRANCH" 2>/dev/null || true
+  if git rev-parse -q --verify "refs/remotes/origin/$BRANCH^{commit}" >/dev/null 2>&1; then
     git checkout -q -B "$BRANCH" "origin/$BRANCH" 2>/dev/null || die "begin: cannot check out origin/$BRANCH"
     log "begin: on $BRANCH at $(git rev-parse --short HEAD)"
   else
@@ -152,30 +159,11 @@ elif [ -z "$BRANCH" ]; then
   log "begin: no integration branch yet (created by advance after triage) — staying on $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
 fi
 
-restored=()
-deleted=()
+# The same restore runs in the critic job, which reads the head the write role
+# pushed — hence one script rather than two copies of the loop.
 if [ $in_git -eq 1 ]; then
-  git fetch -q origin "$DEFAULT_BRANCH" 2>/dev/null || true
-  base_ref=""
-  for cand in "origin/$DEFAULT_BRANCH" "$DEFAULT_BRANCH"; do
-    if git rev-parse -q --verify "$cand^{commit}" >/dev/null 2>&1; then base_ref=$cand; break; fi
-  done
-  mb=""
-  [ -n "$base_ref" ] && mb=$(git merge-base "$base_ref" HEAD 2>/dev/null)
-  [ -n "$mb" ] || mb=$(git rev-parse HEAD 2>/dev/null)
-  while IFS= read -r p; do
-    [ -n "$p" ] || continue
-    if git cat-file -e "$mb:$p" 2>/dev/null; then
-      rm -rf -- "./$p"
-      git checkout -q "$mb" -- "$p" 2>/dev/null || die "begin: cannot restore $p from the merge base $mb"
-      restored+=("$p")
-    elif [ -e "./$p" ] || [ -L "./$p" ]; then
-      rm -rf -- "./$p"
-      deleted+=("$p")
-    fi
-  done < <(jq -r '.restore_from_base[]?' "$slice")
-  [ ${#restored[@]} -eq 0 ] || log "begin: restored from merge base ${mb:0:12}: ${restored[*]}"
-  [ ${#deleted[@]} -eq 0 ] || printf '::warning::begin: deleted from the working tree (absent at the merge base %s, present on the branch): %s\n' "${mb:0:12}" "${deleted[*]}"
+  DEFAULT_BRANCH="$DEFAULT_BRANCH" "$SWARM_LIB/restore-base.sh" --label begin --pipeline "$slice" \
+    || die "begin: the merge-base restore failed — not running a role on this tree"
   if [ -d "$SWARM_ROOT/.claude/agents" ] && [ -x "$SWARM_LIB/install-roles.sh" ]; then
     "$SWARM_LIB/install-roles.sh" >/dev/null || die "begin: install-roles failed after the restore"
   fi

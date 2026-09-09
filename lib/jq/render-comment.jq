@@ -87,7 +87,11 @@ def artifacts_line:
 def body:
   [ header,
     "",
-    (if .summary != null then (.summary | tostring | .[0:900] | sanitize), "" else empty end),
+    # One paragraph, never lines of its own: the summary is role-written text landing
+    # inside a comment the dispatcher signs. Markers and mentions are already
+    # neutralised by sanitize; collapsing newlines stops it drawing a convincing fake
+    # gate block with a `/swarm approve` instruction in it.
+    (if .summary != null then (.summary | tostring | .[0:900] | line), "" else empty end),
     ((.warnings // [])[] | "⚠️ \(. | line)"),
     (if ((.errors // []) | length) > 0 then
        "Validation errors", ((.errors[] | "- \(.check // "?" | span) \(.msg // "" | line)")), ""

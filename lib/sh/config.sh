@@ -128,7 +128,20 @@ cmd_load() {
     [ (keys[] | . as $k | select(($d | has($k)) | not) | select(. != "config_sha")),
       ((.limits // {}) | keys[] | . as $k | select(($p | has($k)) | not) | "limits.\($k)") ] | .[]' <<< "$merged")
   if [ -n "$warnings" ]; then
-    while IFS= read -r k; do printf '::warning::config: unknown key "%s" ignored\n' "$k"; done <<< "$warnings"
+    # stderr: cmd_load's stdout is the config path and nothing else — its caller
+    # captures it with $( ). A ::warning:: on stdout ends up inside CONFIG_JSON, and
+    # every consumer then reads a path that does not exist.
+    while IFS= read -r k; do printf '::warning::config: unknown key "%s" ignored\n' "$k" >&2; done <<< "$warnings"
+  fi
+
+  # G29(b) compares the gate scripts and the blocks named in gate_blocks. A project
+  # whose test runner is configured inside the manifest itself, rather than in a
+  # separate file, and that names no blocks is only half-covered: a role could leave
+  # every script alone and still move the gate by changing which tests run or which
+  # files count for coverage. The swarm cannot guess that block's name — it depends on
+  # the project's stack, which is why it is configuration and not a constant here.
+  if jq -e '((.gate_manifests // []) | length) > 0 and ((.gate_blocks // []) | length) == 0' <<< "$merged" >/dev/null 2>&1; then
+    printf '::warning::config: gate_manifests is set but gate_blocks is empty — if your test runner is configured inside one of those manifests, name that block in gate_blocks or G29(b) will not see it change\n' >&2
   fi
 
   errors=$(jq -r --argjson p "$plimits" '

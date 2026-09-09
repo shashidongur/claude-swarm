@@ -166,7 +166,16 @@
     "**/*.p8",
     "**/*.key",
     ".env*",
-    "**/*.keystore"
+    "**/*.keystore",
+    ".trivyignore",
+    ".trivyignore.yaml",
+    "trivy.yaml",
+    "trivy.yml",
+    "osv-scanner.toml",
+    ".osv-detector.yaml",
+    ".npmrc",
+    "**/.npmrc",
+    ".snyk"
   ],
   "restore_from_base": [
     ".claude",

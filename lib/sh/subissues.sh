@@ -46,7 +46,7 @@ number_of() {
 }
 
 cmd_create() {
-  local issue=${1:-} result=${2:-} n i lane title bf src body out num flat=false rc title_s parent=""
+  local issue=${1:-} result=${2:-} n i lane title bf src body out num flat=false rc title_s parent="" rabs abs
   [ -n "$issue" ] && [ -n "$result" ] || die "usage: subissues.sh create <issue> <result.json>"
   require_env REPO
   [ -f "$result" ] || die "subissues: no such file: $result"
@@ -68,7 +68,18 @@ cmd_create() {
     bf=${bf#.swarm-run/}
     bf=${bf#artifacts/}
     src=""
-    if [ -n "$bf" ] && [ -f "$RUN_DIR/artifacts/$bf" ] && [ ! -L "$RUN_DIR/artifacts/$bf" ]; then src="$RUN_DIR/artifacts/$bf"; fi
+    # The path comes from the role's result.json. Stripping two prefixes is not a
+    # containment check: resolve it and require that it really lands under
+    # artifacts/, the same rule memory-pr.sh applies to its content_file. The body
+    # goes out through `gh issue create --body-file`, which does not pass through
+    # _prepare_body, so a file from outside would be published verbatim.
+    if [ -n "$bf" ] && [ -f "$RUN_DIR/artifacts/$bf" ] && [ ! -L "$RUN_DIR/artifacts/$bf" ]; then
+      rabs=$(realpath -e -- "$RUN_DIR/artifacts" 2>/dev/null) || rabs=""
+      abs=$(realpath -e -- "$RUN_DIR/artifacts/$bf" 2>/dev/null) || abs=""
+      if [ -n "$rabs" ] && [ -n "$abs" ]; then
+        case $abs in "$rabs"/*) src="$RUN_DIR/artifacts/$bf" ;; *) log "subissues: body_file '$bf' resolves outside $RUN_DIR/artifacts — ignored" ;; esac
+      fi
+    fi
     body=$(tmpf .md) || die "subissues: no temp dir"
     if [ -n "$src" ]; then
       "$SWARM_LIB/render.sh" sub-issue "$body" --arg issue "$issue" --arg lane "$lane" --arg branch "${branch:-(not created yet)}" \

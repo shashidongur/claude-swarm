@@ -33,7 +33,7 @@
       "evidence.pending.run_id": 56,
       "evidence.pending.consumer": "code-review:app",
       "evidence.pending.key": "7:build:evidence:1",
-      "evidence.pending.fired_at": null,
+      "evidence.pending.fired_at": "2026-09-06T15:00:00Z",
       "stages.build.attempts.evidence": 1
     }
   }

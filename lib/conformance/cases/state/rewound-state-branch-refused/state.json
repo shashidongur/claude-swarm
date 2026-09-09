@@ -1,28 +1,37 @@
 {
   "branch": "claude/issue-7-live-session-capacity",
   "config_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
-  "created_at": "2026-08-02T09:00:00Z",
-  "current": null,
+  "created_at": "2026-09-06T09:58:12Z",
+  "current": {
+    "activity_from": "2026-09-06T14:41:39Z",
+    "attempt": 1,
+    "base_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+    "comment_id": 1,
+    "key": "7:build:dev:app:1",
+    "role": "dev:app",
+    "run_attempt": 1,
+    "run_id": 2,
+    "started_at": "2026-09-06T14:41:39Z"
+  },
   "dispatches": [
     {
       "artifact": "swarm-7-build-dev-api-a1-1",
-      "at": "2026-08-02T10:00:00Z",
+      "at": "2026-09-06T14:41:39Z",
       "attempt": 1,
       "base_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
-      "claimed_at": "2026-08-02T10:00:00Z",
-      "cost_usd": 30.0,
+      "claimed_at": "2026-09-06T14:41:39Z",
+      "cost_usd": 4.12,
       "critic": null,
       "died_reason": null,
       "duration_s": 1180,
-      "finished_at": "2026-08-02T10:00:00Z",
+      "finished_at": "2026-09-06T14:41:39Z",
       "handoff": "swarm-run-7:build:dev:api:1-1",
       "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
-      "job_minutes": 100,
-      "key": "5:build:dev:app:1",
+      "job_minutes": 21,
+      "key": "7:build:dev:api:1",
       "last_text": "Pushed the lane's changes; tests pass.",
       "model_actual": "claude-sonnet-5",
       "model_requested": "claude-sonnet-5",
-      "overhead_minutes": 20,
       "retry": 0,
       "role": "dev:api",
       "run_attempt": 1,
@@ -35,6 +44,34 @@
         "ok": true
       },
       "verdict": "pass"
+    },
+    {
+      "artifact": null,
+      "at": "2026-09-06T14:41:39Z",
+      "attempt": 1,
+      "base_sha": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "claimed_at": "2026-09-06T14:41:39Z",
+      "cost_usd": 0,
+      "critic": null,
+      "died_reason": null,
+      "duration_s": 0,
+      "finished_at": null,
+      "handoff": null,
+      "head": null,
+      "job_minutes": 0,
+      "key": "7:build:dev:app:1",
+      "last_text": null,
+      "model_actual": null,
+      "model_requested": "claude-sonnet-5",
+      "retry": 0,
+      "role": "dev:app",
+      "run_attempt": 1,
+      "run_id": 2,
+      "stage": "build",
+      "status": "running",
+      "turns": 0,
+      "validation": null,
+      "verdict": null
     }
   ],
   "evidence": {
@@ -62,33 +99,44 @@
   },
   "gate": null,
   "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
-  "issue": 5,
+  "issue": 7,
   "lanes": [
     "api",
     "app"
   ],
   "log": [
     {
-      "at": "2026-08-02T10:00:00Z",
-      "event": "finished"
+      "at": "2026-09-06T14:41:39Z",
+      "by": "octo-owner",
+      "event": "reject",
+      "note": "too vague"
     }
   ],
   "memory": {
     "artifact": null,
-    "pr": 41,
+    "pr": null,
     "proposed": []
   },
-  "merge_sha": "aaaa320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
-  "merged_at": "2026-09-07T09:12:00Z",
-  "merged_by": "octo-owner",
-  "merged_pr": 9,
+  "merge_sha": null,
+  "merged_at": null,
+  "merged_by": null,
+  "merged_pr": null,
   "models": {
     "honoured": true
   },
   "next": null,
   "path": "full",
   "path_source": "triage",
-  "pending_artifacts": [],
+  "pending_artifacts": [
+    {
+      "file": "review-app-a1.md",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    },
+    {
+      "file": "critic/architecture-a1.json",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    }
+  ],
   "pipeline_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
   "pr": 9,
   "questions": {
@@ -113,7 +161,7 @@
     "reset_at": null,
     "spent": 1
   },
-  "stage": "retro",
+  "stage": "build",
   "stages": {
     "architecture": {
       "approved": {
@@ -141,9 +189,9 @@
       },
       "lanes": {
         "api": "done",
-        "app": "done"
+        "app": "running"
       },
-      "status": "done"
+      "status": "running"
     },
     "design": {
       "attempts": {
@@ -153,7 +201,7 @@
       "status": "done"
     },
     "release": {
-      "status": "done"
+      "status": "pending"
     },
     "requirements": {
       "approved": {
@@ -172,16 +220,13 @@
       "status": "done"
     },
     "retro": {
-      "attempts": {
-        "retro": 1
-      },
-      "status": "done"
+      "status": "pending"
     },
     "security": {
-      "status": "done"
+      "status": "pending"
     },
     "test": {
-      "status": "done"
+      "status": "pending"
     },
     "triage": {
       "attempts": {
@@ -191,7 +236,7 @@
     }
   },
   "state_comment_id": 1,
-  "status": "done",
+  "status": "running",
   "subissues": {
     "api": 12,
     "app": 13,
@@ -199,11 +244,11 @@
   },
   "swarm_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
   "totals": {
-    "cost_usd": 30,
-    "overhead_minutes": 20,
+    "cost_usd": 14.2,
+    "overhead_minutes": 9,
     "reworks": 1,
     "role_seconds": 4321,
-    "runner_minutes": 100,
+    "runner_minutes": 61,
     "turns": 611,
     "wakeups": 2
   },
@@ -215,5 +260,5 @@
     "type": "feature"
   },
   "v": 2,
-  "sig": "c7ece62af752738974980b96fbefaaeeb8ccbd519552984590ca189920e283c1"
+  "seq": 5
 }

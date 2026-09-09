@@ -54,3 +54,12 @@ surface even when you behave perfectly. Write bodies and titles to a file and us
 `--body-file` / `--title-file`, or pass them through `gh api` with `-F body=@file` or a
 JSON payload on `--input -`. The same applies to test names, branch names and file
 paths taken from an issue: env → file → grep, never a bare `$VAR` on a command line.
+
+Arithmetic counts as a shell command. `$(( x + 1 ))` does not just do sums: bash
+evaluates array subscripts inside it, and a subscript is command-substituted, so
+`x='i[$(…)]'` runs the `…`. Quoting does not help — the expansion happens inside the
+arithmetic context. Anything you did not compute yourself (a field from a JSON file, a
+line of output, an issue number scraped from text) must be checked to be digits before
+it reaches `$(( ))`, `let`, or an array index:
+
+    case $n in ''|*[!0-9]*) n=0 ;; esac

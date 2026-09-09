@@ -363,6 +363,11 @@ queue_and_fire() {
   if [ $rc -ne 0 ]; then
     log "fire of $nk failed (fire.sh exit $rc)"
     project_labels
+    # Only a fire that produced no verified run makes the job red. The other ways out
+    # of queue_and_fire — an unknown stage/role, the runaway breaker, a key-reuse
+    # precondition — are deliberate wait-states with a comment and a label, and a red
+    # job there would be noise.
+    FIRE_FAILED=1
     return 1
   fi
   project_labels
@@ -568,7 +573,7 @@ do_rework() {
     5)
       reload
       if [ "$(S '.status')" = routing ]; then
-        block budget "rework budget exhausted ($(S '.rework.spent')/$(S '.rework.budget')) — $from asked for $to; /swarm reject <why> or /swarm redo <stage> resets it"
+        block budget "rework budget exhausted ($(S '.rework.spent')/$(S '.rework.budget')) — $from asked for $to; /swarm redo <stage> resets it"
       else
         log "state moved on before the rework of $to was recorded"
       fi
@@ -580,7 +585,7 @@ do_rework() {
   finish_comment "$to ($nk) — rework: $(printf '%s' "$reason" | head -c 160 | tr '\n' ' ')"
   "$SWARM_LIB/fire.sh" "$ISSUE" "$stage" "$to" "$nk" rework >/dev/null || rc=$?
   project_labels
-  [ $rc -eq 0 ] || return 1
+  [ $rc -eq 0 ] || { FIRE_FAILED=1; return 1; }
   return 0
 }
 
@@ -874,6 +879,9 @@ esac
 log "routing $CUR_ROLE ($KEY) verdict $VERDICT on the $PATHK path"
 
 edge=$(jq -r --arg r "$ROLE" --arg v "$VERDICT" '.verdict_edges["\($r).\($v)"] // .verdict_edges["*.\($v)"] // empty' "$PIPELINE")
+# set by any fire that produced no verified run; read after the routing below.
+FIRE_FAILED=0
+
 case $VERDICT in
   pass) route_pass ;;
   rework) route_rework ;;
@@ -883,4 +891,11 @@ case $VERDICT in
   *) block bad-handoff "verdict $VERDICT has no edge (${edge:-none})" ;;
 esac
 rm -f "$STATE" "$STATE.tmp"
+# §4: a fire with no verified run leaves the job red. The issue already carries
+# blocked:fire and its comment, but a green job would tell the human nothing was wrong
+# and make "Re-run failed jobs" — the recovery the failure comment names — unavailable.
+if [ "${FIRE_FAILED:-0}" = 1 ]; then
+  printf '::error::route: the dispatch could not be fired; the issue is blocked:fire — re-run this job or /swarm resume\n'
+  exit 1
+fi
 exit 0

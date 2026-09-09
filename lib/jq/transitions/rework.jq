@@ -17,5 +17,7 @@ state_pre
 | (if opt("critic_rework"; "false") == "true" then .stages[.stage].critic_reworks = ((.stages[.stage].critic_reworks // 0) + 1) else . end)
 | .totals.reworks = ((.totals.reworks // 0) + 1)
 | queue(need("stage"); need("to"); "rework"; opt("not_before"; null))
-| .rework.log = ((.rework.log // []) + [{from: need("from"), to: need("to"), at: ts, key: .next.key, free: $free, reason: (opt("reason"; "") | tostring | .[0:2000])}])
+# Capped like .log: this document is rewritten under CAS on every transition, so an
+# unbounded list makes every later write larger and slower for the life of the issue.
+| .rework.log = (((.rework.log // []) + [{from: need("from"), to: need("to"), at: ts, key: .next.key, free: $free, reason: (opt("reason"; "") | tostring | .[0:2000])}]) | .[-50:])
 | log_event("rework"; null; "\(need("from")) → \(need("to"))")

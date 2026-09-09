@@ -16,10 +16,21 @@
   "requirements_doc": "REQS.md",
   "requirement_id_pattern": "^(FR|NFR)-[A-Z]+-[0-9]+$",
   "pin_marker": "it.failing(",
-  "test_paths": ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
+  "test_paths": [
+    "**/__tests__/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
   "protected_paths": [],
   "gate_manifests": [],
-  "gate_scripts": ["test:ci", "test", "lint", "typecheck", "type-check"],
+  "gate_blocks": [],
+  "gate_scripts": [
+    "test:ci",
+    "test",
+    "lint",
+    "typecheck",
+    "type-check"
+  ],
   "delete_merged_branches": true,
   "lanes": {},
   "evidence": {

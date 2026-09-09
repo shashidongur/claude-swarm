@@ -40,6 +40,8 @@ if [ $rc -ne 0 ]; then
   exit 0
 fi
 S() { jq -r "$1 // empty" "$STATE" 2>/dev/null; }
+rid=""
+slot=""; head=""; consumer=""
 status=$(S '.status')
 # a finalize run owns the record of current.run_id, not one under its own id
 if [ "${FINALIZE:-false}" = true ] && [ -n "$KEY" ] && [ "$(S '.current.key')" = "$KEY" ] && [ -n "$(S '.current.run_id')" ]; then
@@ -69,16 +71,19 @@ case $status in
       log "queued and already fired at $(S '.next.fired_at') — nothing to do"
     fi ;;
   evidence)
-    if [ "$(S '.evidence.pending.run_id')" = 0 ] || [ -z "$(S '.evidence.pending.run_id')" ]; then
-      slot=$(S '.evidence.pending.workflow')
-      head=$(S '.evidence.pending.head')
-      consumer=$(S '.evidence.pending.consumer')
-      if [ -n "$slot" ] && [ -n "$head" ] && [ -n "$consumer" ]; then
-        log "evidence pending without a run id — asking GitHub for $slot on ${head:0:7}"
-        GITHUB_OUTPUT=/dev/null "$SWARM_LIB/evidence.sh" wait "$slot" "$head" "$consumer" >/dev/null 2>&1 || log "evidence.sh wait failed (exit $?)"
-      fi
+    # Re-query whether or not the run id is known. A CI run that completes between
+    # evidence.sh's probe and its evidence-pending write sends its workflow_run event
+    # while the issue is still at `routing`, where resolve records it and moves on —
+    # nothing then re-checks, and only the watchdog closes the wait, up to 12 h later.
+    slot=$(S '.evidence.pending.workflow')
+    head=$(S '.evidence.pending.head')
+    consumer=$(S '.evidence.pending.consumer')
+    rid=$(S '.evidence.pending.run_id')
+    if [ -n "$slot" ] && [ -n "$head" ] && [ -n "$consumer" ]; then
+      log "evidence pending (${slot} on ${head:0:7}, run ${rid:-none}) — asking GitHub"
+      GITHUB_OUTPUT=/dev/null "$SWARM_LIB/evidence.sh" wait "$slot" "$head" "$consumer" >/dev/null 2>&1 || log "evidence.sh wait failed (exit $?)"
     else
-      log "evidence pending run $(S '.evidence.pending.run_id') — waiting for its workflow_run event"
+      log "evidence pending is incomplete (workflow=${slot:-?} head=${head:-?} consumer=${consumer:-?}) — nothing to ask"
     fi ;;
   *) log "status $status — nothing to reconcile" ;;
 esac

@@ -17,6 +17,15 @@ state_pre
 | (if $g == "budget" then
      pre(.next != null; "budget gate without a queued next")
      | .limits.cost_usd_per_issue = (opt("cap"; null) | if . == null then null else toint end)
+     # The same gate is raised by the per-issue cost cap (G30) and by the monthly
+     # runner brake (G31), and only the first is a per-issue limit. Without a waiver
+     # the approve is a no-op against the brake: brakes() re-reads the same monthly
+     # figure and gates again, so every press posts a contradictory approve→gate pair
+     # and the only ways out are /swarm drop, editing the config on the default
+     # branch, or the month rolling over. The waiver buys exactly one envelope of
+     # runner minutes for this issue, measured from what it has spent so far.
+     | .limits.brake_waived_at = ts
+     | .limits.brake_waived_minutes = ((.totals.runner_minutes // 0))
      | .status = "queued"
      | .gate = null
      | .next.fired_at = null | .next.fired_by = null | .next.fired_run_id = null

@@ -54,4 +54,5 @@ fi | sed -E \
   -e 's/gh[spour]_[A-Za-z0-9]{20,}/***/g' \
   -e 's/github_pat_[A-Za-z0-9_]{20,}/***/g' \
   -e 's/sk-ant-[A-Za-z0-9_-]{20,}/***/g' \
-  -e 's/x-access-token:[^@[:space:]]+@/x-access-token:***@/g'
+  -e 's/x-access-token:[^@[:space:]]+@/x-access-token:***@/g' \
+  -e 's/([Aa][Uu][Tt][Hh][Oo][Rr][Ii][Zz][Aa][Tt][Ii][Oo][Nn]:[[:space:]]*)([Bb]asic|[Bb]earer|[Tt]oken)[[:space:]]+[A-Za-z0-9+\/=_.~-]{8,}/\1\2 ***/g'

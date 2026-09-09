@@ -11,8 +11,10 @@
   "expect": {
     "exit": 0,
     "stdout_contains": [
-      "\"runner_minutes\": 140",
-      "\"cost_usd\": 42.5"
+      "\"month\": \"2026-08\"",
+      "\"runner_minutes\": 115",
+      "\"overhead_minutes\": 22",
+      "\"cost_usd\": 35"
     ]
   }
 }

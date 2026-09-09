@@ -14,7 +14,8 @@
     "exit": 0,
     "outputs": {
       "go": "false",
-      "block": "bad-handoff"
+      "block": "bad-handoff",
+      "issue": "7"
     },
     "calls": [
       "!workflow run *",

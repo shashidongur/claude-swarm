@@ -296,9 +296,17 @@ if [ "$CLASS" = write ] && [ -n "$PUSHED" ] && [ "$PUSHED" != "$BASE_SHA" ]; the
 fi
 
 VALIDATION="$ADV/validation.json"
-ROLE=$ROLE_TOKEN LANE=$LANE CLASS=$CLASS STAGE=$STAGE ISSUE=$ISSUE ATTEMPT=$ATTEMPT EXEC=${EXEC_FILE:-} BRANCH=$BRANCH BASE_SHA=$BASE_SHA \
-  ARTIFACTS_DIR=$ARTIFACTS_DIR OWNER_REPO=$REPO STATE_JSON=$STATE CONFIG_JSON=$CONFIG_JSON RUN_DIR=$RUN_DIR VALIDATION_OUT=$VALIDATION \
-  GITHUB_OUTPUT=/dev/null "$SWARM_LIB/validate-result.sh" --authoritative >> "$LOGF" 2>&1
+# The authoritative pass reads result.json — a document the role wrote — and runs
+# sed, grep and git with values taken out of it. It needs neither the HMAC key nor the
+# swarm PAT: it reads the state from a file and talks to GitHub with GH_TOKEN. So it
+# does not get them. If anything in there is ever coaxed into running a command, it
+# runs without the two secrets that would let it forge state or reach other repositories.
+env -u SWARM_STATE_KEY -u SWARM_TOKEN \
+  ROLE="$ROLE_TOKEN" LANE="$LANE" CLASS="$CLASS" STAGE="$STAGE" ISSUE="$ISSUE" ATTEMPT="$ATTEMPT" \
+  EXEC="${EXEC_FILE:-}" BRANCH="$BRANCH" BASE_SHA="$BASE_SHA" ARTIFACTS_DIR="$ARTIFACTS_DIR" \
+  OWNER_REPO="$REPO" STATE_JSON="$STATE" CONFIG_JSON="$CONFIG_JSON" RUN_DIR="$RUN_DIR" \
+  VALIDATION_OUT="$VALIDATION" GITHUB_OUTPUT=/dev/null \
+  "$SWARM_LIB/validate-result.sh" --authoritative >> "$LOGF" 2>&1
 VALID_OK=false
 [ -f "$VALIDATION" ] && VALID_OK=$(jq -r '.ok // false' "$VALIDATION")
 ERRORS=$(jq -c '.errors // []' "$VALIDATION" 2>/dev/null || printf '[]')
@@ -419,10 +427,19 @@ if [ "$CLASS" = write ] && [ $git_ok -eq 1 ] && [ -n "$PUSHED" ] && [ -n "$BASE_
   fi
 fi
 if [ "$CLASS" = write ] && [ -n "$ACTIVITY_FROM" ] && [ -n "$BRANCH" ]; then
+  # The snapshot comes from the claim-time swarm-tree artifact ($REFS_SNAPSHOT, set by
+  # the workflow), never from $RUN_DIR: that directory is the handoff the role itself
+  # uploaded, and a check must not take its evidence from the party being checked.
   while IFS= read -r l; do
     [ -n "$l" ] || continue
-    PERIM+=("repository activity outside the branch: $l (git push --delete origin <ref>, or git revert, by a human)")
-  done < <(REFS_SNAPSHOT="$RUN_DIR/refs-snapshot.txt" "$SWARM_LIB/perimeter.sh" activity "$ACTIVITY_FROM" "$BRANCH" 2>>"$LOGF")
+    case $l in
+      # The fallback saying it could not run is a gap in the evidence, not proof of a
+      # breach. Blocking on it would wedge every write stage whenever GitHub's activity
+      # endpoint is down; it is recorded so the gap is visible in the report instead.
+      check-not-run*) WARN+=("G29(d) could not run: $l") ;;
+      *) PERIM+=("repository activity outside the branch: $l (git push --delete origin <ref>, or git revert, by a human)") ;;
+    esac
+  done < <("$SWARM_LIB/perimeter.sh" activity "$ACTIVITY_FROM" "$BRANCH" 2>>"$LOGF")
 fi
 if [ "$CLASS" = read ]; then
   while IFS= read -r m; do
@@ -591,19 +608,25 @@ case $OUTCOME in
         max-turns|error)
           if [ "$ATTEMPT" -le 1 ]; then
             rc=0
-            "$SWARM_LIB/state.sh" write "$ISSUE" dispatch-queued --arg stage "$STAGE" --arg role "$ROLE_TOKEN" --arg reason retry --arg from_key "$KEY" --arg model "$MODEL_REQ" >/dev/null || rc=$?
-            if [ $rc -eq 0 ]; then
-              reload
-              nk=$(S '.next.key')
-              advice="retrying automatically once as $nk"
+            # The breaker is checked BEFORE the queue, not after it. Queueing first
+            # left a dispatch recorded but never fired, and — because the record
+            # itself counts towards the limit — every /swarm resume then added
+            # another one inside the same hour, so the window could never clear.
+            if runaway_tripped; then
+              block_now runaway "automatic retry of $KEY refused: dispatches in the last hour reached the runaway limit"
+              advice="the runaway breaker is on; /swarm resume once the hour is clear"
               "$SWARM_LIB/render.sh" died "$body" --arg role "$ROLE_TOKEN" --arg cause "$cause" --arg advice "$advice" --arg attempt "$ATTEMPT" --arg run_url "$RUN_URL" --sarg details "$details" --arg marker "$marker_line" && put_comment "$body"
-              if runaway_tripped; then
-                block_now runaway "automatic retry of $KEY refused: dispatches in the last hour reached the runaway limit"
-              else
-                "$SWARM_LIB/fire.sh" "$ISSUE" "$STAGE" "$ROLE_TOKEN" "$nk" retry >/dev/null || rc=$?
-              fi
             else
-              log "retry could not be queued (state.sh exit $rc)"
+              "$SWARM_LIB/state.sh" write "$ISSUE" dispatch-queued --arg stage "$STAGE" --arg role "$ROLE_TOKEN" --arg reason retry --arg from_key "$KEY" --arg model "$MODEL_REQ" >/dev/null || rc=$?
+              if [ $rc -eq 0 ]; then
+                reload
+                nk=$(S '.next.key')
+                advice="retrying automatically once as $nk"
+                "$SWARM_LIB/render.sh" died "$body" --arg role "$ROLE_TOKEN" --arg cause "$cause" --arg advice "$advice" --arg attempt "$ATTEMPT" --arg run_url "$RUN_URL" --sarg details "$details" --arg marker "$marker_line" && put_comment "$body"
+                "$SWARM_LIB/fire.sh" "$ISSUE" "$STAGE" "$ROLE_TOKEN" "$nk" retry >/dev/null || rc=$?
+              else
+                log "retry could not be queued (state.sh exit $rc)"
+              fi
             fi
           else
             block_now agent-output "run died ($cause) at attempt $ATTEMPT"

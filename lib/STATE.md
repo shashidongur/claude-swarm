@@ -40,6 +40,23 @@ forgeable through the Contents API's `author` field; a keyed MAC held only by th
 dispatcher's LLM-free jobs (`resolve`, `advance`, `refuse`) is not. Staged artifacts are
 listed in the signed state with their `sha256`, so they cannot be swapped either.
 
+A signature proves a document was written by the dispatcher. It cannot prove the
+document is the *latest* one the dispatcher wrote — restoring an older, still validly
+signed `issues/<N>.json` to the state branch would otherwise replay cleanly and
+un-consume gate approvals, reset the cost total and rewind the attempt counters. So
+every transition increments `seq`, and it only ever goes up:
+
+- `state.sh write` refuses to merge onto a re-read whose `seq` is lower than the one it
+  already saw, and says so (`state #N went backwards (seq A → B)`); nothing is written.
+- G29(d) reports any write to the state branch by the write role's identity — a role has
+  no business there at all. The dispatcher's own writes are its normal work and stay
+  quiet, and a *rollback* made that way looks exactly like a legitimate write, which is
+  why the counter and not the ref comparison is what catches it.
+- `seq` is in the state comment's machine block, so a rewind is visible without tooling.
+
+A rewind performed while nothing else is running still verifies; closing that needs a
+counter stored outside the branch, which the design does not have today.
+
 **`blocked:perimeter` on a signature** means a state file was found whose `sig` is
 missing or does not verify. The comment names the offending commit
 (`git log -1 swarm/state -- issues/<N>.json`). Look at it before anything else: either
@@ -58,6 +75,7 @@ unverified file.
 | `gate` | when `gate`: `name`, `since`, the gate comment id, `reminded_at` |
 | `evidence.pending` / `seen` / `fires` | the evidence run being waited on; every CI/evidence conclusion by head, workflow and event; fire counts per workflow |
 | `branch`, `head`, `pr` | the integration branch, the last head a write role pushed, the PR number |
+| `seq` | transition counter; monotonic. A read that goes backwards means the state branch was rewound |
 | `merged_at`, `merged_pr`, `merge_sha`, `merged_by` | set once by the merge; retro fires at most once per merge |
 | `pending_artifacts` | files staged on `swarm/state` that the next write role's first commit lands; cleared only when seen on a pushed head |
 | `rework` | `spent` / `budget` (5), `reset_at`, and the log of every rework edge |

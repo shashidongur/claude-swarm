@@ -14,10 +14,10 @@
     "exit": 0,
     "stdout_contains": [
       "\"month\": \"2026-09\"",
-      "\"runner_minutes\": 101",
-      "\"overhead_minutes\": 14",
-      "\"minutes\": 115",
-      "\"cost_usd\": 26.7"
+      "\"runner_minutes\": 86",
+      "\"overhead_minutes\": 12",
+      "\"minutes\": 98",
+      "\"cost_usd\": 21.7"
     ]
   }
 }

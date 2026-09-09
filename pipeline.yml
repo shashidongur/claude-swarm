@@ -47,6 +47,18 @@ protected_paths:
   - "**/*.key"
   - ".env*"
   - "**/*.keystore"
+  # A scanner's own ignore file is the gate's configuration: adding one turns a red
+  # finding green without touching the finding. None of these usually exists, so a new
+  # one is an ordinary added file with no diff signal unless it is named here.
+  - ".trivyignore"
+  - ".trivyignore.yaml"
+  - "trivy.yaml"
+  - "trivy.yml"
+  - "osv-scanner.toml"
+  - ".osv-detector.yaml"
+  - ".npmrc"
+  - "**/.npmrc"
+  - ".snyk"
 
 # begin.sh restores these in the working tree from the merge base with the default branch (§13.2).
 restore_from_base: [".claude", "CLAUDE.md", ".mcp.json", ".claude-plugin"]

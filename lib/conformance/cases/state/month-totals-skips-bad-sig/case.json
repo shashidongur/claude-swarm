@@ -14,7 +14,8 @@
     "exit": 0,
     "stdout_contains": [
       "issues/7.json has a bad signature — skipped",
-      "\"runner_minutes\": 40"
+      "\"runner_minutes\": 25",
+      "\"cost_usd\": 7.5"
     ]
   }
 }

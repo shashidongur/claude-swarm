@@ -79,6 +79,10 @@ jobs:
   # ── resolve: the event → intent mapper; claims the dispatch; ships the swarm tree ──
   resolve:
     # The cheap gate (§3.2): most events are not dispatches and must not cost a runner.
+    # A workflow `if:` cannot read the project's config, so the branch literal below is
+    # the DEFAULT branch_prefix. A project that overrides branch_prefix is still served:
+    # its pull_request events match on the `Swarm-Issue: #` trailer the swarm puts in
+    # every PR body, and its workflow_run events on the `swarm#` run name.
     if: >-
       (github.event_name == 'issues' && github.event.sender.type == 'User'
           && startsWith(github.event.label.name, 'swarm:'))
@@ -87,7 +91,9 @@ jobs:
               || contains(join(github.event.issue.labels.*.name, ','), 'swarm:gate:question')))
       || (github.event_name == 'pull_request_review' && github.event.sender.type == 'User'
           && startsWith(github.event.review.body, '/swarm'))
-      || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.head.ref, 'claude/issue-'))
+      || (github.event_name == 'pull_request'
+          && (startsWith(github.event.pull_request.head.ref, 'claude/issue-')
+              || contains(github.event.pull_request.body, 'Swarm-Issue: #')))
       || (github.event_name == 'workflow_run'
           && (startsWith(github.event.workflow_run.head_branch, 'claude/issue-')
               || contains(github.event.workflow_run.display_title, 'swarm#')))
@@ -216,6 +222,18 @@ jobs:
         if: steps.r.outputs.go == 'true'
         shell: bash
         run: .swarm/lib/sh/pack-tree.sh --out swarm-tree
+
+      # G29(d)'s fallback compares the refs at the end of the run with the refs now.
+      # It rides the swarm-tree artifact so `advance` can read a claim-time answer the
+      # role never touched (the handoff artifact is the role's own upload).
+      - name: Snapshot the refs for the perimeter check
+        if: steps.r.outputs.go == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ISSUE: ${{ steps.r.outputs.issue }}
+        run: .swarm/lib/sh/perimeter.sh snapshot swarm-tree/refs-snapshot.txt
 
       - name: Upload the swarm tree
         if: steps.r.outputs.go == 'true'
@@ -412,7 +430,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EXEC: ${{ steps.role.outputs.execution_file }}
-          ROLE_OUTCOME: ${{ steps.role.outcome }}
         run: .swarm/lib/sh/validate-result.sh
 
       - id: verrs
@@ -461,7 +478,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EXEC: ${{ steps.retry.outputs.execution_file }}
-          ROLE_OUTCOME: ${{ steps.retry.outcome }}
         run: .swarm/lib/sh/validate-result.sh --final
 
       # The critic (D3): the other model tier, the critic tool list, the rubric; its
@@ -524,6 +540,14 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 7
+
+      # §11.4: nothing leaves the job unredacted. The audit bundle is redacted as it is
+      # written; the handoff is the role's own files, and the same files are what
+      # commit-artifacts.sh later lands under docs/swarm/, so they are rewritten here.
+      - name: Redact the handoff
+        if: always() && steps.begin.outcome == 'success'
+        shell: bash
+        run: .swarm/lib/sh/redact-handoff.sh .swarm-run
 
       # The handoff for advance (result.json, artifacts, validation, critic, settings).
       - name: Upload the handoff
@@ -670,7 +694,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EXEC: ${{ steps.role.outputs.execution_file }}
-          ROLE_OUTCOME: ${{ steps.role.outcome }}
         run: .swarm/lib/sh/validate-result.sh
 
       - id: verrs
@@ -718,7 +741,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EXEC: ${{ steps.retry.outputs.execution_file }}
-          ROLE_OUTCOME: ${{ steps.retry.outcome }}
         run: .swarm/lib/sh/validate-result.sh --final
 
       - name: Collect the audit bundle
@@ -741,6 +763,14 @@ jobs:
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 7
+
+      # §11.4: nothing leaves the job unredacted. The audit bundle is redacted as it is
+      # written; the handoff is the role's own files, and the same files are what
+      # commit-artifacts.sh later lands under docs/swarm/, so they are rewritten here.
+      - name: Redact the handoff
+        if: always() && steps.begin.outcome == 'success'
+        shell: bash
+        run: .swarm/lib/sh/redact-handoff.sh .swarm-run
 
       - name: Upload the handoff
         if: always() && steps.begin.outcome == 'success'
@@ -776,9 +806,15 @@ jobs:
     # The critic step itself is bounded by critic_timeout; the rest is checkouts and
     # downloads (expressions cannot add, so the job cap is a constant).
     timeout-minutes: 30
+    # issues/pull-requests read because the critic class allows `gh issue view`,
+    # `gh pr view|diff|checks` and `gh api repos/*/issues/*`; probe R2 showed the
+    # override token is bounded by the job's permissions, so without these the
+    # critic's own tool list 403s. Still read-only, and no write scope is added.
     permissions:
       contents: read
       actions: read
+      issues: read
+      pull-requests: read
     env:
       REPO: ${{ github.repository }}
       RUN_ID: ${{ github.run_id }}
@@ -830,6 +866,14 @@ jobs:
             git checkout -q -B "$BRANCH" "origin/$BRANCH"
           fi
           echo "critic reads $(git rev-parse HEAD)"
+
+      # The checkout above is the head the WRITE ROLE pushed, and a write role has
+      # unrestricted Bash. Probe R30: a project .claude/settings.json hook runs under
+      # the action and enableAllProjectMcpServers is on, so without this the role
+      # could commit hooks or MCP config that execute inside the critic judging it.
+      - name: Restore the steering files from the merge base
+        shell: bash
+        run: .swarm/lib/sh/restore-base.sh --label critic --pipeline .swarm-run/pipeline.json
 
       - name: Install the roles
         shell: bash
@@ -896,6 +940,11 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       SWARM_STATE_KEY: ${{ secrets.SWARM_STATE_KEY }}
+      # On the job, not on the Advance step alone: Reconcile and the failure reporter
+      # run as separate steps, and a retro re-route from Reconcile reaches memory-pr.sh,
+      # which silently degrades to a patch artifact when the token is absent. No model
+      # step runs in this job, so nothing can read it.
+      SWARM_TOKEN: ${{ secrets.SWARM_TOKEN }}
       REPO: ${{ github.repository }}
       OWNER: ${{ github.repository_owner }}
       RUN_ID: ${{ github.run_id }}
@@ -904,6 +953,7 @@ jobs:
       CONFIG_PATH: ${{ inputs.config_path }}
       SWARM_REPO: ${{ inputs.swarm_repo }}
       SWARM_REF: ${{ inputs.swarm_ref }}
+      REFS_SNAPSHOT: .swarm-claim/refs-snapshot.txt
       FINALIZE: ${{ needs.resolve.outputs.finalize }}
       ISSUE: ${{ needs.resolve.outputs.issue }}
       KEY: ${{ needs.resolve.outputs.key }}
@@ -929,11 +979,15 @@ jobs:
       BEGIN_OUTCOME: ${{ needs.run-read.outputs.begin_outcome || needs.run-write.outputs.begin_outcome }}
       VALID: ${{ needs.run-read.outputs.valid || needs.run-write.outputs.valid }}
     steps:
+      # persist-credentials is true: commit-artifacts.sh pushes the artifacts commit to
+      # the integration branch, perimeter.sh compares `git ls-remote origin`, and the
+      # authoritative re-validation fetches the head the role pushed. This job runs no
+      # model step, so no role can reach the credential.
       - name: Check out the project
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
+          persist-credentials: true
 
       # Pinned at state.swarm_sha (re-validation, rendering). persist-credentials is
       # true only here: the memory PR at retro pushes a branch of the swarm repo.
@@ -946,6 +1000,19 @@ jobs:
           path: .swarm
           fetch-depth: 0
           persist-credentials: true
+
+      # Before anything reads the state: state.sh resolves the state branch from
+      # $STATE_BRANCH or $CONFIG_JSON and otherwise falls back to `swarm/state`, so a
+      # project that overrides state_branch would get a red advance on every finalize.
+      - name: Load the project config
+        shell: bash
+        run: |
+          if cfg=$(.swarm/lib/sh/config.sh load --out "$RUNNER_TEMP/swarm-config.json"); then
+            echo "CONFIG_JSON=$cfg" >> "$GITHUB_ENV"
+            echo "STATE_BRANCH=$(jq -r '.state_branch // "swarm/state"' "$cfg")" >> "$GITHUB_ENV"
+          else
+            echo "::warning::config not loadable in advance — the default state branch is assumed"
+          fi
 
       # A finalize run (§4.5) owns the handoff of state.current.run_id, not its own.
       - id: names
@@ -963,6 +1030,20 @@ jobs:
             echo "handoff=swarm-run-$k-$rid"
             echo "critic=swarm-critic-$k-$rid"
           } >> "$GITHUB_OUTPUT"
+
+      # The claim-time swarm tree, for its refs-snapshot.txt only. Downloaded
+      # separately from the handoff because the handoff is what the ROLE uploaded:
+      # a perimeter check must not read its evidence from the party it is checking.
+      # actions/upload-artifact@v4 refuses a name that already exists, and resolve
+      # takes this one before the run job starts, so the role cannot replace it.
+      - name: Download the claim-time swarm tree
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: swarm-tree-${{ steps.names.outputs.run_id }}
+          path: .swarm-claim
+          run-id: ${{ steps.names.outputs.run_id }}
+          github-token: ${{ github.token }}
 
       - name: Download the handoff
         uses: actions/download-artifact@v4
@@ -985,8 +1066,6 @@ jobs:
       - id: adv
         name: Advance
         shell: bash
-        env:
-          SWARM_TOKEN: ${{ secrets.SWARM_TOKEN }}
         run: .swarm/lib/sh/advance.sh
 
       # Convergence (§4.4): routing with a finished record → route again; queued and

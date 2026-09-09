@@ -16,7 +16,7 @@ verb ∈ { start, approve, reject, resume, redo, skip, park, drop, hands-off, pa
 start      [full|short] [force]                                  # force overrides the monthly brake (G31)
 approve    [requirements|architecture|confidence|budget]         # optional gate name must match state.gate
 reject     <free text reason, ≥ 3 chars>                         # at any gate; stored fenced and fed to the rework target
-resume                                                           # after blocked/parked/died/fire-failed/stalled; at question gate = proceed with assumptions
+resume                                                           # after blocked/parked/dropped/died/fire-failed/stalled; at question gate = proceed with assumptions
 redo       <stage> [free text reason]                            # stage ∈ pipeline stages; from a non-running status; re-pins swarm_sha
 skip       <stage> [free text reason]                            # stage ∉ {triage, build, release, retro}; records skipped_by_owner and advances
 park
@@ -56,9 +56,9 @@ approver rule). Merging the PR — as an approver — is the approval of gate 3.
 | Verb | Admissible when | Effect |
 |---|---|---|
 | `start` | no state; or `parked`/`blocked`/`dropped` | monthly brake (G31); create state (path forced if given) + pin `swarm_sha`, fire `triage` (or `requirements` when a path is forced); on an existing parked/blocked/dropped state behaves as `resume`; on a state created < 5 min ago by another `start` → reply "already started" (G28) |
-| `approve` | `status = gate`, gate ∈ {requirements, architecture, confidence, budget} | record approver + time in `stages[<stage>].approved`; `totals.wakeups++`; fire the stage after the gate; at `confidence` fire the stage after the escalated one; at `budget` raise `limits.cost_usd_per_issue` for this issue by one envelope and fire the queued `next` |
+| `approve` | `status = gate`, gate ∈ {requirements, architecture, confidence, budget} | record approver + time in `stages[<stage>].approved`; `totals.wakeups++`; fire the stage after the gate; at `confidence` fire the stage after the escalated one; at `budget` raise `limits.cost_usd_per_issue` for this issue by one envelope, waive the monthly brake for one more envelope of runner minutes (`limits.brake_waived_at`/`brake_waived_minutes` — the cap alone is a per-issue limit and would not clear a monthly brake, so the approve would loop), and fire the queued `next` |
 | `reject` | `status = gate` (any gate incl. `release`) | `rework.spent = 0`, `rework.reset_at`; fire the gate's rework target with the fenced reason: `requirements → analyst`, `architecture → architect`, `confidence → the escalated role`, `question → analyst`, `release → analyst` in feedback mode (returns `hints.redo: <stage>`; `advance` fires that stage); `budget → park` |
-| `resume` | `blocked`, `parked`, `gate:question`, `queued`, `evidence` | clear `swarm:blocked`/`blocked:*`/`swarm:parked`; then by case: `blocked:fire` → fire `next`; `blocked:stalled` with a completed run job for `current.run_id` and a handoff artifact → fire `reason=finalize`; `parked` → fire `next` if set, else `current` at attempt+1; other `blocked` → re-fire `current` at attempt+1; `queued` → fire `next` unless `next.fired_at` is recent and its run is alive (reply "already fired: <run url>"); `evidence` → re-query GitHub for the pending run; `question` → fire `analyst` with "no answer; proceed on stated assumptions" |
+| `resume` | `blocked`, `parked`, `dropped`, `gate:question`, `queued`, `evidence` | clear `swarm:blocked`/`blocked:*`/`swarm:parked`; then by case: `blocked:stalled` with a completed run job for `current.run_id` and a handoff artifact → fire `reason=finalize` (back to the status the block interrupted, so a run that stalled while routing routes on instead of doing nothing); `blocked:evidence` and `blocked:fire` with a pending evidence wait and nothing queued → re-query or re-fire it; `queued` → fire `next` unless `next.fired_at` is recent and its run is alive (reply "already fired: <run url>"); `question` → fire `analyst` with "no answer; proceed on stated assumptions". Every other `blocked`, `parked` or `dropped` issue takes one path, in this order: **something queued** → fire it (whatever the block reason: the runaway breaker leaves a queued `next`, and queueing a second one would keep the window full); **the current record already `finished`** → route on from it, never re-run it (a second implementation on the branch, a second charge, and the role the log names as next skipped); **otherwise** → re-run `current` at attempt+1 |
 | `redo` | any status except `running`/`routing` (→ reply "wait for the stage to finish or `/swarm park` first") | `rework.spent = 0`; set `stage`; re-pin `swarm_sha`; fire its first role at attempt+1 with the reason; later stages reset to `pending`; branch/PR kept |
 | `skip` | not `running`; stage on the path, ∉ {triage, build, release, retro}; stage index ≥ current | `stages[<stage>].status = skipped_by_owner` (+ reason); if it is the current stage, advance to the next stage as if passed; a gate after the skipped stage is still enforced |
 | `park` | any except `done`/`dropped` | `status = parked`; a running stage finishes its job, `advance` records everything and fires nothing; sub-issues untouched |
@@ -103,7 +103,9 @@ mention v2 ever writes. The other gate and wait-state comments follow the same s
 - **`confidence`** — lists the critic findings and offers `/swarm approve` (push
   through) or `/swarm redo <stage> <why>`.
 - **`budget`** — shows the sum, the cap and the next dispatch's estimate, and offers
-  `/swarm approve` (raise the cap by one envelope), `/swarm park` or `/swarm drop`.
+  `/swarm approve` (raise the cap by one envelope; when the gate came from the monthly
+  runner brake this also waives that brake for one more envelope of minutes, which is
+  the only thing that lets the approve clear it), `/swarm park` or `/swarm drop`.
 
 After `gate_reminder_days` (3) at any gate the watchdog posts one reminder, then edits
 the same comment every 7 days. Nothing else happens while a gate waits — labels, state

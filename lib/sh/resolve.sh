@@ -237,6 +237,19 @@ monthly_brake() {
   return 1
 }
 
+# brake_waived: the monthly brake (G31) was approved at the budget gate and this issue
+# has not yet spent the envelope that approve bought. `/swarm approve` at that gate
+# raises `.limits.cost_usd_per_issue`, which monthly_brake never reads — so without a
+# waiver the approve cannot clear the gate it is offered for.
+brake_waived() {
+  local at spent now_m env_m
+  at=$(S '.limits.brake_waived_at'); [ -n "$at" ] || return 1
+  spent=$(S '.limits.brake_waived_minutes'); spent=${spent:-0}
+  now_m=$(S '.totals.runner_minutes'); now_m=${now_m:-0}
+  env_m=$(envelope_minutes "$(path_of)")
+  jq -e -n --argjson n "${now_m:-0}" --argjson s "${spent:-0}" --argjson e "${env_m:-0}" '($n - $s) < $e' >/dev/null 2>&1
+}
+
 # gate_budget <summary-kind> <detail>: the cost/monthly wait-state on a queued next (G30/G31)
 gate_budget() {
   local kind=$1 detail=$2 cap cost approver body cid est new_cap
@@ -285,7 +298,11 @@ brakes() {
   fi
   cls=$(role_class "$stage" "$role")
   if [ "$cls" = write ] && [ "$(status)" = queued ] && brake=$(monthly_brake "$(path_of)"); then
-    gate_budget "monthly budget" "$brake"
+    if brake_waived; then
+      log "resolve: monthly brake waived by the budget approve at $(S '.limits.brake_waived_at') — $brake"
+    else
+      gate_budget "monthly budget" "$brake"
+    fi
   fi
   return 0
 }
@@ -418,12 +435,26 @@ claim() { # <reason>
     5) "$SWARM_LIB/state.sh" read "$ISSUE" > "$STATE" 2>/dev/null 3>/dev/null; say "claim of $key lost — held by run $(S .current.run_id) (status $(status))" ;;
     *) die "resolve: the claim of $key failed (state.sh exit $rc)" ;;
   esac
+  # The claim is written. From here the run MUST reach `advance`, which owns every
+  # ending: recording the result, unclaiming, re-queueing. Publishing go=true now means
+  # that even if a later step in this job dies, advance still runs (its `always()` and
+  # cancelled-pending rule take over) instead of leaving the issue `running` with a
+  # claimed key until the watchdog notices hours later. The outputs below are written
+  # again on the normal path; the last write wins.
+  out go true
   attempt=${key##*:}
   emoji=$(P ".emoji[\"${role%%:*}\"]"); [ -n "$emoji" ] || emoji="🧭"
   body=$(tmpf .md) || die "resolve: no temp dir"
-  "$SWARM_LIB/render.sh" working "$body" --arg emoji "$emoji" --arg role "$role" --arg attempt "$attempt" --arg started_at "$(now)" --arg run_url "$RUN_URL" \
-    --arg marker "$(marker stage "stage=$stage" "role=$role" "attempt=$attempt" "key=$key" "run=$RUN_ID" "status=running")" || die "resolve: cannot render the working comment"
-  if existing=$(find_comment "$ISSUE" "$(marker_pred stage "key=$key" "run=$RUN_ID")"); then
+  if ! "$SWARM_LIB/render.sh" working "$body" --arg emoji "$emoji" --arg role "$role" --arg attempt "$attempt" --arg started_at "$(now)" --arg run_url "$RUN_URL" \
+    --arg marker "$(marker stage "stage=$stage" "role=$role" "attempt=$attempt" "key=$key" "run=$RUN_ID" "status=running")"; then
+    # Cosmetic: the run is claimed and will be recorded either way. Dying here used to
+    # strand the issue.
+    printf '::warning::resolve: cannot render the working comment for %s — continuing without it\n' "$key"
+    : > "$body"
+  fi
+  if [ ! -s "$body" ]; then
+    log "resolve: no working comment body — skipping the comment"
+  elif existing=$(find_comment "$ISSUE" "$(marker_pred stage "key=$key" "run=$RUN_ID")"); then
     cid=$(printf '%s' "$existing" | jq -r .id); edit_comment "$cid" "$body" || log "resolve: working comment not edited"
   else
     cid=$(post_comment "$ISSUE" "$body") || log "resolve: working comment not posted"
@@ -642,6 +673,47 @@ handoff_exists() { # <run_id> <key> — artifact names carry the key with ':' ma
   gh api "repos/$REPO/actions/runs/$1/artifacts" --jq "[.artifacts[]? | select(.name == \"swarm-run-$k-$1\") | select(.expired != true)] | length" 2>/dev/null | grep -qE '^[1-9]'
 }
 
+# current_finished: the record of `current` is terminal-`finished` — the role ran,
+# pushed and was recorded, so the thing that is missing is the routing after it, not
+# the role.
+current_finished() {
+  local k r
+  k=$(S .current.key); r=$(S .current.run_id)
+  [ -n "$k" ] && [ -n "$r" ] || return 1
+  [ "$(jq -r --arg k "$k" --argjson r "$r" \
+       '[(.dispatches // [])[] | select(.key == $k and .run_id == $r)] | last | .status // empty' "$STATE" 2>/dev/null)" = finished ]
+}
+
+# resume_current: the one way out of every terminal wait-state, in priority order.
+#   1. something is queued → fire it, whatever the block reason was. The runaway
+#      breaker in particular writes `next` and only then blocks, so a resume that
+#      ignored `next` would queue a SECOND dispatch inside the runaway window and
+#      guarantee the next resume fails too.
+#   2. the current record is already finished → route on from it (never re-run it: a
+#      second implementation on the branch, a second charge, and the role the log
+#      names as next skipped).
+#   3. otherwise → re-run the current role at attempt+1.
+resume_current() {
+  if [ -n "$(S .next.key)" ]; then
+    write resume --arg mode next --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
+    projection; ack "resumed by $SENDER — firing \`$(S .next.key)\`"; fire_next resume
+    ok_done "fired $(S '.next.key // .current.key')"
+  fi
+  if current_finished; then
+    write resume --arg mode route --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
+    projection
+    if fire_finalize; then
+      ack "resumed by $SENDER — \`$(S .current.role)\` had already finished; routing on from its record"
+      ok_done "routing fired for $(S .current.key)"
+    fi
+    die "resolve: the routing fire failed; \`/swarm resume\` again"
+  fi
+  [ -n "$(S .current.role)" ] || refuse_human "nothing to resume — $(status_line)"
+  write resume --arg mode retry --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
+  projection; ack "resumed by $SENDER — \`$(S .next.role)\` re-runs as \`$(S .next.key)\`"; fire_next resume
+  ok_done "retry fired $(S '.next.key // .current.key')"
+}
+
 do_resume() {
   local st reason
   st=$(status)
@@ -651,10 +723,7 @@ do_resume() {
       reason=$(S .blocked.reason)
       case $reason in
         fire)
-          if [ -n "$(S .next.key)" ]; then
-            write resume --arg mode next --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
-            projection; ack "resumed by $SENDER — re-firing \`$(S .next.key)\`"; fire_next resume; ok_done "re-fired $(S '.next.key // .current.key')"
-          elif [ -n "$(S .evidence.pending.key)" ]; then
+          if [ -z "$(S .next.key)" ] && [ -n "$(S .evidence.pending.key)" ]; then
             write resume --arg mode evidence --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
             projection; ack "resumed by $SENDER — re-firing the \`$(S .evidence.pending.workflow)\` evidence workflow"
             "$SWARM_LIB/evidence.sh" fire "$ISSUE" "$(S .evidence.pending.workflow)" "$(S .evidence.pending.head)" "$(S .evidence.pending.key)" "$(S .evidence.pending.consumer)" >/dev/null || exit 1
@@ -679,19 +748,14 @@ do_resume() {
             ok_done "evidence still pending"
           fi ;;
       esac
-      [ -n "$(S .current.role)" ] || refuse_human "nothing to retry — $(status_line)"
-      write resume --arg mode retry --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
-      projection; ack "resumed by $SENDER — \`$(S .next.role)\` re-runs as \`$(S .next.key)\`"; fire_next resume
-      ok_done "retry fired $(S '.next.key // .current.key')" ;;
+      resume_current ;;
     parked)
-      if [ -n "$(S .next.key)" ]; then
-        write resume --arg mode next --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
-        projection; ack "resumed by $SENDER — firing \`$(S .next.key)\`"; fire_next resume; ok_done "fired $(S '.next.key // .current.key')"
-      fi
-      [ -n "$(S .current.role)" ] || refuse_human "nothing to resume — $(status_line)"
-      write resume --arg mode retry --arg by "$SENDER" >/dev/null || refuse_human "cannot resume — $(status_line)"
-      projection; ack "resumed by $SENDER — \`$(S .next.role)\` re-runs as \`$(S .next.key)\`"; fire_next resume
-      ok_done "retry fired $(S '.next.key // .current.key')" ;;
+      resume_current ;;
+    # `/swarm start` on a dropped issue is documented to behave as a resume, and
+    # resolve's own refusal text says so; drop.jq clears `next`, so without this the
+    # only way back was `/swarm redo <stage>`, which is documented for something else.
+    dropped)
+      resume_current ;;
     queued)
       local rm fired rid
       rm=$(C '.watchdog.queued_refire_minutes'); [ -n "$rm" ] || rm=30
@@ -916,6 +980,14 @@ out event_id "$EVENT_ID"
 if [ "$intent" = manual ]; then SENDER=$ACTOR; SENDER_TYPE=User; ISSUE=$D_ISSUE; fi
 [ "$intent" = claim ] || [ "$intent" = finalize ] && ISSUE=$D_ISSUE
 export ISSUE
+# Publish the issue number as soon as it is known, not only at the end of the happy
+# path. Everything below can `say … <block>`, which exits — the kill switch (G2) and
+# the config check (G27) among them — and the `refuse` job that then runs needs ISSUE
+# to post the refusal. Without this it fails with "missing environment: ISSUE" and the
+# human sees a red job and no explanation, on exactly the paths refuse exists for. The
+# PR and workflow_run branches below re-map ISSUE to the swarm issue and re-emit it;
+# the last write to $GITHUB_OUTPUT is the one the job takes.
+out issue "$ISSUE"
 
 # ── 2. G2 kill switch (fail closed) ─────────────────────────────────────────
 

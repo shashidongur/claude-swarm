@@ -188,9 +188,28 @@ else
   err schema "lib/jq/result-check.jq is missing from the swarm tree"
   finish
 fi
+# Shape first, then reality. Everything below reads paths out of result.json, runs
+# sed/grep with them and does arithmetic on them. None of that may run on a document
+# that failed the shape check: an ill-typed field (a string where result-check.jq
+# requires an integer) would reach a shell context written for the typed value, and
+# in `advance` that shell holds the state key. A role whose result.json is
+# mis-shaped gets the schema errors and nothing else.
+[ ${#ERRS[@]} -eq 0 ] || finish
 
 R() { jq -r "$1 // empty" "$RESULT" 2>/dev/null; }
 VERDICT=$(R '.verdict')
+
+# int_or_empty <value>: the value when it is a plain non-negative integer, else
+# empty. Every arithmetic context fed from result.json goes through this. Bash
+# evaluates array subscripts inside $(( )), and a subscript is command-substituted,
+# so an unchecked string in an arithmetic expansion is shell execution. The early
+# finish above already stops an ill-typed document; this is the second lock.
+int_or_empty() {
+  case ${1:-} in
+    ''|*[!0-9]*) return 0 ;;
+    *) printf '%s' "$1" ;;
+  esac
+}
 
 # ── V2 artifacts ────────────────────────────────────────────────────────────────
 
@@ -239,7 +258,7 @@ while [ "$i" -lt "$n_ev" ]; do
   case $kind in
     file)
       p=$(R ".evidence[$i].path")
-      line=$(R ".evidence[$i].line")
+      line=$(int_or_empty "$(R ".evidence[$i].line")")
       sym=$(R ".evidence[$i].symbol")
       if [ -z "$p" ] || [ ! -f "$p" ]; then
         err V3 "evidence[$i]: file $p does not exist in the checkout"
@@ -569,7 +588,12 @@ if role_in release && [ "$VERDICT" = pass ]; then
         || err V14 "recorded artifact $ARTIFACTS_DIR/$ISSUE/$f is missing on head ${check_head:0:12}"
     done < <(jq -r --slurpfile p "$PIPELINE_FILE" '
       ($p[0] | if has("stages") then [.stages[].roles[]] else [.role] end) as $roles
-      | [ (.dispatches // [])[] | select(.status == "finished" and .verdict == "pass")
+      # dispatches[] is capped at 60; totals.folded_passes carries the {role, attempt}
+      # of every passing record that has already been folded out of it, so a long issue
+      # is still checked for the artifacts of its early stages.
+      | ([ (.dispatches // [])[] | select(.status == "finished" and .verdict == "pass")
+           | {role, attempt: (.attempt // 1)} ] + (.totals.folded_passes // []) | unique) as $passes
+      | [ $passes[]
           | (.role | tostring | split(":")) as $rl | ((.attempt // 1) | tostring) as $at
           | ($roles[] | select(.name == $rl[0]) | .artifacts // [])[]
           | select(. != "postmortem.md")
@@ -628,7 +652,9 @@ if [ "$CLASS" = read ] && [ $git_ok -eq 1 ]; then
   mapfile -t RESTORE < <(jq -r '.restore_from_base[]?' "$PIPELINE_FILE" 2>/dev/null)
   dirty=$(git status --porcelain --untracked-files=all 2>/dev/null | awk '{ print $NF }' | while IFS= read -r f; do
     f=${f#\"}; f=${f%\"}
-    case $f in .swarm-run/*|.swarm/*|.swarm-run|.swarm) continue ;; esac
+    # .swarm-claim is the claim-time swarm tree the advance job downloads for the
+    # perimeter check; like .swarm and .swarm-run it is the dispatcher's, not the role's.
+    case $f in .swarm-run/*|.swarm/*|.swarm-claim/*|.swarm-run|.swarm|.swarm-claim) continue ;; esac
     skip=0
     for r in "${RESTORE[@]}"; do
       [ -n "$r" ] || continue

@@ -1,0 +1,24 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-code-review-app.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "@fixtures/validate/results/code-review-line-injection.json",
+    ".swarm-run/artifacts/review-app-a1.md": "# review app a1\n\nNo findings.\n",
+    "app/src/screens/LiveSessions.tsx": "export const session = load();\nexport const seats = 12;\nexport const capacityLabel = `${seats} seats`;\n"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      "RCE_PROOF": "absent",
+      ".swarm-run/validation.json": "\"check\": \"schema\""
+    },
+    "stdout_not_contains": [
+      "not found near",
+      "RCE_PROOF"
+    ]
+  }
+}

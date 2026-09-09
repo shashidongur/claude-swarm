@@ -21,7 +21,7 @@
 #                     (with the trailer unless SC_TRAILER=0)
 #   SC_NO_BRANCH=1    no integration branch on origin (triage)
 #   SC_REWRITE=1      the attempt's push rewrites history (base no longer an ancestor)
-#   SC_SNAPSHOT=1     write .swarm-run/refs-snapshot.txt at claim time
+#   SC_SNAPSHOT=1     write .swarm-claim/refs-snapshot.txt at claim time
 #   SC_EXTRA_REF      a ref pushed after the snapshot (activity fallback), e.g. refs/heads/main2
 #   SC_SCRIPT         advance|reconcile|advance-failed|route (advance)
 #   SC_NO_COMMENT=1   no working comment in the thread
@@ -77,8 +77,12 @@ if [ "${SC_NO_BRANCH:-0}" != 1 ]; then
   BASE=$(git rev-parse HEAD)
   git push -q origin "$branch" 2>/dev/null
   if [ "${SC_SNAPSHOT:-0}" = 1 ]; then
-    mkdir -p .swarm-run
-    git ls-remote origin 2>/dev/null > .swarm-run/refs-snapshot.txt
+    # .swarm-claim, not .swarm-run: in production resolve takes this snapshot into the
+    # swarm-tree artifact at claim time and advance downloads it there. .swarm-run is
+    # the handoff the ROLE uploads, and a perimeter check must not read its evidence
+    # from the party it is checking.
+    mkdir -p .swarm-claim
+    git ls-remote origin 2>/dev/null | LC_ALL=C sort > .swarm-claim/refs-snapshot.txt
   fi
   if [ -n "${SC_BRANCH_FILES:-}" ]; then
     write_files "$SC_BRANCH_FILES"
