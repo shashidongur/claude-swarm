@@ -1,0 +1,6 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["is_approver", "OWNER", "release"],
+  "env": { "OWNER": "owner" },
+  "expect": { "exit": 0, "stdout_contains": ["RC=0"] }
+}

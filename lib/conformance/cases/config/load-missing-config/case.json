@@ -1,0 +1,5 @@
+{
+  "script": "lib/sh/config.sh",
+  "args": ["load", "--out", "config.json"],
+  "expect": { "exit": 4, "stdout_contains": ["config: .github/swarm.yml not found on main of o/r"], "files": { "config.json": "absent" } }
+}

@@ -1,0 +1,19 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "requirements",
+  "target_key": "@KEY",
+  "rubric": "requirements",
+  "model": "claude-opus-5",
+  "score": 99,
+  "threshold": 70,
+  "dimensions": {
+    "grounded": 99,
+    "complete": 99,
+    "testable": 99,
+    "scoped": 99
+  },
+  "findings": [],
+  "verdict": "pass",
+  "confidence": "high"
+}

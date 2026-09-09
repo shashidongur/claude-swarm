@@ -1,0 +1,32 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "working",
+    "-",
+    "--arg",
+    "emoji",
+    "🔨",
+    "--arg",
+    "role",
+    "dev:app",
+    "--arg",
+    "attempt",
+    "1",
+    "--arg",
+    "started_at",
+    "2026-09-06T14:41:39Z",
+    "--arg",
+    "run_url",
+    "https://github.com/o/r/actions/runs/1",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=running | at=2026-09-06T14:41:39Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🔨 **dev:app** · ⏳ running · attempt 1 · started 2026-09-06T14:41:39Z · https://github.com/o/r/actions/runs/1",
+      "<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=running | at=2026-09-06T14:41:39Z -->"
+    ]
+  }
+}

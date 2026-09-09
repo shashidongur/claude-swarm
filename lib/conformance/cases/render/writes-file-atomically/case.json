@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "reply",
+    "out/reply.md",
+    "--arg",
+    "text",
+    "hello",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=reply | issue=7 | event=1 | at=2026-09-06T15:01:19Z -->"
+  ],
+  "project_files": {
+    "out/.keep": ""
+  },
+  "expect": {
+    "exit": 0,
+    "files": {
+      "out/reply.md": "🧭 **dispatch** · reply — hello"
+    }
+  }
+}

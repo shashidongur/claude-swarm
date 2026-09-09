@@ -1,0 +1,32 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "log",
+    "--arg",
+    "event",
+    "event",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "config_sha",
+    "abc123def4567890abc123def4567890abc123de",
+    "--arg",
+    "v1_history",
+    "true"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "config_sha": "abc123def4567890abc123def4567890abc123de",
+      "flags.v1_history": true,
+      "log.1.event": "event",
+      "log.1.by": "octo-owner"
+    }
+  }
+}

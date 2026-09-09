@@ -1,0 +1,26 @@
+{
+  "v": 2,
+  "issue": 7,
+  "sections": {
+    "backend-tests": {
+      "ran": true
+    },
+    "secrets": {
+      "ran": true
+    },
+    "sast": {
+      "ran": true,
+      "new": 2,
+      "baseline": 10
+    },
+    "audit": {
+      "ran": true,
+      "api": {
+        "new": [
+          "GHSA-xxxx"
+        ],
+        "baseline": 9
+      }
+    }
+  }
+}

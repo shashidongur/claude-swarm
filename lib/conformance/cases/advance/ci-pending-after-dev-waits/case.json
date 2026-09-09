@@ -1,0 +1,33 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_HANDOFF": "dev-app-pass",
+    "SC_BRANCH_FILES": "app/src/screens/LiveSessions.tsx=export const capacityLabel = 1;\n",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-finished",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~evidence-pending",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "evidence",
+      "evidence.pending.workflow": "ci",
+      "evidence.pending.consumer": "code-review:app",
+      "evidence.pending.run_id": 55
+    }
+  }
+}

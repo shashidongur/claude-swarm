@@ -1,0 +1,17 @@
+{
+  "databaseId": 67,
+  "displayTitle": "walkthrough swarm#7 7:test:evidence:1",
+  "status": "completed",
+  "conclusion": "success",
+  "event": "workflow_dispatch",
+  "url": "https://github.com/o/r/actions/runs/67",
+  "jobs": [
+    {
+      "name": "device",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-09-06T14:40:00Z",
+      "completedAt": "2026-09-06T14:58:00Z"
+    }
+  ]
+}

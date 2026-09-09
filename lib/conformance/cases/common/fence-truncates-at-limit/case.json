@@ -1,0 +1,11 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["fence", "artifact requirements.md"],
+  "env": { "SWARM_FENCE_LIMIT": "10" },
+  "stdin": "0123456789ABCDEF",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["<untrusted source=\"artifact requirements.md\">\n0123456789\n[truncated to 10 of 16 bytes]\n</untrusted source=\"artifact requirements.md\">"],
+    "stdout_not_contains": ["ABCDEF"]
+  }
+}

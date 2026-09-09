@@ -1,0 +1,24 @@
+{
+  "v": 2,
+  "issue": 7,
+  "sections": {
+    "backend-tests": {
+      "ran": true
+    },
+    "secrets": {
+      "ran": true
+    },
+    "sast": {
+      "ran": true,
+      "new": 0,
+      "baseline": 10
+    },
+    "audit": {
+      "ran": true,
+      "api": {
+        "new": [],
+        "baseline": 9
+      }
+    }
+  }
+}

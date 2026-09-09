@@ -1,0 +1,33 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "skip",
+    "--arg",
+    "stage",
+    "architecture",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "reason",
+    "no design change",
+    "--arg",
+    "gate",
+    "architecture"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "stages.architecture.status": "skipped_by_owner",
+      "stages.architecture.skipped_by": "octo-owner",
+      "status": "gate",
+      "gate.name": "architecture",
+      "next": null
+    }
+  }
+}

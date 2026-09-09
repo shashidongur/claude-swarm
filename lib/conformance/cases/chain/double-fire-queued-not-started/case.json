@@ -1,0 +1,31 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "SWARM_STATE_RACE_HOOK": "\"$SWARM_ROOT/lib/sh/state.sh\" write 7 dispatch-running --arg key 7:build:code-review:app:1 --arg run_id 999 >/dev/null"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false"
+    },
+    "calls": [
+      "!POST repos/o/r/issues/7/comments\t*running · attempt*",
+      "!workflow run *"
+    ],
+    "stdout_contains": [
+      "CAS conflict 1",
+      "claim of 7:build:code-review:app:1 lost — held by run 999"
+    ],
+    "state_after": {
+      "status": "running",
+      "current.run_id": 999
+    }
+  }
+}

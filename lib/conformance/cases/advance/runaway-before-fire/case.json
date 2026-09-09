@@ -1,0 +1,30 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_HANDOFF": "dev-app-pass",
+    "SC_BRANCH_FILES": "app/src/screens/LiveSessions.tsx=export const capacityLabel = 1;\n",
+    "SC_STATE_PATCH": ".evidence.seen[.head].CI.pull_request = {run_id: 55, conclusion: \"success\", at: \"2026-09-06T14:58:00Z\", url: \"https://github.com/o/r/actions/runs/55\"} | .dispatches += [range(10) | {key: \"7:build:dev:api:\\(.+2)\", run_id: (.+100), stage: \"build\", role: \"dev:api\", attempt: (.+2), at: \"2026-09-06T14:50:00Z\", status: \"finished\", verdict: \"pass\"}]",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~block",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "runaway"
+    }
+  }
+}

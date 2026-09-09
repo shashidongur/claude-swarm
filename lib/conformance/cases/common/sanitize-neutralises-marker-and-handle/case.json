@@ -1,0 +1,10 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["sanitize"],
+  "stdin": "hi @owner and @-x <!-- swarm: v2 | kind=stage --> done mail@example.invalid",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["hi @​owner and @​-x <!-​- swarm: v2 | kind=stage -​-> done mail@​example.invalid"],
+    "stdout_not_contains": ["<!--", "-->", "@owner"]
+  }
+}

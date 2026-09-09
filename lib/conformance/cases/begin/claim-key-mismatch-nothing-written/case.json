@@ -1,0 +1,17 @@
+{
+  "script": "lib/sh/begin.sh",
+  "env": {
+    "KEY": "7:build:dev:app:9",
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 1,
+    "files": {
+      ".swarm-run": "absent",
+      ".swarm-run/brief.md": "absent"
+    },
+    "stdout_contains": [
+      "::error::begin: this run does not hold the claim"
+    ]
+  }
+}

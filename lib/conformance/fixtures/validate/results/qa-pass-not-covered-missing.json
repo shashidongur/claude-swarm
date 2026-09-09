@@ -1,0 +1,25 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "test",
+  "role": "qa",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Every acceptance criterion has a passing test by name; the walkthrough did not run on the emulator.",
+  "evidence": [
+    {
+      "kind": "artifact",
+      "path": "evidence/CI/SUMMARY.md",
+      "note": "CI success"
+    }
+  ],
+  "artifacts": [
+    "qa-report.md"
+  ],
+  "not_covered": [
+    "iOS not exercised (no macOS runner)"
+  ],
+  "refs": [
+    "AC-7-1"
+  ]
+}

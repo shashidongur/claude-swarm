@@ -1,0 +1,30 @@
+{
+  "script": "lib/conformance/fixtures/begin/audit-probe.sh",
+  "args": [
+    "--critic-only"
+  ],
+  "env": {
+    "CRITIC_EXEC": "critic-exec.json",
+    "CRITIC_GH_TOKEN": "ghs_abcdefghijklmnopqrstuvwxyz0123456789"
+  },
+  "project_files": {
+    "critic-exec.json": "@fixtures/exec/with-token.json",
+    ".swarm-run/critic.json": "{\"score\": 79, \"verdict\": \"pass\"}\n",
+    ".swarm-run/brief.md": "never copied\n"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: collect exit 0",
+      "PROBE: file critic.json",
+      "PROBE: file critic-execution.json.gz",
+      "PROBE: critic-execution.json.gz redacted",
+      "PROBE: file perimeter.txt"
+    ],
+    "files": {
+      ".swarm-run/critic/critic.json": "79",
+      ".swarm-run/critic/brief.md": "absent",
+      ".swarm-run/audit": "absent"
+    }
+  }
+}

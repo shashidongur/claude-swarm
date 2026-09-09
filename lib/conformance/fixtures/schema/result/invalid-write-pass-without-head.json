@@ -1,0 +1,21 @@
+{
+  "artifacts": [],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "npm run test:ci -- Issue7",
+      "exit": 0,
+      "kind": "command",
+      "result": "Tests: 3 passed"
+    }
+  ],
+  "issue": 7,
+  "role": "dev:api",
+  "stage": "build",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "touches": [
+    "api/x.ts"
+  ],
+  "v": 2,
+  "verdict": "pass"
+}

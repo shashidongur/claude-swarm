@@ -1,0 +1,21 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "exec.json"
+  ],
+  "project_files": {
+    "exec.json": "@fixtures/exec/healthy.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"present\": true",
+      "\"total_cost_usd\": 4.12",
+      "\"num_turns\": 88",
+      "\"model_actual\": \"claude-sonnet-5\"",
+      "\"terminal_reason\": \"success\"",
+      "\".swarm-run/result.json\"",
+      "\"npm run test:ci -- Issue7\""
+    ]
+  }
+}

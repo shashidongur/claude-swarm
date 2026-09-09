@@ -1,0 +1,791 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-swarm/schema/result.schema.json",
+  "title": "claude-swarm .swarm-run/result.json (v2 output contract, spec §7.2)",
+  "description": "The one file a role hands to the machine. Shape only: the reality checks V1–V19 (paths resolved under their roots, head on origin, refs grepped, the owner/repo part of a url) run in lib/sh/validate-result.sh. No `next`, no labels, no markers, no mentions — routing is not the role's business. Lane names are validated at runtime against the project config; the role vocabulary here is the swarm's own.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "issue",
+    "stage",
+    "role",
+    "attempt",
+    "verdict",
+    "summary"
+  ],
+  "definitions": {
+    "path": {
+      "description": "Relative path: segments of [A-Za-z0-9._-] that may start with a letter, digit, `_` or a dot-prefixed name; never `.`, `..`, an empty segment or a leading `/`; no `@`, no `<`. (Spec §7.2's grammar widened so its own example `__tests__/…` and dotfiles in `touches[]` validate.)",
+      "type": "string",
+      "pattern": "^([A-Za-z0-9_]|\\.[A-Za-z0-9_-])[A-Za-z0-9._-]*(/([A-Za-z0-9_]|\\.[A-Za-z0-9_-])[A-Za-z0-9._-]*)*$"
+    },
+    "clean": {
+      "description": "Free text with no @handle and no HTML comment delimiter (V16 / E_COMMENT).",
+      "type": "string",
+      "not": {
+        "pattern": "@[A-Za-z0-9-]|<!--|-->"
+      }
+    },
+    "cleanNonEmpty": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/clean"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "role": {
+      "type": "string",
+      "pattern": "^(triage|analyst|ux|a11y|architect|threat-model|planner|test-writer|dev(:[A-Za-z0-9_-]+)?|code-review(:[A-Za-z0-9_-]+)?|qa|security|compliance|release|retro)$"
+    },
+    "writeRole": {
+      "type": "string",
+      "pattern": "^(test-writer|dev(:[A-Za-z0-9_-]+)?|release)$"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "triage",
+        "requirements",
+        "design",
+        "architecture",
+        "build",
+        "test",
+        "security",
+        "release",
+        "retro"
+      ]
+    },
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "evidenceItem": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "command",
+            "file",
+            "url",
+            "artifact"
+          ]
+        }
+      },
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "cmd"
+          ],
+          "properties": {
+            "kind": {
+              "const": "command"
+            },
+            "cmd": {
+              "$ref": "#/definitions/cleanNonEmpty"
+            },
+            "result": {
+              "$ref": "#/definitions/clean"
+            },
+            "exit": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ],
+          "properties": {
+            "kind": {
+              "const": "file"
+            },
+            "path": {
+              "$ref": "#/definitions/path"
+            },
+            "line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "symbol": {
+              "$ref": "#/definitions/clean"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "url"
+          ],
+          "properties": {
+            "kind": {
+              "const": "url"
+            },
+            "url": {
+              "description": "Must start with https://github.com/<owner>/<repo>/ — the owner/repo part is checked at runtime (V19).",
+              "type": "string",
+              "pattern": "^https://github\\.com/[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9][A-Za-z0-9._-]*/[^\\s@<>]*$"
+            },
+            "note": {
+              "$ref": "#/definitions/clean"
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "path"
+          ],
+          "properties": {
+            "kind": {
+              "const": "artifact"
+            },
+            "path": {
+              "$ref": "#/definitions/path"
+            },
+            "note": {
+              "$ref": "#/definitions/clean"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "v": {
+      "const": 2
+    },
+    "issue": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stage": {
+      "$ref": "#/definitions/stage"
+    },
+    "role": {
+      "$ref": "#/definitions/role"
+    },
+    "attempt": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "rework",
+        "blocked",
+        "question",
+        "duplicate"
+      ]
+    },
+    "summary": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/clean"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 900
+        }
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/evidenceItem"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/path"
+      },
+      "uniqueItems": true
+    },
+    "touches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/path"
+      },
+      "uniqueItems": true
+    },
+    "head": {
+      "$ref": "#/definitions/sha"
+    },
+    "refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+      },
+      "uniqueItems": true
+    },
+    "rework_to": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(:[A-Za-z0-9_-]+)?$"
+    },
+    "reason": {
+      "$ref": "#/definitions/cleanNonEmpty"
+    },
+    "questions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "to",
+          "q"
+        ],
+        "properties": {
+          "to": {
+            "type": "string",
+            "enum": [
+              "reporter",
+              "approver"
+            ]
+          },
+          "q": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/clean"
+              },
+              {
+                "type": "string",
+                "minLength": 15
+              }
+            ]
+          }
+        }
+      }
+    },
+    "hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "enum": [
+            "full",
+            "short"
+          ]
+        },
+        "area": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/clean"
+            },
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$"
+            }
+          ]
+        },
+        "lanes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "uniqueItems": true
+        },
+        "walkthrough": {
+          "type": "boolean"
+        },
+        "redo": {
+          "$ref": "#/definitions/stage"
+        }
+      }
+    },
+    "subissues": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "lane",
+          "title",
+          "body_file"
+        ],
+        "properties": {
+          "lane": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "title": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/clean"
+              },
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            ]
+          },
+          "body_file": {
+            "$ref": "#/definitions/path"
+          }
+        }
+      }
+    },
+    "memory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "path",
+          "content_file"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "gotcha",
+              "adr",
+              "postmortem",
+              "runs"
+            ]
+          },
+          "path": {
+            "allOf": [
+              {
+                "$ref": "#/definitions/path"
+              },
+              {
+                "type": "string",
+                "pattern": "^(postmortems/[0-9]+\\.md|adrs/[0-9]{4}-[a-z0-9-]+\\.md|gotchas/auto/[a-z0-9-]+\\.md|runs/[0-9]+\\.json)$"
+              }
+            ]
+          },
+          "content_file": {
+            "$ref": "#/definitions/path"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "gotcha"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "path": {
+                  "pattern": "^gotchas/auto/",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "adr"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "path": {
+                  "pattern": "^adrs/",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "postmortem"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "path": {
+                  "pattern": "^postmortems/",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "runs"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "path": {
+                  "pattern": "^runs/",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "duplicates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "triage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "size",
+        "area",
+        "prio",
+        "path"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "bug",
+            "feature",
+            "chore"
+          ]
+        },
+        "size": {
+          "type": "string",
+          "enum": [
+            "S",
+            "M",
+            "L",
+            "XL"
+          ]
+        },
+        "area": {
+          "description": "A configured lane name or `both` (checked at runtime).",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+$"
+        },
+        "prio": {
+          "type": "string",
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "enum": [
+            "full",
+            "short"
+          ]
+        }
+      }
+    },
+    "not_covered": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/cleanNonEmpty"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "pass/rework need at least one checkable evidence item",
+      "if": {
+        "properties": {
+          "verdict": {
+            "enum": [
+              "pass",
+              "rework"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "evidence"
+        ],
+        "properties": {
+          "evidence": {
+            "type": "array",
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "description": "rework/blocked/question/duplicate carry a reason",
+      "if": {
+        "properties": {
+          "verdict": {
+            "enum": [
+              "rework",
+              "blocked",
+              "question",
+              "duplicate"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "reason"
+        ]
+      }
+    },
+    {
+      "description": "rework names its target unless the target is fixed by pipeline.json (a11y → ux, threat-model → architect)",
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "rework"
+          },
+          "role": {
+            "not": {
+              "enum": [
+                "a11y",
+                "threat-model"
+              ]
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "rework_to"
+        ]
+      }
+    },
+    {
+      "description": "duplicate is a triage-only verdict and lists the duplicates",
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "duplicate"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "duplicates"
+        ],
+        "properties": {
+          "role": {
+            "const": "triage"
+          }
+        }
+      }
+    },
+    {
+      "description": "question is an analyst-only verdict and lists the questions",
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "question"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "questions"
+        ],
+        "properties": {
+          "role": {
+            "const": "analyst"
+          }
+        }
+      }
+    },
+    {
+      "description": "triage: `triage` block required on pass; stage-only fields elsewhere are rejected",
+      "if": {
+        "properties": {
+          "role": {
+            "const": "triage"
+          }
+        }
+      },
+      "then": {
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "verdict": {
+                  "const": "pass"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "triage"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "questions"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "subissues"
+              ]
+            }
+          }
+        ]
+      },
+      "else": {
+        "allOf": [
+          {
+            "not": {
+              "required": [
+                "triage"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "duplicates"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "description": "questions only from the analyst",
+      "if": {
+        "properties": {
+          "role": {
+            "not": {
+              "const": "analyst"
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "questions"
+          ]
+        }
+      }
+    },
+    {
+      "description": "subissues only from the planner",
+      "if": {
+        "properties": {
+          "role": {
+            "not": {
+              "const": "planner"
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "subissues"
+          ]
+        }
+      }
+    },
+    {
+      "description": "any role may propose gotchas; only retro proposes other memory kinds",
+      "if": {
+        "properties": {
+          "role": {
+            "not": {
+              "const": "retro"
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "memory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "const": "gotcha"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "write class: head is the pushed sha on pass; read class: touches must be empty",
+      "if": {
+        "properties": {
+          "role": {
+            "$ref": "#/definitions/writeRole"
+          }
+        }
+      },
+      "then": {
+        "if": {
+          "properties": {
+            "verdict": {
+              "const": "pass"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "head"
+          ]
+        }
+      },
+      "else": {
+        "properties": {
+          "touches": {
+            "type": "array",
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

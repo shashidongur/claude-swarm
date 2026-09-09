@@ -1,0 +1,36 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "perimeter-merge",
+    "-",
+    "--arg",
+    "pr",
+    "9",
+    "--arg",
+    "merged_by",
+    "mallory",
+    "--arg",
+    "merged_by_type",
+    "User",
+    "--arg",
+    "approvers",
+    "octo-owner",
+    "--arg",
+    "merge_sha",
+    "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+    "--arg",
+    "default_branch",
+    "main",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=refused | issue=7 | event=9 | at=2026-09-07T09:12:00Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **dispatch** · 🚧 blocked:perimeter — PR #9 was merged by mallory (User), who is not an approver for release (octo-owner).",
+      "Merge commit `0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d` on `main`. To undo it a human runs `git revert -m 1 0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d` and pushes. No retro ran, the branch was not deleted, the sub-issues stay open and the issue is not done.",
+      "<!-- swarm: v2 | kind=refused | issue=7 | event=9 | at=2026-09-07T09:12:00Z -->"
+    ]
+  }
+}

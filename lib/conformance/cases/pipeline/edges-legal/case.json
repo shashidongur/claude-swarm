@@ -1,0 +1,12 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "edges-legal"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "OK: edges-legal"
+    ]
+  }
+}

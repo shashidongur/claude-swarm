@@ -1,0 +1,31 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "triage",
+  "role": "triage",
+  "attempt": 1,
+  "verdict": "duplicate",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "evidence": [
+    {
+      "kind": "command",
+      "cmd": "npm run test:ci -- Issue7",
+      "result": "Tests: 3 passed",
+      "exit": 0
+    }
+  ],
+  "artifacts": [
+    "triage.json"
+  ],
+  "duplicates": [
+    4
+  ],
+  "reason": "issue #4 describes the same overbooking defect on live sessions",
+  "triage": {
+    "type": "bug",
+    "size": "S",
+    "area": "api",
+    "prio": "P2",
+    "path": "short"
+  }
+}

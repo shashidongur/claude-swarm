@@ -1,0 +1,27 @@
+{
+  "artifacts": [
+    "postmortem.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "npm run test:ci -- Issue7",
+      "exit": 0,
+      "kind": "command",
+      "result": "Tests: 3 passed"
+    }
+  ],
+  "issue": 7,
+  "memory": [
+    {
+      "content_file": "artifacts/postmortem.md",
+      "kind": "gotcha",
+      "path": "decisions.md"
+    }
+  ],
+  "role": "retro",
+  "stage": "retro",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "pass"
+}

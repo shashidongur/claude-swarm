@@ -1,0 +1,35 @@
+{
+  "artifacts": [
+    "triage.json"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "gh search issues --repo o/r --state open capacity",
+      "exit": 0,
+      "kind": "command",
+      "result": "no open duplicates"
+    }
+  ],
+  "hints": {
+    "area": "both",
+    "lanes": [
+      "api",
+      "app"
+    ],
+    "path": "full"
+  },
+  "issue": 7,
+  "role": "triage",
+  "stage": "triage",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "triage": {
+    "area": "both",
+    "path": "full",
+    "prio": "P2",
+    "size": "M",
+    "type": "feature"
+  },
+  "v": 2,
+  "verdict": "pass"
+}

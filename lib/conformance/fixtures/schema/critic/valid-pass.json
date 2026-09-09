@@ -1,0 +1,27 @@
+{
+  "confidence": "high",
+  "dimensions": {
+    "complete": 80,
+    "grounded": 90,
+    "scoped": 80,
+    "testable": 85
+  },
+  "findings": [
+    {
+      "claim": "The capacity limit is assumed, not cited.",
+      "fix": "Cite the requirement or mark it an assumption.",
+      "severity": "low",
+      "where": "requirements.md AC-7-5",
+      "why": "No requirement id backs the number 12."
+    }
+  ],
+  "issue": 7,
+  "model": "claude-opus-5",
+  "rubric": "requirements",
+  "score": 84,
+  "stage": "requirements",
+  "target_key": "7:requirements:analyst:1",
+  "threshold": 70,
+  "v": 2,
+  "verdict": "pass"
+}

@@ -1,0 +1,12 @@
+{
+  "number": 9,
+  "title": "feat: live session capacity (#7)",
+  "state": "OPEN",
+  "isDraft": false,
+  "baseRefName": "main",
+  "headRefName": "claude/issue-7-live-session-capacity",
+  "headRefOid": "@HEAD",
+  "body": "Closes #7\n\nSwarm-Issue: #7",
+  "url": "https://github.com/o/r/pull/9",
+  "files": []
+}

@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/fire.sh",
+  "args": [
+    "7",
+    "build",
+    "code-review:app",
+    "7:build:code-review:app:1",
+    "resume"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 1,
+    "calls": [
+      "PATCH repos/o/r/issues/comments/900",
+      "!POST repos/o/r/issues/7/comments"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "fire-failed",
+    "-",
+    "--sarg",
+    "error",
+    "gh: HTTP 500: workflow dispatch failed (cc @owner)",
+    "--arg",
+    "key",
+    "7:build:code-review:app:1",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=died | issue=7 | key=7:build:code-review:app:1 | at=2026-09-06T15:01:19Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **dispatch** · 🚧 fire failed — gh: HTTP 500: workflow dispatch failed (cc @​owner); /swarm resume re-fires 7:build:code-review:app:1",
+      "<!-- swarm: v2 | kind=died | issue=7 | key=7:build:code-review:app:1 | at=2026-09-06T15:01:19Z -->"
+    ],
+    "stdout_not_contains": [
+      "@owner"
+    ]
+  }
+}

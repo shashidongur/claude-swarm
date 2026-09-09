@@ -1,0 +1,15 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "next-key"
+  ],
+  "env": {
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: 7:build:dev:app:2 7:build:planner:2 7:test:evidence:1"
+    ]
+  }
+}

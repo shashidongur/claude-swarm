@@ -1,0 +1,34 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "died",
+    "-",
+    "--arg",
+    "role",
+    "dev:app",
+    "--arg",
+    "cause",
+    "timeout after 75m",
+    "--arg",
+    "advice",
+    "/swarm resume to retry",
+    "--arg",
+    "attempt",
+    "2",
+    "--arg",
+    "run_url",
+    "https://github.com/o/r/actions/runs/2",
+    "--arg",
+    "details",
+    "",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=died | issue=7 | at=2026-09-06T15:01:19Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "💀 **dev:app** · run died (timeout after 75m) — /swarm resume to retry · attempt 2 · https://github.com/o/r/actions/runs/2"
+    ]
+  }
+}

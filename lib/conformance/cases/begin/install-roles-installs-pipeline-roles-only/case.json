@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/install-roles.sh",
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "installed": "16"
+    },
+    "files": {
+      ".claude/agents/dev.md": "exists",
+      ".claude/agents/critic.md": "exists",
+      ".claude/agents/warden.md": "absent",
+      ".claude/skills": "absent",
+      ".git/info/exclude": "/.claude/agents/dev.md"
+    }
+  }
+}

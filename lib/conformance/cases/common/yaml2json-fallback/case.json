@@ -1,0 +1,6 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["yaml2json"],
+  "stdin": "a: 1\nb: [x, y]\nc:\n  d: true\n",
+  "expect": { "exit": 0, "stdout_contains": ["\"a\": 1", "\"d\": true", "RC=0"] }
+}

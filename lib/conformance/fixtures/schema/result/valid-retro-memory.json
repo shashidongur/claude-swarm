@@ -1,0 +1,46 @@
+{
+  "artifacts": [
+    "postmortem.md",
+    "mem-1.md",
+    "mem-2.md",
+    "mem-3.md",
+    "mem-4.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 1,
+      "path": "docs/swarm/7/runs.json",
+      "symbol": "cost_usd"
+    }
+  ],
+  "issue": 7,
+  "memory": [
+    {
+      "content_file": "artifacts/postmortem.md",
+      "kind": "postmortem",
+      "path": "postmortems/7.md"
+    },
+    {
+      "content_file": "artifacts/mem-1.md",
+      "kind": "adr",
+      "path": "adrs/0007-live-session-capacity.md"
+    },
+    {
+      "content_file": "artifacts/mem-2.md",
+      "kind": "gotcha",
+      "path": "gotchas/auto/capacity-double-tap.md"
+    },
+    {
+      "content_file": "artifacts/mem-4.md",
+      "kind": "runs",
+      "path": "runs/7.json"
+    }
+  ],
+  "role": "retro",
+  "stage": "retro",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "pass"
+}

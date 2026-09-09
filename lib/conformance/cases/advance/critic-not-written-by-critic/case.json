@@ -1,0 +1,29 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:requirements:analyst:1",
+    "SC_PR": "none",
+    "SC_HANDOFF": "analyst-pass",
+    "SC_CRITIC": "not-written",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~kind=gate"
+    ],
+    "state_after": {
+      "status": "gate",
+      "dispatches.0.critic.error": "not written by the critic"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "comment-id",
+    "--arg",
+    "target",
+    "current",
+    "--arg",
+    "key",
+    "7:build:dev:app:1",
+    "--arg",
+    "comment_id",
+    "1005"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "current.comment_id": 1005,
+      "dispatches.1.comment_id": 1005
+    }
+  }
+}

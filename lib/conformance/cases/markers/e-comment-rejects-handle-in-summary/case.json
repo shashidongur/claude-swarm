@@ -1,0 +1,16 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "check",
+    "res.json"
+  ],
+  "project_files": {
+    "res.json": "@fixtures/schema/result/invalid-handle-in-summary.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"check\":\"V16\""
+    ]
+  }
+}

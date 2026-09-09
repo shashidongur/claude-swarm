@@ -1,0 +1,21 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~already merged at 2026-09-06T14:50:00Z; retro running",
+      "!workflow run *",
+      "!PUT repos/o/r/contents/issues/7.json\t*pr-merged*"
+    ]
+  }
+}

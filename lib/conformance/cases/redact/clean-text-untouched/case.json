@@ -1,0 +1,9 @@
+{
+  "script": "lib/sh/redact.sh",
+  "stdin": "nothing secret here: ghs_short, a mail@example.invalid and x-access-token: (no credential)\n",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["nothing secret here: ghs_short, a mail@example.invalid and x-access-token: (no credential)"],
+    "stdout_not_contains": ["***"]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "env": {
+    "SC_FILES": "app/src/__tests__/b.test.ts=it.failing('AC-7-1 shows the counter', () => {\\n  expect(1).toBe(2);\\n});\\n\napp/src/a.ts=export const x = 1;\\n",
+    "SC_PR_LIST": "1"
+  },
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-test-writer.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "@fixtures/validate/results/test-writer-pass.json",
+    ".swarm-run/artifacts/test-plan.md": "# test plan\n",
+    ".swarm-run/artifacts/pr-body.md": "Closes #7\n\nSwarm-Issue: #7\n",
+    "docs/swarm/7/requirements.md": "AC-7-1 Given a session When a student joins Then the counter increments\n"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V8\""
+    },
+    "stdout_contains": [
+      "outside config.test_paths"
+    ]
+  }
+}

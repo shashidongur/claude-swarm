@@ -1,0 +1,26 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SWARM_SKIP_INSTALL": "1"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: begin exit 0",
+      "PROBE: last commit: docs(swarm): #7 land staged artifacts",
+      "PROBE: trailer yes",
+      "PROBE: ahead of origin: 1"
+    ],
+    "files": {
+      "docs/swarm/7/review-app-a1.md": "No findings.",
+      "docs/swarm/7/critic/architecture-a1.json": "79",
+      ".swarm-run/brief.md": "Staged on the state branch"
+    },
+    "calls": [
+      "!workflow run *",
+      "!POST *",
+      "!PUT *"
+    ]
+  }
+}

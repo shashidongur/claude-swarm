@@ -1,0 +1,35 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:requirements:analyst:1",
+    "SC_PR": "none",
+    "SC_HANDOFF": "analyst-pass",
+    "SC_CRITIC": "requirements-fail",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~rework",
+      "workflow run swarm-dispatch.yml",
+      "~7:requirements:analyst:2",
+      "!POST repos/o/r/issues/7/comments\t*kind=gate*"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:requirements:analyst:2",
+      "stages.requirements.critic_reworks": 1,
+      "rework.spent": 1,
+      "dispatches.0.critic.verdict": "fail"
+    }
+  }
+}

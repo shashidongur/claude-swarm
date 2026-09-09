@@ -1,0 +1,23 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!POST repos/o/r/issues/7/comments",
+      "!PATCH repos/o/r/issues/comments/900",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "gate"
+    }
+  }
+}

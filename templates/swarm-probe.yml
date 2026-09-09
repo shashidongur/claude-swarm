@@ -1,0 +1,294 @@
+# Swarm v2 probe — copy into .github/workflows/, run once, read the answers, delete it.
+#
+# Settles the runtime facts the v2 dispatcher rests on, in about ten minutes and well
+# under a dollar of model usage:
+#   R1  who the actor of a github.token-fired workflow_dispatch run is (→ allowed_bots)
+#   R2  whether the github_token override bounds the role's gh/git to the job permissions
+#   R3  whether `--model` is honoured under the OAuth subscription token
+#   R4  whether the Contents API PUT with a stale sha is a real compare-and-swap
+#   R5  whether the execution file survives a --max-turns overrun (and a step timeout)
+#   R6  what a step killed by timeout-minutes reports, and whether if: always() steps run
+#   R28 which repositories the App installation token reaches
+#   R29 whether the App token can push a workflow file and merge a PR
+#   R30 whether headless runs apply a project .claude/settings.json hook
+#
+# What the first project's runs answered (memory/_swarm-itself/v2-probe-results.md):
+# the chain actor is github-actions[bot] (allowed_bots "github-actions,claude"); the
+# override token bounds a role to the job's permissions; --model is honoured; the
+# execution file exists after a max-turns overrun with {subtype: "error_max_turns"}; a
+# step killed by timeout-minutes reports outcome=failure (never cancelled) and later
+# if: always() steps run; the stale-sha PUT fails with HTTP 409 "does not match";
+# project settings hooks and .mcp.json ARE loaded headless. Re-run the probe only when
+# the action or the runner changes; R28/R29 are answered by the `write` job, which
+# only runs once this file is on the DEFAULT branch (the OIDC → App-token exchange
+# refuses a workflow file that is not identical there).
+#
+# Lessons the probe itself taught: every `gh workflow run` / `gh run list` / `gh run
+# view` passes -R "$GITHUB_REPOSITORY" (a job without a checkout has no git context);
+# a workflow_dispatch workflow that never existed on the default branch cannot be
+# dispatched by name, so a push of this file on your branch runs the `fire` job.
+#
+# How to run: set CHANGE-ME-BRANCH to the branch you push this file on (or dispatch it
+# with mode=fire from the Actions tab once it is on the default branch). The `fire` job
+# fires mode=run under github.token — exactly what the v2 dispatcher does to chain
+# stages — and verifies the run by its run-name.
+
+name: swarm-probe
+run-name: "probe ${{ inputs.mode || 'fire' }} ${{ inputs.tag }}"
+
+on:
+  push:
+    branches: [CHANGE-ME-BRANCH]
+    paths: ['.github/workflows/swarm-probe.yml']
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'fire | run'
+        type: string
+        required: true
+        default: fire
+      tag:
+        description: 'set by the fire job'
+        type: string
+        required: false
+        default: ''
+      issue:
+        description: 'an existing issue number (R2 tries to comment on it and expects 403)'
+        type: string
+        required: false
+        default: '1'
+
+permissions:
+  contents: read
+  actions: write
+  issues: read
+
+jobs:
+  fire:
+    # What advance does: fire under github.token, then verify the run by its run-name.
+    if: github.event_name == 'push' || inputs.mode == 'fire'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ inputs.issue || '1' }}
+        run: |
+          TAG="probe-$GITHUB_RUN_ID"
+          # No checkout in this job: gh needs -R to know the repository.
+          gh workflow run swarm-probe.yml -R "$GITHUB_REPOSITORY" --ref "$GITHUB_REF_NAME" -f mode=run -f tag="$TAG" -f issue="$ISSUE"
+          for i in $(seq 1 18); do
+            if gh run list -R "$GITHUB_REPOSITORY" --workflow swarm-probe.yml --event workflow_dispatch --json databaseId,displayTitle --limit 10 \
+                 --jq ".[] | select(.displayTitle | endswith(\"$TAG\")) | .databaseId" | grep -q .; then
+              echo "R1/D1: fired run verified by run-name after $((i*5)) s"; exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::fired run not found by run-name within 90 s"; exit 1
+
+  run:
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'run'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      actions: read     # no id-token: write on purpose — the override token skips OIDC
+    steps:
+      - run: |
+          echo "R1 actor=${{ github.actor }} triggering_actor=${{ github.triggering_actor }} event=${{ github.event_name }}"
+          echo "R1 actor=${{ github.actor }} triggering_actor=${{ github.triggering_actor }}" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # R30 setup: a harmless SessionStart hook in the project settings of the checkout.
+      - run: |
+          mkdir -p .claude
+          printf '%s' '{"hooks":{"SessionStart":[{"hooks":[{"type":"command","command":"touch /tmp/hook-ran"}]}]}}' > .claude/settings.json
+      # R2 + R3: the override token and --model under the OAuth token.
+      - id: a
+        uses: anthropics/claude-code-action@v1
+        continue-on-error: true
+        timeout-minutes: 6
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          allowed_bots: "github-actions,claude"
+          show_full_output: true
+          claude_args: --model claude-opus-5 --max-turns 8 --allowedTools "Bash(gh api:*),Bash(git:*),Write"
+          prompt: |
+            You are a probe. Run exactly these commands in order and stop. Do not retry, do not
+            work around a failure; a refusal IS the expected result and must be reported.
+            (1) `gh api repos/${{ github.repository }}/issues?per_page=1` — report the HTTP status
+                (200 expected).
+            (2) `gh api -X POST repos/${{ github.repository }}/issues/${{ inputs.issue }}/comments -f body=probe`
+                — report the HTTP status verbatim (403 expected; if it succeeds, say so).
+            (3) `git config user.email probe@example.com && git config user.name probe &&
+                git commit --allow-empty -m probe && git push origin HEAD:refs/heads/probe-should-fail`
+                — report the push result verbatim (a refusal is expected).
+            Then write the three outcomes, one per line, to /tmp/probe.txt using the Write tool.
+      - if: always()
+        run: |
+          F="${{ steps.a.outputs.execution_file }}"
+          echo "R2/R3 step outcome=${{ steps.a.outcome }} execution_file=$F"
+          if [ -f "$F" ]; then
+            jq -c 'if type=="array" then .[] else . end | select(.type=="result") | {modelUsage: ((.modelUsage // {}) | keys), num_turns, total_cost_usd, terminal_reason, subtype}' "$F" || echo "could not parse the execution file"
+          else
+            echo "no execution file"
+          fi
+          echo "--- /tmp/probe.txt"; cat /tmp/probe.txt 2>/dev/null || echo "(not written)"
+          if [ -e /tmp/hook-ran ]; then echo "R30: project settings hooks ARE applied headless"; else echo "R30: project settings hooks NOT applied headless"; fi
+          {
+            echo "## R2/R3"; echo '```'; cat /tmp/probe.txt 2>/dev/null || echo "(not written)"; echo '```'
+            echo "## R30"; if [ -e /tmp/hook-ran ]; then echo "hooks applied"; else echo "hooks not applied"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      # R5a: the execution file after a --max-turns overrun.
+      - id: b
+        uses: anthropics/claude-code-action@v1
+        continue-on-error: true
+        timeout-minutes: 5
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          allowed_bots: "github-actions,claude"
+          claude_args: --model claude-haiku-4-5 --max-turns 1 --allowedTools Read
+          prompt: "Read README.md, then list the repository root, then read one more file of your choice, then summarise all three."
+      - if: always()
+        run: |
+          echo "R5a step outcome=${{ steps.b.outcome }}"
+          if ls -l "$RUNNER_TEMP/claude-execution-output.json" 2>/dev/null; then echo "R5a: execution file present after max-turns"; else echo "R5a: no execution file after max-turns"; fi
+          echo "R5a execution_file output=${{ steps.b.outputs.execution_file }}"
+          mkdir -p /tmp/probe-artifacts; cp "$RUNNER_TEMP/claude-execution-output.json" /tmp/probe-artifacts/after-max-turns.json 2>/dev/null || true
+      # R6a: a plain step killed by timeout-minutes — its outcome, and whether later
+      # if: always() steps run (measured: outcome=failure, conclusion=success, they run).
+      - id: t1
+        continue-on-error: true
+        timeout-minutes: 1
+        run: |
+          echo "R6a: sleeping 200 s under a 1-minute step timeout"
+          sleep 200
+          echo "R6a: should never print"
+      - if: always()
+        run: |
+          echo "R6a plain-step outcome after timeout=${{ steps.t1.outcome }} conclusion=${{ steps.t1.conclusion }}"
+          { echo "## R6a"; echo "plain step outcome=${{ steps.t1.outcome }} conclusion=${{ steps.t1.conclusion }}"; } >> "$GITHUB_STEP_SUMMARY"
+      # R5b: the action killed by timeout-minutes mid-command. Claude Code backgrounds
+      # long commands, so this rarely holds the step; the file is assumed absent after
+      # a hard kill and the dispatcher tolerates that.
+      - id: c
+        uses: anthropics/claude-code-action@v1
+        continue-on-error: true
+        timeout-minutes: 1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          allowed_bots: "github-actions,claude"
+          claude_args: --model claude-haiku-4-5 --max-turns 6 --allowedTools "Bash(sleep:*)"
+          prompt: |
+            This is a timing probe of the CI runner. Using the Bash tool, run exactly this
+            command and wait for it to complete: `sleep 90`. Do not skip it, do not shorten
+            it, do not run it in the background. When it has completed, reply with the single
+            word done.
+      - if: always()
+        run: |
+          echo "R5b action outcome after timeout=${{ steps.c.outcome }} conclusion=${{ steps.c.conclusion }} execution_file=${{ steps.c.outputs.execution_file }}"
+          if ls -l "$RUNNER_TEMP/claude-execution-output.json" 2>/dev/null; then echo "R5b: execution file present after timeout"; else echo "R5b: no execution file after timeout"; fi
+          cp "$RUNNER_TEMP/claude-execution-output.json" /tmp/probe-artifacts/after-timeout.json 2>/dev/null || true
+          { echo "## R5b"; echo "action outcome=${{ steps.c.outcome }} conclusion=${{ steps.c.conclusion }}"; ls -l /tmp/probe-artifacts 2>/dev/null; } >> "$GITHUB_STEP_SUMMARY"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: probe-${{ inputs.tag }}
+          path: /tmp/probe-artifacts
+          if-no-files-found: warn
+          retention-days: 3
+
+  write:
+    # R28/R29: what the App installation token can reach and do. Runs only when this
+    # file is identical on the default branch (the OIDC → App-token exchange refuses
+    # it otherwise) — that is why these two answers belong to switch-on.
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'run'
+    needs: run
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: w
+        uses: anthropics/claude-code-action@v1
+        continue-on-error: true
+        timeout-minutes: 8
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          allowed_bots: "github-actions,claude"
+          show_full_output: true
+          claude_args: --model claude-haiku-4-5 --max-turns 16 --allowedTools "Bash(gh api:*),Bash(gh pr:*),Bash(git:*),Write"
+          prompt: |
+            You are a probe on a scratch branch. Run exactly these commands in order and write each
+            result (HTTP status, error text, or success) verbatim into /tmp/probe-write.txt with the
+            Write tool after the last one. A refusal IS an expected result; never retry or work
+            around one. Never touch the default branch.
+            (1) `gh api /installation/repositories --jq '.repositories[].full_name'`
+            (2) `git config user.email probe@example.com && git config user.name probe &&
+                git checkout -b probe/base && git push origin HEAD:refs/heads/probe/base`
+            (3) `git checkout -b probe/wf && mkdir -p .github/workflows && printf 'name: probe-wf\non: workflow_dispatch\njobs: {}\n' > .github/workflows/probe-wf.yml && git add .github/workflows/probe-wf.yml && git commit -m probe-wf && git push origin HEAD:refs/heads/probe/wf`
+            (4) `gh pr create --base probe/base --head probe/wf --title "probe (scratch, will be deleted)" --body probe`
+                then `N=$(gh pr view --json number -q .number) && gh api -X PUT repos/${{ github.repository }}/pulls/$N/merge -f merge_method=merge`
+            (5) `git push origin :refs/heads/probe/wf :refs/heads/probe/base`
+      - if: always()
+        run: |
+          echo "--- /tmp/probe-write.txt"; cat /tmp/probe-write.txt 2>/dev/null || echo "(not written)"
+          { echo "## R28/R29"; echo '```'; cat /tmp/probe-write.txt 2>/dev/null || echo "(not written)"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Cleanup with github.token in case the role could not delete its scratch refs.
+          for b in probe/wf probe/base probe-should-fail; do
+            if gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/$b" >/dev/null 2>&1; then echo "deleted $b"; else echo "$b absent"; fi
+          done
+
+  cas:
+    # R4: the Contents API compare-and-swap on an orphan branch (the v2 state store).
+    # Creates `swarm/state` when it is missing (idempotent; `state.sh init-branch` does
+    # the same) and leaves it in place.
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'run'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          R: ${{ github.repository }}
+        run: |
+          set -u
+          if gh api "repos/$R/git/ref/heads/swarm/state" >/dev/null 2>&1; then
+            echo "swarm/state already exists"
+          else
+            TREE=$(jq -n '{tree:[{path:"README.md",mode:"100644",type:"blob",content:"swarm state branch — one signed JSON file per issue under issues/. Never merge this branch."}]}' \
+                   | gh api -X POST "repos/$R/git/trees" --input - --jq .sha)
+            COMMIT=$(jq -n --arg t "$TREE" '{message:"swarm: state branch",tree:$t}' | gh api -X POST "repos/$R/git/commits" --input - --jq .sha)
+            jq -n --arg s "$COMMIT" '{ref:"refs/heads/swarm/state",sha:$s}' | gh api -X POST "repos/$R/git/refs" --input - --jq .ref
+            echo "created orphan branch swarm/state at $COMMIT"
+          fi
+          # Blob shas are content-addressed: each write carries DIFFERENT content, or the
+          # "stale" sha of the third write would still be the current one.
+          C1=$(printf '{"probe":1}' | base64 -w0); C2=$(printf '{"probe":2}' | base64 -w0); C3=$(printf '{"probe":3}' | base64 -w0)
+          S1=$(jq -n --arg c "$C1" '{message:"probe p1",content:$c,branch:"swarm/state"}' | gh api -X PUT "repos/$R/contents/issues/probe.json" --input - --jq .content.sha)
+          echo "p1 created sha=$S1"
+          S2=$(jq -n --arg c "$C2" --arg s "$S1" '{message:"probe p2",content:$c,sha:$s,branch:"swarm/state"}' | gh api -X PUT "repos/$R/contents/issues/probe.json" --input - --jq .content.sha)
+          echo "p2 updated sha=$S2 (must differ from S1)"
+          set +e
+          OUT=$(jq -n --arg c "$C3" --arg s "$S1" '{message:"probe p3 (stale sha)",content:$c,sha:$s,branch:"swarm/state"}' | gh api -X PUT "repos/$R/contents/issues/probe.json" --input - 2>&1)
+          RC=$?
+          set -e
+          echo "R4 stale-sha PUT exit=$RC (expected: 1, HTTP 409 'does not match')"; echo "$OUT" | tail -5
+          { echo "## R4"; echo "stale-sha PUT exit=$RC"; echo '```'; echo "$OUT" | tail -5; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          # remove the probe file (needs the current sha)
+          CUR=$(gh api "repos/$R/contents/issues/probe.json?ref=swarm/state" --jq .sha)
+          if jq -n --arg s "$CUR" '{message:"probe cleanup",sha:$s,branch:"swarm/state"}' | gh api -X DELETE "repos/$R/contents/issues/probe.json" --input - >/dev/null; then echo "probe.json removed"; fi
+          [ "$RC" -ne 0 ] || { echo "::error::stale-sha PUT succeeded — the Contents API is NOT a CAS here"; exit 1; }

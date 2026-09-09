@@ -54,3 +54,65 @@ current `main` in a clean worktree:
 
 **How to apply:** land the backend suites in tranches with their results, never as one
 38-file drop. Validate against `main`, not against the branch they were written on.
+
+## Pipeline v2: the gates are owner comments, and gate 3 is a merge by an approver — 2026-09-06
+
+Three human wake-ups on the full path: `/swarm approve` after requirements, after
+architecture, and the merge; one on the short path. Approvers are `.github/swarm.yml
+approvers.*`, empty here, so every gate falls back to the repository owner (a `User`).
+**Gate 3 counts only when an approver merged**: a merge by `claude[bot]` or anyone else
+is `blocked:perimeter` with the revert command, no retro, no branch delete. This
+supersedes "the human gate is merge, not approval" above in one respect — the swarm now
+checks *who* merged, because the write class holds an App token that may be able to
+merge its own PR (probe R29 answers this once the stub is on `main`).
+
+## Reviewer ≠ author, by model tier — 2026-09-06
+
+`code-review` runs on the strong tier (`claude-opus-5`), `dev` on the default
+(`claude-sonnet-5`); `must_differ_from: dev` is conformance-checked, and the model
+actually used is recorded per dispatch from the execution file. Probe run 2 confirmed
+`--model` is honoured under the OAuth token (`modelUsage: ["claude-opus-5"]`), so
+`require_model_map` stays `false` with `models.honoured` defaulting to true.
+
+## Memory is written through a pull request at retro — 2026-09-06
+
+The retro role proposes `postmortems/<N>.md`, an ADR pointer and ≤ 3 gotchas under
+`gotchas/auto/`; `advance` opens a PR on claude-swarm with `SWARM_TOKEN` that the owner
+merges. Machine-written memory is read fenced until promoted. Nothing lands on the
+executable branch without a human reading it.
+
+## The PR is opened by the test-writer, and CI runs once per push — 2026-09-06
+
+The test-writer (App token) makes the first push and `gh pr create --draft` in the same
+turn; from then on only roles push, and the dispatcher stages its artifacts on
+`swarm/state` to land with the next role push. `ci.yml` triggers on `pull_request` and
+`push: main` only — **no `push: claude/**` trigger** — so each head runs CI once
+(`pull_request: opened` covers the first push within seconds). A `github.token` push to
+a branch with an open PR would leave its CI run in "approval required".
+
+## Red CI is baselined, not fixed by the dev — 2026-09-06
+
+Mobile jest failures inside `mobile/jest.baseline.json` (recorded in coverage mode: 91
+in that mode vs 52 without), audit advisories inside the two `audit.baseline.json`
+files, and Semgrep findings present at the merge base are not "red"; a secret always
+is. The gate files are protected paths. Reason: on `main` today `npm audit
+--audit-level=high` exits 1 on both packages (9 high + 1 critical / 20 high + 2
+critical) and 52–91 mobile tests fail by design — an unbaselined gate would send every
+dev into rework it cannot fix.
+
+## The state file is signed, and `.claude/` is restored before every role — 2026-09-08
+
+`SWARM_STATE_KEY` signs `issues/<N>.json`; only LLM-free jobs hold it. Probe run 2
+showed a `.claude/settings.json` SessionStart hook from the checkout **runs headless**
+(`settingSources: ["user", "project", "local"]`, and `.mcp.json` servers are enabled),
+so `begin.sh`'s restore of `.claude/`, `CLAUDE.md`, `.mcp.json`, `.claude-plugin/` from
+the merge base is load-bearing, not belt-and-braces.
+
+## Write-class stages need the stub on `main` — 2026-09-08
+
+The OIDC → App-token exchange refuses a calling workflow file that differs from the
+default branch's ("Workflow validation failed … identical content"). So the v2 stub is
+merged to `main` before the first write role runs; read-class stages (override token)
+work from any branch. R28/R29 (what the App token can reach, whether it can merge or
+push workflow files) are measured then, and the detective controls assume the worst
+until they are.

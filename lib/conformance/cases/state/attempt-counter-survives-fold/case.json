@@ -1,0 +1,35 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "dispatch-queued",
+    "--arg",
+    "stage",
+    "build",
+    "--arg",
+    "role",
+    "dev:app",
+    "--arg",
+    "from_key",
+    "7:build:code-review:app:61",
+    "--arg",
+    "reason",
+    "rework"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:build:dev:app:62",
+      "stages.build.attempts.dev:app": 62,
+      "dispatches.59.key": "7:build:dev:app:62",
+      "dispatches.60": null,
+      "totals.folded": 1,
+      "dispatches.0.key": "7:build:old:2"
+    }
+  }
+}

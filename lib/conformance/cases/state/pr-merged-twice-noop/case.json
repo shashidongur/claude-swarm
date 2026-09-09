@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "pr-merged",
+    "--arg",
+    "pr",
+    "9",
+    "--arg",
+    "by",
+    "octo-owner"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: already merged at 2026-09-07T09:12:00Z"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

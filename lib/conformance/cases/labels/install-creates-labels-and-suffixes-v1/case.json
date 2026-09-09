@@ -1,0 +1,34 @@
+{
+  "script": "lib/sh/labels.sh",
+  "args": [
+    "install",
+    "o/r"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "CONFIG_JSON": "config.json"
+  },
+  "fixtures": [
+    "resolve"
+  ],
+  "project_files": {
+    "config.json": "@fixtures/config/user-owned.json"
+  },
+  "commit_project_files": false,
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "label create swarm:ready",
+      "label create swarm:gate:budget",
+      "label create blocked:perimeter",
+      "label create area:api",
+      "label create area:app",
+      "label create area:both",
+      "PATCH repos/o/r/labels/swarm:pr",
+      "~v1: pull request open (v1, unused by v2)",
+      "!PATCH repos/o/r/labels/swarm:spec"
+    ]
+  }
+}

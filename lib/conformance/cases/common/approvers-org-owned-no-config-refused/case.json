@@ -1,0 +1,6 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["approvers_for", "default"],
+  "env": { "OWNER": "octo-org" },
+  "expect": { "exit": 0, "stdout_contains": ["RC=1"], "stdout_not_contains": ["octo-org\n"] }
+}

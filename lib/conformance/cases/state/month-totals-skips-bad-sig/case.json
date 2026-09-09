@@ -1,0 +1,20 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "month-totals",
+    "o/r"
+  ],
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "fixtures": [
+    "state-month"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "issues/7.json has a bad signature — skipped",
+      "\"runner_minutes\": 40"
+    ]
+  }
+}

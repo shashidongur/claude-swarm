@@ -1,0 +1,28 @@
+{
+  "script": "lib/sh/labels.sh",
+  "args": [
+    "reconcile",
+    "o/r"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "DELETE repos/o/r/issues/4/labels/swarm:pr",
+      "POST repos/o/r/issues/4/labels",
+      "~swarm:done",
+      "!DELETE repos/o/r/issues/5/labels/swarm:pr"
+    ],
+    "stdout_contains": [
+      "#4: swarm:pr → swarm:done (merged PR #6)",
+      "#5 has no merged pull request"
+    ]
+  }
+}

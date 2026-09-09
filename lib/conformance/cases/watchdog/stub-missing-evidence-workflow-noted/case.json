@@ -1,0 +1,23 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "project_files": {
+    ".github/workflows/swarm-dispatch.yml": "name: Swarm dispatch\non:\n  workflow_run:\n    workflows: [CI]\n    types: [completed]\n  schedule:\n    - cron: '23 5,17 * * *'\njobs: {}\n"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/1/comments",
+      "~evidence workflow `walkthrough` is not in `swarm-dispatch.yml` workflow_run.workflows",
+      "~evidence workflow `security` is not in"
+    ]
+  }
+}

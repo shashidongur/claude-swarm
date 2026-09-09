@@ -1,0 +1,30 @@
+{
+  "script": "lib/sh/begin.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "KEY": "7:build:dev:app:9",
+    "ISSUE": "7",
+    "RUN_ID": "424242"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 1,
+    "calls": [
+      "!POST *",
+      "!PUT *",
+      "!PATCH *",
+      "!workflow run *"
+    ],
+    "files": {
+      ".swarm-run": "absent"
+    },
+    "stdout_contains": [
+      "::error::begin: this run does not hold the claim"
+    ]
+  }
+}

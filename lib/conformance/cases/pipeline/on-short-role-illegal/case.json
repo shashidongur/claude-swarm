@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "on-short-legal",
+    "--mutate",
+    ".stages[6].roles[0].on_short = \"sometimes\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: on-short-legal — role security (stage security): on_short sometimes is not"
+    ]
+  }
+}

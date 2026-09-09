@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false",
+      "block": "bad-handoff"
+    },
+    "calls": [
+      "!workflow run *",
+      "!PUT repos/o/r/contents/issues/7.json"
+    ],
+    "stdout_contains": [
+      "unknown role 'frobnicator'"
+    ]
+  }
+}

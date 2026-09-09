@@ -1,0 +1,15 @@
+{
+  "databaseId": 424242,
+  "displayTitle": "swarm chain #7 7:build:dev:app:1",
+  "status": "in_progress",
+  "conclusion": null,
+  "url": "https://github.com/o/r/actions/runs/424242",
+  "jobs": [
+    { "name": "resolve", "status": "completed", "conclusion": "success",
+      "startedAt": "2026-09-06T14:40:00Z", "completedAt": "2026-09-06T14:40:41Z" },
+    { "name": "run-read", "status": "completed", "conclusion": "success",
+      "startedAt": "2026-09-06T14:41:00Z", "completedAt": "2026-09-06T14:53:30Z" },
+    { "name": "advance", "status": "in_progress", "conclusion": null,
+      "startedAt": "2026-09-06T14:54:00Z", "completedAt": null }
+  ]
+}

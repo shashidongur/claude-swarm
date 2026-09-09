@@ -1,0 +1,107 @@
+{
+  "approvers": {
+    "architecture": [],
+    "confidence": [],
+    "default": [],
+    "release": [],
+    "requirements": []
+  },
+  "artifacts_dir": "docs/swarm",
+  "branch_prefix": "claude/issue-",
+  "contract_command": "node scripts/contract-diff.js --report-only",
+  "default_branch": "main",
+  "delete_merged_branches": true,
+  "evidence": {
+    "ci": "CI",
+    "security": "security",
+    "test": "walkthrough"
+  },
+  "gate_manifests": [
+    "api/package.json",
+    "app/package.json"
+  ],
+  "gate_scripts": [
+    "test:ci",
+    "test",
+    "lint",
+    "typecheck",
+    "type-check"
+  ],
+  "lanes": {
+    "api": {
+      "commands": {
+        "cwd": "api",
+        "install": "npm ci",
+        "lint": "npm run lint",
+        "test": "npm run test:ci",
+        "typecheck": "npm run typecheck"
+      },
+      "paths": [
+        "api/**"
+      ],
+      "specialist": "agents/api-engineer.md"
+    },
+    "app": {
+      "commands": {
+        "cwd": "app",
+        "install": "npm ci",
+        "lint": "npm run lint",
+        "test": "npm run test:ci",
+        "typecheck": "npm run type-check"
+      },
+      "paths": [
+        "app/**"
+      ],
+      "specialist": "agents/app-engineer.md"
+    }
+  },
+  "limits": {
+    "cost_usd_per_issue": 75,
+    "critic_rework": 1,
+    "evidence_fires_per_issue": 2,
+    "open_prs": 3,
+    "pr_files": 25,
+    "pr_lines": 800,
+    "pushes_per_pr_per_day": 10,
+    "question_rounds": 2,
+    "ratelimit_backoff_minutes": 180,
+    "rework_budget": -1,
+    "runaway_per_hour": 10,
+    "runner_minutes_month": 1500,
+    "usd_month": 200
+  },
+  "memory": {
+    "path": "memory/github.com/o/r"
+  },
+  "pin_marker": "it.failing(",
+  "protected_paths": [
+    "api/test.baseline.json",
+    "app/test.baseline.json",
+    "scripts/**"
+  ],
+  "reporter_may_answer": true,
+  "require_model_map": false,
+  "requirement_id_pattern": "^(FR|NFR)-[A-Z]+-[0-9]+$",
+  "requirements_doc": "REQS.md",
+  "sensitive_paths": [
+    "api/src/**/*payment*",
+    "api/src/auth/**",
+    "app/src/auth/**"
+  ],
+  "state_branch": "swarm/state",
+  "test_paths": [
+    "api/__tests__/**",
+    "app/src/**/__tests__/**",
+    "app/flows/**"
+  ],
+  "v": 2,
+  "walkthrough_when": [
+    "app/**"
+  ],
+  "watchdog": {
+    "evidence_timeout_minutes": 120,
+    "gate_reminder_days": 3,
+    "queued_refire_minutes": 30,
+    "running_stall_minutes": 20
+  }
+}

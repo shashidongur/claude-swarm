@@ -1,0 +1,12 @@
+{
+  "artifacts": [
+    "design.md"
+  ],
+  "attempt": 1,
+  "issue": 7,
+  "role": "ux",
+  "stage": "design",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "pass"
+}

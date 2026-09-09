@@ -1,0 +1,1257 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-swarm/schema/state.schema.json",
+  "title": "claude-swarm per-issue state document (v2, spec §4.2)",
+  "description": "issues/<N>.json on the project's state branch. Signed: `sig` is HMAC-SHA256 over `jq -S -c 'del(.sig)'`; a document may be unsigned only in transit (the harness signs fixtures). Lane names and workflow names are free strings validated at runtime against the project config. Unknown top-level keys are tolerated so transitions can add bookkeeping without a schema change; every known key is typed strictly.",
+  "type": "object",
+  "required": [
+    "v",
+    "issue",
+    "repo",
+    "created_at",
+    "path",
+    "stage",
+    "status",
+    "stages",
+    "dispatches",
+    "totals",
+    "rework",
+    "flags"
+  ],
+  "definitions": {
+    "ts": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "tsOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ts"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "shaOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/sha"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "idOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "login": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
+    },
+    "stageName": {
+      "type": "string",
+      "enum": [
+        "triage",
+        "requirements",
+        "design",
+        "architecture",
+        "build",
+        "test",
+        "security",
+        "release",
+        "retro"
+      ]
+    },
+    "roleName": {
+      "description": "role[:lane]",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(:[A-Za-z0-9_-]+)?$"
+    },
+    "key": {
+      "description": "<issue>:<stage>:<role>[:<lane>]:<attempt>, or <issue>:<stage>:evidence:<n>",
+      "type": "string",
+      "pattern": "^[0-9]+:[a-z][a-z0-9-]*:[a-z][a-z0-9-]*(:[A-Za-z0-9_-]+)?:[0-9]+$"
+    },
+    "keyOrNull": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/key"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "model": {
+      "type": "string",
+      "pattern": "^claude-[a-z0-9.+-]+(\\+claude-[a-z0-9.+-]+)*$"
+    },
+    "gateName": {
+      "type": "string",
+      "enum": [
+        "requirements",
+        "architecture",
+        "release",
+        "question",
+        "confidence",
+        "budget"
+      ]
+    },
+    "blockReason": {
+      "type": "string",
+      "enum": [
+        "agent-output",
+        "budget",
+        "runaway",
+        "evidence",
+        "stalled",
+        "fire",
+        "injection",
+        "duplicate",
+        "conflict",
+        "bad-handoff",
+        "perimeter",
+        "auth",
+        "model"
+      ]
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "rework",
+        "blocked",
+        "question",
+        "duplicate"
+      ]
+    },
+    "path": {
+      "type": "string",
+      "enum": [
+        "full",
+        "short"
+      ]
+    },
+    "stageRecord": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "running",
+            "done",
+            "skipped",
+            "skipped_by_owner"
+          ]
+        },
+        "attempts": {
+          "description": "Monotonic per-role attempt counters — the source of attempt numbers, never the length of dispatches[].",
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[a-z][a-z0-9-]*(:[A-Za-z0-9_-]+)?$"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "critic": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "score": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "threshold": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "pass",
+                    "fail"
+                  ]
+                },
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "critic_reworks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "approved": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "by",
+                "at"
+              ],
+              "properties": {
+                "by": {
+                  "$ref": "#/definitions/login"
+                },
+                "at": {
+                  "$ref": "#/definitions/ts"
+                },
+                "comment_id": {
+                  "$ref": "#/definitions/id"
+                }
+              }
+            }
+          ]
+        },
+        "lanes": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "running",
+              "done"
+            ]
+          }
+        },
+        "reason": {
+          "type": "string"
+        },
+        "skipped_by": {
+          "$ref": "#/definitions/login"
+        }
+      }
+    },
+    "dispatchRecord": {
+      "type": "object",
+      "required": [
+        "key",
+        "run_id",
+        "stage",
+        "role",
+        "attempt",
+        "at",
+        "status"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/key"
+        },
+        "run_id": {
+          "$ref": "#/definitions/id"
+        },
+        "stage": {
+          "$ref": "#/definitions/stageName"
+        },
+        "role": {
+          "$ref": "#/definitions/roleName"
+        },
+        "attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "run_attempt": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "at": {
+          "$ref": "#/definitions/ts"
+        },
+        "claimed_at": {
+          "$ref": "#/definitions/tsOrNull"
+        },
+        "finished_at": {
+          "$ref": "#/definitions/tsOrNull"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "finished",
+            "died",
+            "invalid",
+            "cancelled-pending",
+            "superseded"
+          ]
+        },
+        "verdict": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/verdict"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_requested": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/model"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_actual": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/model"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cost_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "turns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duration_s": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "job_minutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retry": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "critic": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "score": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "threshold": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "pass",
+                    "fail"
+                  ]
+                },
+                "confidence": {
+                  "type": "string",
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low"
+                  ]
+                },
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          ]
+        },
+        "base_sha": {
+          "$ref": "#/definitions/shaOrNull"
+        },
+        "head": {
+          "$ref": "#/definitions/shaOrNull"
+        },
+        "artifact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "handoff": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "died_reason": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "max-turns",
+                "timeout",
+                "cancelled",
+                "error",
+                "auth",
+                "ratelimit"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "ok",
+                "errors"
+              ],
+              "properties": {
+                "ok": {
+                  "type": "boolean"
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "check",
+                      "msg"
+                    ],
+                    "properties": {
+                      "check": {
+                        "type": "string",
+                        "pattern": "^(V[0-9]{1,2}|schema|E_[A-Z_]+)$"
+                      },
+                      "msg": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "warnings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "last_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 500
+        }
+      }
+    }
+  },
+  "properties": {
+    "v": {
+      "const": 2
+    },
+    "sig": {
+      "$ref": "#/definitions/sha256"
+    },
+    "issue": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "created_at": {
+      "$ref": "#/definitions/ts"
+    },
+    "swarm_sha": {
+      "$ref": "#/definitions/shaOrNull"
+    },
+    "pipeline_sha": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40,64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "config_sha": {
+      "$ref": "#/definitions/shaOrNull"
+    },
+    "state_comment_id": {
+      "$ref": "#/definitions/idOrNull"
+    },
+    "path": {
+      "$ref": "#/definitions/path"
+    },
+    "path_source": {
+      "type": "string",
+      "enum": [
+        "triage",
+        "analyst",
+        "owner"
+      ]
+    },
+    "triage": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "type",
+            "size",
+            "area",
+            "prio"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "bug",
+                "feature",
+                "chore"
+              ]
+            },
+            "size": {
+              "type": "string",
+              "enum": [
+                "S",
+                "M",
+                "L",
+                "XL"
+              ]
+            },
+            "area": {
+              "description": "A configured lane name or `both`.",
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "prio": {
+              "type": "string",
+              "enum": [
+                "P0",
+                "P1",
+                "P2",
+                "P3"
+              ]
+            },
+            "path": {
+              "$ref": "#/definitions/path"
+            },
+            "duplicates": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "lanes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]+$"
+      },
+      "uniqueItems": true
+    },
+    "stage": {
+      "$ref": "#/definitions/stageName"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "running",
+        "routing",
+        "queued",
+        "evidence",
+        "gate",
+        "blocked",
+        "parked",
+        "dropped",
+        "done"
+      ]
+    },
+    "current": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "role",
+            "attempt",
+            "key"
+          ],
+          "properties": {
+            "role": {
+              "$ref": "#/definitions/roleName"
+            },
+            "attempt": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "key": {
+              "$ref": "#/definitions/key"
+            },
+            "run_id": {
+              "$ref": "#/definitions/idOrNull"
+            },
+            "run_attempt": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "comment_id": {
+              "$ref": "#/definitions/idOrNull"
+            },
+            "started_at": {
+              "$ref": "#/definitions/tsOrNull"
+            },
+            "claimed_at": {
+              "$ref": "#/definitions/tsOrNull"
+            },
+            "base_sha": {
+              "$ref": "#/definitions/shaOrNull"
+            },
+            "activity_from": {
+              "$ref": "#/definitions/tsOrNull"
+            },
+            "fired_run_id": {
+              "$ref": "#/definitions/idOrNull"
+            }
+          }
+        }
+      ]
+    },
+    "next": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "stage",
+            "role",
+            "key"
+          ],
+          "properties": {
+            "stage": {
+              "$ref": "#/definitions/stageName"
+            },
+            "role": {
+              "$ref": "#/definitions/roleName"
+            },
+            "key": {
+              "$ref": "#/definitions/key"
+            },
+            "fired_at": {
+              "$ref": "#/definitions/tsOrNull"
+            },
+            "fired_by": {
+              "$ref": "#/definitions/idOrNull"
+            },
+            "fired_run_id": {
+              "$ref": "#/definitions/idOrNull"
+            },
+            "not_before": {
+              "$ref": "#/definitions/tsOrNull"
+            },
+            "reason": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "gate": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "name",
+            "since"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/definitions/gateName"
+            },
+            "since": {
+              "$ref": "#/definitions/ts"
+            },
+            "comment_id": {
+              "$ref": "#/definitions/idOrNull"
+            },
+            "reminded_at": {
+              "$ref": "#/definitions/tsOrNull"
+            },
+            "escalated_role": {
+              "$ref": "#/definitions/roleName"
+            }
+          }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "pending": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "workflow",
+                "key",
+                "head"
+              ],
+              "properties": {
+                "workflow": {
+                  "description": "Evidence slot or configured workflow name; validated at runtime.",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "key": {
+                  "$ref": "#/definitions/key"
+                },
+                "head": {
+                  "$ref": "#/definitions/sha"
+                },
+                "fired_at": {
+                  "$ref": "#/definitions/tsOrNull"
+                },
+                "run_id": {
+                  "$ref": "#/definitions/id"
+                },
+                "consumer": {
+                  "$ref": "#/definitions/roleName"
+                }
+              }
+            }
+          ]
+        },
+        "seen": {
+          "description": "By head sha, then workflow name, then event name.",
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[0-9a-f]{40}$"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "propertyNames": {
+                "pattern": "^[a-z_]+$"
+              },
+              "additionalProperties": {
+                "type": "object",
+                "required": [
+                  "run_id",
+                  "conclusion",
+                  "at"
+                ],
+                "properties": {
+                  "run_id": {
+                    "$ref": "#/definitions/id"
+                  },
+                  "conclusion": {
+                    "type": "string",
+                    "enum": [
+                      "success",
+                      "failure",
+                      "cancelled",
+                      "skipped",
+                      "timed_out",
+                      "action_required",
+                      "neutral",
+                      "stale",
+                      "startup_failure"
+                    ]
+                  },
+                  "at": {
+                    "$ref": "#/definitions/ts"
+                  },
+                  "url": {
+                    "type": "string",
+                    "pattern": "^https://github\\.com/"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "fires": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "branch": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "head": {
+      "$ref": "#/definitions/shaOrNull"
+    },
+    "pr": {
+      "$ref": "#/definitions/idOrNull"
+    },
+    "merged_at": {
+      "$ref": "#/definitions/tsOrNull"
+    },
+    "merged_pr": {
+      "$ref": "#/definitions/idOrNull"
+    },
+    "merge_sha": {
+      "$ref": "#/definitions/shaOrNull"
+    },
+    "merged_by": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/login"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "subissues": {
+      "type": "object",
+      "properties": {
+        "flat": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "pending_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "sha256"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "pattern": "^([A-Za-z0-9_]|\\.[A-Za-z0-9_-])[A-Za-z0-9._-]*(/([A-Za-z0-9_]|\\.[A-Za-z0-9_-])[A-Za-z0-9._-]*)*$"
+          },
+          "sha256": {
+            "$ref": "#/definitions/sha256"
+          }
+        }
+      }
+    },
+    "rework": {
+      "type": "object",
+      "required": [
+        "spent",
+        "budget"
+      ],
+      "properties": {
+        "spent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "budget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reset_at": {
+          "$ref": "#/definitions/tsOrNull"
+        },
+        "log": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "from",
+              "to",
+              "at"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "$ref": "#/definitions/roleName"
+              },
+              "at": {
+                "$ref": "#/definitions/ts"
+              },
+              "key": {
+                "$ref": "#/definitions/key"
+              },
+              "free": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "questions": {
+      "type": "object",
+      "properties": {
+        "rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "comment_id": {
+          "$ref": "#/definitions/idOrNull"
+        }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "required": [
+        "triage",
+        "requirements",
+        "design",
+        "architecture",
+        "build",
+        "test",
+        "security",
+        "release",
+        "retro"
+      ],
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/stageRecord"
+      }
+    },
+    "dispatches": {
+      "description": "Append-only, capped at 60; the oldest records are folded into totals.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/dispatchRecord"
+      },
+      "maxItems": 60
+    },
+    "totals": {
+      "type": "object",
+      "required": [
+        "cost_usd",
+        "runner_minutes",
+        "overhead_minutes"
+      ],
+      "properties": {
+        "cost_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "turns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "role_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "runner_minutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overhead_minutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wakeups": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reworks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "folded": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "required": [
+        "honoured"
+      ],
+      "properties": {
+        "honoured": {
+          "type": "boolean"
+        }
+      }
+    },
+    "flags": {
+      "type": "object",
+      "required": [
+        "hands_off"
+      ],
+      "properties": {
+        "hands_off": {
+          "type": "boolean"
+        },
+        "v1_history": {
+          "type": "boolean"
+        }
+      }
+    },
+    "blocked": {
+      "description": "Present while status = blocked: the blocked:<reason> label and the human-readable detail.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "reason"
+          ],
+          "properties": {
+            "reason": {
+              "$ref": "#/definitions/blockReason"
+            },
+            "detail": {
+              "type": "string"
+            },
+            "at": {
+              "$ref": "#/definitions/ts"
+            },
+            "comment_id": {
+              "$ref": "#/definitions/idOrNull"
+            }
+          }
+        }
+      ]
+    },
+    "memory": {
+      "type": "object",
+      "properties": {
+        "pr": {
+          "$ref": "#/definitions/idOrNull"
+        },
+        "artifact": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "proposed": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "refusals": {
+      "description": "login → date (YYYY-MM-DD) of the last refusal reply (G38).",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      }
+    },
+    "log": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "type": "object",
+        "required": [
+          "at",
+          "event"
+        ],
+        "properties": {
+          "at": {
+            "$ref": "#/definitions/ts"
+          },
+          "event": {
+            "type": "string",
+            "minLength": 1
+          },
+          "by": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "queued"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "next"
+        ],
+        "properties": {
+          "next": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "gate"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "gate"
+        ],
+        "properties": {
+          "gate": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "running",
+              "routing"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "current"
+        ],
+        "properties": {
+          "current": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "evidence"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "evidence"
+        ],
+        "properties": {
+          "evidence": {
+            "type": "object",
+            "required": [
+              "pending"
+            ],
+            "properties": {
+              "pending": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "id": 610,
+    "body": "🧭 **dispatch** · 🚧 refused — runaway\n<!-- swarm: v2 | kind=refused | issue=7 | event=run-424242 | at=2026-09-06T14:59:00Z -->",
+    "user": {
+      "login": "github-actions[bot]",
+      "type": "Bot"
+    }
+  }
+]

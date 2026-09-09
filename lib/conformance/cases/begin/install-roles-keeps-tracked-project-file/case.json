@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/install-roles.sh",
+  "project_files": {
+    ".claude/agents/dev.md": "the project's own dev agent\n"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "::warning::install-roles: .claude/agents/dev.md is tracked by the project"
+    ],
+    "files": {
+      ".claude/agents/dev.md": "the project's own dev agent",
+      ".claude/agents/qa.md": "exists"
+    }
+  }
+}

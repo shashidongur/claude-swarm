@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!POST repos/o/r/issues/7/comments",
+      "!workflow run *"
+    ],
+    "stdout_contains": [
+      "already replied to event 501 (comment 400)"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:build:planner:1"
+    }
+  }
+}

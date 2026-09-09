@@ -1,0 +1,25 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "SWARM_TOKEN": "fake-pat"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve",
+    "state-month"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/1/comments",
+      "~Usage this month: ⚠ 1260/1500 min (billing endpoint) · $",
+      "~at or above 80 %"
+    ],
+    "stdout_contains": [
+      "usage: ⚠ 1260/1500 min (billing endpoint)"
+    ]
+  }
+}

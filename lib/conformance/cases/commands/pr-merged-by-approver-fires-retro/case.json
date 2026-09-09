@@ -1,0 +1,34 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~pr-merged",
+      "issue close 12",
+      "issue close 13",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:retro:retro:1\""
+    ],
+    "state_after": {
+      "status": "queued",
+      "stage": "retro",
+      "merged_at": "2026-09-06T15:00:00Z",
+      "merged_pr": 9,
+      "merged_by": "owner",
+      "merge_sha": "1234567890abcdef1234567890abcdef12345678",
+      "gate": null,
+      "next.key": "7:retro:retro:1",
+      "next.fired_run_id": 9027
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "gate",
+    "-",
+    "--arg",
+    "gate",
+    "requirements",
+    "--arg",
+    "approver",
+    "octo-owner",
+    "--arg",
+    "summary",
+    "Requirements for #7 are on the branch: docs/swarm/7/requirements.md (7 ACs, refs FR-…).\nCritic score 84/70: grounded, testable; one assumption flagged about capacity limits (AC-7-5).",
+    "--arg",
+    "cost",
+    "1.90",
+    "--arg",
+    "runner_minutes",
+    "9",
+    "--arg",
+    "instruction",
+    "Reply `/swarm approve` to continue to design, or `/swarm reject <why>` to send it back to the analyst.",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=gate | issue=7 | gate=requirements | key=7:requirements:analyst:1 | at=2026-09-06T10:03:40Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🛎️ **gate · requirements** — @octo-owner, your call.",
+      "Requirements for #7 are on the branch: docs/swarm/7/requirements.md (7 ACs, refs FR-…).",
+      "Critic score 84/70: grounded, testable; one assumption flagged about capacity limits (AC-7-5).",
+      "Cost so far $1.90 · 9 runner minutes.",
+      "Reply `/swarm approve` to continue to design, or `/swarm reject <why>` to send it back to the analyst.",
+      "<!-- swarm: v2 | kind=gate | issue=7 | gate=requirements | key=7:requirements:analyst:1 | at=2026-09-06T10:03:40Z -->"
+    ]
+  }
+}

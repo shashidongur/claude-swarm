@@ -1,0 +1,11 @@
+[
+  {
+    "id": 400,
+    "body": "🧭 **dispatch** · reply — approved by owner — `planner` queued as `7:build:planner:1`\n<!-- swarm: v2 | kind=reply | issue=7 | event=501 | at=2026-09-06T14:59:00Z -->",
+    "user": {
+      "login": "github-actions[bot]",
+      "type": "Bot"
+    },
+    "created_at": "2026-09-06T14:59:00Z"
+  }
+]

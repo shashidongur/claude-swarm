@@ -1,0 +1,16 @@
+{
+  "number": 9,
+  "title": "feat(FR-LIV-03): live session capacity (#7)",
+  "state": "open",
+  "labels": [],
+  "user": {
+    "login": "claude[bot]",
+    "type": "Bot"
+  },
+  "pull_request": {
+    "url": "https://api.github.com/repos/o/r/pulls/9",
+    "merged_at": null
+  },
+  "body": "Closes #7\n\nSwarm-Issue: #7",
+  "html_url": "https://github.com/o/r/pull/9"
+}

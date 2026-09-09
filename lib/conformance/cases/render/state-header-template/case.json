@@ -1,0 +1,37 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "state-header",
+    "-",
+    "--arg",
+    "stage",
+    "build",
+    "--arg",
+    "status",
+    "running `dev:app` (attempt 1)",
+    "--arg",
+    "cost",
+    "14.20",
+    "--arg",
+    "runner_minutes",
+    "61",
+    "--arg",
+    "overhead_minutes",
+    "9",
+    "--arg",
+    "rework_spent",
+    "1",
+    "--arg",
+    "rework_budget",
+    "5",
+    "--arg",
+    "cap",
+    "75"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **swarm** · build · running `dev:app` (attempt 1) · $14.20 · 61 min runner (+9 overhead) · rework 1/5 · cap $75"
+    ]
+  }
+}

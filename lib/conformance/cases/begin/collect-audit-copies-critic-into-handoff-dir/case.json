@@ -1,0 +1,19 @@
+{
+  "script": "lib/sh/collect-audit.sh",
+  "env": {
+    "CRITIC_EXEC": "critic-exec.json"
+  },
+  "project_files": {
+    "critic-exec.json": "@fixtures/exec/healthy.json",
+    ".swarm-run/critic.json": "{\"score\": 79}\n",
+    ".swarm-run/result.json": "{\"v\":2}\n"
+  },
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/critic/critic.json": "79",
+      ".swarm-run/critic/critic-execution.json.gz": "exists",
+      ".swarm-run/audit/critic.json": "79"
+    }
+  }
+}

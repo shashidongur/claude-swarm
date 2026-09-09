@@ -1,0 +1,13 @@
+{
+  "attempt": 1,
+  "duplicates": [
+    4
+  ],
+  "issue": 7,
+  "reason": "Looks like an earlier issue.",
+  "role": "analyst",
+  "stage": "requirements",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "duplicate"
+}

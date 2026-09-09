@@ -1,0 +1,32 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "EVENT": "schedule",
+    "ACTION": ""
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false"
+    },
+    "calls": [
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:retro:retro:1\"",
+      "~\"reason=watchdog\""
+    ],
+    "stdout_contains": [
+      "SKIP: watchdog tick done"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.fired_run_id": 9027
+    }
+  }
+}

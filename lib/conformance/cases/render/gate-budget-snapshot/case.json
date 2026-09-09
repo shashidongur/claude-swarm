@@ -1,0 +1,47 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "gate-budget",
+    "-",
+    "--arg",
+    "approver",
+    "octo-owner",
+    "--arg",
+    "cost",
+    "75.40",
+    "--arg",
+    "cap",
+    "75",
+    "--arg",
+    "issue",
+    "7",
+    "--arg",
+    "next",
+    "code-review:app (attempt 2)",
+    "--arg",
+    "estimate",
+    "3.00",
+    "--arg",
+    "runner_minutes",
+    "180",
+    "--arg",
+    "overhead_minutes",
+    "40",
+    "--arg",
+    "new_cap",
+    "125",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=gate | issue=7 | gate=budget | key=7:build:code-review:app:2 | at=2026-09-06T16:00:00Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🛎️ **gate · budget** — @octo-owner, your call.",
+      "Cost so far $75.40 has reached the cap $75 for #7; the next dispatch is code-review:app (attempt 2) (estimated $3.00).",
+      "180 runner minutes (+40 overhead) so far.",
+      "Reply `/swarm approve` to raise the cap by one envelope (to $125) and continue, `/swarm park` to pause, or `/swarm drop` to abandon.",
+      "<!-- swarm: v2 | kind=gate | issue=7 | gate=budget | key=7:build:code-review:app:2 | at=2026-09-06T16:00:00Z -->"
+    ]
+  }
+}

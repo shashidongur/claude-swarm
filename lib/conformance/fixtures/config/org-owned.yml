@@ -1,0 +1,74 @@
+# Sample project config (org-owned); regenerated from org-owned.json.
+approvers:
+  architecture:
+  - octo-owner
+  - octo-lead
+  confidence:
+  - octo-owner
+  default:
+  - octo-owner
+  release:
+  - octo-owner
+  - octo-lead
+  requirements:
+  - octo-owner
+  - octo-pm
+artifacts_dir: docs/swarm
+branch_prefix: claude/issue-
+contract_command: null
+default_branch: main
+delete_merged_branches: false
+evidence:
+  ci: CI
+gate_manifests:
+- api/package.json
+- app/package.json
+gate_scripts:
+- test:ci
+- lint
+- typecheck
+lanes:
+  api:
+    commands:
+      cwd: api
+      install: npm ci
+      lint: npm run lint
+      test: npm run test:ci
+      typecheck: npm run typecheck
+    paths:
+    - api/**
+    - shared/**
+  app:
+    commands:
+      cwd: app
+      install: npm ci
+      lint: npm run lint
+      test: npm run test:ci
+      typecheck: npm run typecheck
+    paths:
+    - app/**
+limits:
+  cost_usd_per_issue: 40
+  evidence_fires_per_issue: 1
+  usd_month: 120
+memory:
+  path: memory/github.com/octo-org/octo-app
+pin_marker: test.failing(
+protected_paths:
+- api/coverage.thresholds.json
+- app/coverage.thresholds.json
+- tools/**
+reporter_may_answer: false
+require_model_map: true
+requirement_id_pattern: ^REQ-[0-9]+$
+requirements_doc: docs/REQUIREMENTS.md
+sensitive_paths:
+- api/src/billing/**
+state_branch: swarm/state
+test_paths:
+- api/test/**
+- app/test/**
+v: 2
+walkthrough_when: []
+watchdog:
+  gate_reminder_days: 2

@@ -1,0 +1,29 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_HANDOFF": "dev-app-pass",
+    "SC_STATE_PATCH": ".dispatches[0].status = \"finished\" | .dispatches[0].verdict = \"pass\"",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "!PUT *",
+      "!POST *",
+      "!PATCH *",
+      "!workflow run *"
+    ],
+    "stdout_contains": [
+      "already finalised"
+    ]
+  }
+}

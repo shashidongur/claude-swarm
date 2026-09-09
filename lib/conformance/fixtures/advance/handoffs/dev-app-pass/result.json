@@ -1,0 +1,31 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "dev:app",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "evidence": [
+    {
+      "kind": "command",
+      "cmd": "npm run test:ci -- Issue7",
+      "result": "Tests: 3 passed",
+      "exit": 0
+    },
+    {
+      "kind": "file",
+      "path": "app/src/screens/LiveSessions.tsx",
+      "line": 1,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "touches": [
+    "app/src/screens/LiveSessions.tsx"
+  ],
+  "head": "@HEAD",
+  "artifacts": [],
+  "not_covered": [
+    "device walkthrough not run in this stage"
+  ]
+}

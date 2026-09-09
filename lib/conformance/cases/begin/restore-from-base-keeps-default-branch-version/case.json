@@ -1,0 +1,18 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:code-review:app:1",
+    "SC_MAIN_FILES": ".claude/settings.json={\"from\": \"main\"}\\n",
+    "SC_BRANCH_FILES": ".claude/settings.json={\"from\": \"branch\", \"planted\": true}\\n"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: begin exit 0",
+      "PROBE: .claude/settings.json exists"
+    ],
+    "files": {
+      ".claude/settings.json": "\"from\": \"main\""
+    }
+  }
+}

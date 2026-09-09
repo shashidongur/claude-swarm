@@ -1,0 +1,35 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "refusal",
+    "--arg",
+    "login",
+    "mallory"
+  ],
+  "env": {
+    "SWARM_STATE_RACE_HOOK": "[ -f \"$SWARM_FAKE_GH/once\" ] || { touch \"$SWARM_FAKE_GH/once\"; \"$SWARM_ROOT/lib/sh/state.sh\" write 7 log --arg event concurrent >/dev/null; }",
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "CAS conflict 1 on refusal",
+      "HTTP 409"
+    ],
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 log",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 refusal",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 refusal"
+    ],
+    "state_after": {
+      "refusals.mallory": "2026-09-06",
+      "status": "running",
+      "log.1.event": "concurrent"
+    }
+  }
+}

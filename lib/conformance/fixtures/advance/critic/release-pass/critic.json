@@ -1,0 +1,19 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "release",
+  "target_key": "@KEY",
+  "rubric": "release",
+  "model": "claude-opus-5",
+  "score": 81,
+  "threshold": 70,
+  "dimensions": {
+    "grounded": 81,
+    "complete": 81,
+    "testable": 81,
+    "scoped": 81
+  },
+  "findings": [],
+  "verdict": "pass",
+  "confidence": "high"
+}

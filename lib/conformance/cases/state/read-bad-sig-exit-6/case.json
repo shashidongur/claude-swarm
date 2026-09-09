@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "read",
+    "7"
+  ],
+  "expect": {
+    "exit": 6,
+    "stdout_contains": [
+      "signature missing or mismatching"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

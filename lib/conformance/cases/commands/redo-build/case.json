@@ -1,0 +1,36 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 redo",
+      "POST repos/o/r/issues/7/comments",
+      "~re-pinned",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:build:planner:2\"",
+      "~\"reason=redo\""
+    ],
+    "stdout_contains": [
+      "re-pinned"
+    ],
+    "state_after": {
+      "status": "queued",
+      "stage": "build",
+      "next.key": "7:build:planner:2",
+      "rework.spent": 0,
+      "swarm_sha": "*",
+      "stages.test.status": "pending",
+      "owner_reason.text": "the plan missed the app lane"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "path",
+    "--arg",
+    "path",
+    "short",
+    "--arg",
+    "source",
+    "owner",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "next_stage",
+    "build",
+    "--arg",
+    "next_role",
+    "test-writer"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "path": "short",
+      "path_source": "owner",
+      "stages.design.status": "skipped",
+      "stages.architecture.status": "skipped",
+      "status": "queued",
+      "stage": "build",
+      "next.key": "7:build:test-writer:1",
+      "gate": null
+    }
+  }
+}

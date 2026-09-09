@@ -1,0 +1,17 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:test:qa:1",
+    "EVIDENCE_JSON": "{\"walkthrough\": {\"skipped\": \"evidence fire cap reached (2); CI evidence only\"}}"
+  },
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/evidence/test/manifest.json": "evidence fire cap reached (2); CI evidence only",
+      ".swarm-run/evidence/index.json": "\"artifact\": \"skipped\""
+    },
+    "stdout_contains": [
+      "PROBE: begin exit 0"
+    ]
+  }
+}

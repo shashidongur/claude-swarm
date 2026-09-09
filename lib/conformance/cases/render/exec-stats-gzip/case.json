@@ -1,0 +1,15 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "exec.json.gz"
+  ],
+  "project_files": {
+    "exec.json.gz": "@fixtures/exec/healthy.json.gz"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"total_cost_usd\": 4.12"
+    ]
+  }
+}

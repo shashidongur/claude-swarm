@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-swarm/schema/critic.schema.json",
+  "title": "claude-swarm .swarm-run/critic.json (v2 critic score, spec §8.2)",
+  "description": "Written by the critic step/job with the Write tool and nothing else; advance accepts it only when the critic's own execution file shows that Write. verdict = pass iff score >= threshold and no `high` finding. Strings carry no @handle and no HTML comment delimiter (they are rendered into comments).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["v", "issue", "stage", "target_key", "rubric", "model", "score", "threshold", "dimensions", "findings", "verdict", "confidence"],
+  "definitions": {
+    "clean": { "type": "string", "not": { "pattern": "@[A-Za-z0-9-]|<!--|-->" } },
+    "score": { "type": "integer", "minimum": 0, "maximum": 100 }
+  },
+  "properties": {
+    "v": { "const": 2 },
+    "issue": { "type": "integer", "minimum": 1 },
+    "stage": { "type": "string", "enum": ["triage", "requirements", "design", "architecture", "build", "test", "security", "release", "retro"] },
+    "target_key": {
+      "description": "The idempotency key of the dispatch being scored.",
+      "type": "string",
+      "pattern": "^[0-9]+:[a-z][a-z0-9-]*:[a-z][a-z0-9-]*(:[A-Za-z0-9_-]+)?:[0-9]+$"
+    },
+    "rubric": { "type": "string", "enum": ["requirements", "architecture", "release", "design", "plan", "report", "generic"] },
+    "model": { "type": "string", "pattern": "^claude-[a-z0-9.-]+$" },
+    "score": { "$ref": "#/definitions/score" },
+    "threshold": { "$ref": "#/definitions/score" },
+    "dimensions": {
+      "description": "Rubric-defined dimensions, each 0–100; score is their weighted mean.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_-]*$" },
+      "additionalProperties": { "$ref": "#/definitions/score" }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "where", "claim", "why", "fix"],
+        "properties": {
+          "severity": { "type": "string", "enum": ["high", "medium", "low"] },
+          "where": { "allOf": [ { "$ref": "#/definitions/clean" }, { "type": "string", "minLength": 1 } ] },
+          "claim": { "allOf": [ { "$ref": "#/definitions/clean" }, { "type": "string", "minLength": 1 } ] },
+          "why": { "$ref": "#/definitions/clean" },
+          "fix": { "$ref": "#/definitions/clean" }
+        }
+      }
+    },
+    "verdict": { "type": "string", "enum": ["pass", "fail"] },
+    "confidence": { "type": "string", "enum": ["high", "medium", "low"] }
+  },
+  "allOf": [
+    {
+      "description": "a high finding can never be a pass",
+      "if": { "properties": { "findings": { "type": "array", "contains": { "type": "object", "properties": { "severity": { "const": "high" } }, "required": ["severity"] } } } },
+      "then": { "properties": { "verdict": { "const": "fail" } } }
+    }
+  ]
+}

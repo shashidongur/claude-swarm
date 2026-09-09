@@ -1,0 +1,34 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "pending-lifecycle"
+  ],
+  "env": {
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7/pending/review-app-a1.md",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~pending-stage",
+      "PUT repos/o/r/contents/issues/7/pending/critic/architecture-a1.json",
+      "PUT repos/o/r/contents/issues/7.json",
+      "DELETE repos/o/r/contents/issues/7/pending/review-app-a1.md",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~pending-clear"
+    ],
+    "stdout_contains": [
+      "PROBE: pending after stage [\"review-app-a1.md\",\"critic/architecture-a1.json\"]",
+      "PROBE: both files copied",
+      "PROBE: staged file still present after copy",
+      "PROBE: a second copy still works",
+      "PROBE: staged file deleted after clear",
+      "PROBE: pending after clear [\"critic/architecture-a1.json\"]"
+    ],
+    "state_after": {
+      "pending_artifacts.0.file": "critic/architecture-a1.json",
+      "pending_artifacts.1": null
+    }
+  }
+}

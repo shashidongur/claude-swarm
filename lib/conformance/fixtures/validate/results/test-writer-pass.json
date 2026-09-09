@@ -1,0 +1,29 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "test-writer",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Pinned one red test per acceptance criterion in the app lane and opened the draft pull request.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "app/src/__tests__/b.test.ts",
+      "line": 1,
+      "symbol": "it.failing"
+    }
+  ],
+  "artifacts": [
+    "test-plan.md",
+    "pr-body.md"
+  ],
+  "not_covered": [],
+  "refs": [
+    "AC-7-1"
+  ],
+  "touches": [
+    "app/src/__tests__/b.test.ts"
+  ],
+  "head": "0000000000000000000000000000000000000000"
+}

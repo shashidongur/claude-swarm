@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/evidence.sh",
+  "args": [
+    "collect",
+    "7",
+    "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "ISSUE": "7",
+    "CONFIG_JSON": "config.json"
+  },
+  "project_files": {
+    "config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/evidence/security/manifest.json": "{\"v\": 2, \"issue\": 7, \"synthetic\": true, \"sections\": {\"all\": {\"ran\": false, \"reason\": \"evidence fire cap reached (2); CI evidence only\"}}}"
+  },
+  "commit_project_files": false,
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "evidence": "security=skipped,CI=ok"
+    },
+    "files": {
+      ".swarm-run/evidence/index.json": "\"reason\": \"evidence fire cap reached (2); CI evidence only\"",
+      ".swarm-run/evidence/security/manifest.json": "evidence fire cap reached"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "id": 900,
+    "body": "🐕 **watchdog** · old\n<!-- swarm: v2 | kind=watchdog | issue=7 | gate=architecture | topic=gate-reminder | at=2026-08-24T17:23:00Z -->",
+    "user": {
+      "login": "github-actions[bot]",
+      "type": "Bot"
+    },
+    "created_at": "2026-08-24T17:23:00Z"
+  }
+]

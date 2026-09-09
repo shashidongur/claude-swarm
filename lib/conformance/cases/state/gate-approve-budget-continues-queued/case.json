@@ -1,0 +1,31 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "gate-approve",
+    "--arg",
+    "name",
+    "budget",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "cap",
+    "110"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "gate": null,
+      "next.key": "7:build:code-review:app:1",
+      "next.fired_at": null,
+      "limits.cost_usd_per_issue": 110,
+      "totals.wakeups": 3
+    }
+  }
+}

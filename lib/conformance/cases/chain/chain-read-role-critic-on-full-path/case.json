@@ -1,0 +1,24 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "true",
+      "critic_model": "claude-opus-5",
+      "critic_rubric": "requirements",
+      "critic_threshold": "70",
+      "critic_turns": "40",
+      "critic_timeout": "15",
+      "job_timeout": "70"
+    }
+  }
+}

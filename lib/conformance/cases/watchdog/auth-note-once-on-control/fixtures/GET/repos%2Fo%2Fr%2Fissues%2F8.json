@@ -1,0 +1,14 @@
+{
+  "number": 8,
+  "title": "Other",
+  "state": "open",
+  "labels": [
+    {
+      "name": "swarm:build"
+    }
+  ],
+  "user": {
+    "login": "reporter",
+    "type": "User"
+  }
+}

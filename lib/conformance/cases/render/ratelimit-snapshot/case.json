@@ -1,0 +1,28 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "ratelimit",
+    "-",
+    "--arg",
+    "role",
+    "analyst",
+    "--arg",
+    "not_before",
+    "2026-09-06T18:00:00Z",
+    "--arg",
+    "attempt",
+    "1",
+    "--arg",
+    "run_url",
+    "https://github.com/o/r/actions/runs/3",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=died | issue=7 | at=2026-09-06T15:01:19Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "💀 **analyst** · run died (usage limit) — will retry after 2026-09-06T18:00:00Z; `/swarm resume` to retry now · attempt 1 · https://github.com/o/r/actions/runs/3"
+    ]
+  }
+}

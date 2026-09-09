@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "paths-contain",
+    "--mutate",
+    ".paths.short = [\"triage\",\"build\"]"
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: paths-contain — path short lacks retro"
+    ]
+  }
+}

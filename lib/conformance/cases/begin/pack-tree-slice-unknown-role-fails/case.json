@@ -1,0 +1,18 @@
+{
+  "script": "lib/sh/pack-tree.sh",
+  "args": [
+    "slice",
+    "pipeline.json",
+    "build",
+    "warden"
+  ],
+  "project_files": {
+    "pipeline.json": "@../../pipeline.json"
+  },
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "unknown role warden"
+    ]
+  }
+}

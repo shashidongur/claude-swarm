@@ -1,0 +1,6 @@
+{
+  "script": "lib/sh/config.sh",
+  "args": ["load", "--out", "config.json", "--file", "swarm.yml"],
+  "project_files": { "swarm.yml": "@fixtures/config/no-lanes.yml" },
+  "expect": { "exit": 4, "stdout_contains": ["config: lanes: at least one lane is required"], "files": { "config.json": "absent" } }
+}

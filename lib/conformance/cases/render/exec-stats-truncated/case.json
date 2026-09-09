@@ -1,0 +1,15 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "exec.json"
+  ],
+  "project_files": {
+    "exec.json": "@fixtures/exec/truncated.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"present\":false"
+    ]
+  }
+}

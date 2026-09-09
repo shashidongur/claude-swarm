@@ -1,0 +1,10 @@
+{
+  "script": "lib/sh/redact.sh",
+  "stdin": "@fixtures/redact/transcript.txt",
+  "env": { "REDACT_VALUES": "hunter2-super-secret-value\nabc\n" },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["The value passed by the job was *** and the short one is abc."],
+    "stdout_not_contains": ["hunter2"]
+  }
+}

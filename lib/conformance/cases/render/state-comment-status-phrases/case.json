@@ -1,0 +1,15 @@
+{
+  "script": "lib/conformance/fixtures/render/render-probe.sh",
+  "args": [
+    "headers"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **swarm** · architecture · gate `architecture` since ",
+      "🧭 **swarm** · build · blocked:fire · ",
+      "🧭 **swarm** · build · queued — fired 2026-09-06T14:41:39Z, run not yet started · ",
+      "🧭 **swarm** · test · waiting for evidence `test` on f54b320 · "
+    ]
+  }
+}

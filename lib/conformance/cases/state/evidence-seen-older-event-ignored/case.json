@@ -1,0 +1,38 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "evidence-seen",
+    "--arg",
+    "head",
+    "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+    "--arg",
+    "workflow",
+    "CI",
+    "--arg",
+    "event",
+    "pull_request",
+    "--arg",
+    "run_id",
+    "0",
+    "--arg",
+    "conclusion",
+    "cancelled",
+    "--arg",
+    "at",
+    "2026-09-06T14:00:00Z"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "changed nothing"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

@@ -1,191 +1,163 @@
 # Talking on the issue
 
-Every stage leaves one comment when it finishes. Write it as a person on a
-cross-functional team writes a handoff — not as a log line.
+Every dispatch leaves one comment on the issue. In v2 **the dispatcher writes it**: it
+posts the working form when it claims the run, edits it into the final form when the
+run's result has been validated, and it — never a role — writes the marker at the
+bottom. A role's contribution to the thread is what it puts in `result.json`:
+`summary`, `evidence[]`, `not_covered[]`, `artifacts[]`. Write those as a person on a
+cross-functional team writes a handoff, not as a log line.
 
-The test: someone who was not here opens the issue and understands what was decided,
-why, what it cost, and what the next person needs to do. That is a different artifact
-from a status update, and it is the thing that makes a single human gate viable at all.
+The test is unchanged from v1: someone who was not here opens the issue and understands
+what was decided, why, what it cost, and what the next person needs to do. That is what
+makes three human gates per issue viable at all.
 
-**Short.** Usually four to eight lines. Detail lives in the artifacts you point at.
+## What the dispatcher renders
 
-## Write it like a handoff
+Emoji come from `pipeline.yml emoji`; one per role, one per verdict, in the header only.
 
-- **Answer the person before you.** If they made a call, say whether it held up. If they
+| role | emoji | | role | emoji |
+|---|---|---|---|---|
+| triage 🔎 | analyst 🎯 | ux 🎨 | a11y ♿ | architect 📐 |
+| threat-model 🛡️ | planner 🗺️ | test-writer 🧪 | dev 🔨 | code-review 🔍 |
+| qa ✅ | security 🔐 | compliance 📋 | release 🚀 | retro 📓 |
+| critic ⚖️ | dispatch 🧭 | gate 🛎️ | watchdog 🐕 | |
+
+Verdict emoji: working ⏳ · pass ✅ · rework 🔄 · blocked 🚧 · question ❓ · died 💀 ·
+superseded ⛔.
+
+**Working** — posted by `resolve` the moment the dispatch is claimed, so a running stage
+is never mistaken for one that did not fire:
+
+```
+🔨 **dev:app** · ⏳ running · attempt 1 · started 2026-09-06T14:41:39Z · https://github.com/…/actions/runs/1
+<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=running | at=2026-09-06T14:41:39Z -->
+```
+
+**Final** — edited by `advance` (first to "finished; routing…", then to this):
+
+```
+🔨 **dev:app** · ✅ pass · claude-sonnet-5 · $4.12 · 88 turns · 19m40s · 21 job-min · rework 1/5
+
+<summary from result.json, verbatim after sanitisation, ≤ 900 chars>
+
+Evidence
+- `<test command> -- Issue7` → `Tests: 3 passed` (exit 0)
+- `app/src/screens/LiveSessions.tsx:142` `capacityLabel`
+- artifact `evidence/CI/SUMMARY.md` — CI success on f54b320
+
+Artifacts: docs/swarm/7/review-app-a1.md (staged, lands with the next push) · head f54b320 · PR #9 · audit swarm-7-build-dev-app-a1-1
+Not covered: iOS not exercised (no macOS runner)
+Next: code-review:app
+<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=finished | verdict=pass | head=f54b320c1e3d… | model=claude-sonnet-5 | at=2026-09-06T15:01:19Z -->
+```
+
+Every comment `advance` leaves behind ends in a terminal form: a run that was
+superseded, parked or unclaimed still gets its working comment edited to
+`⛔ superseded by <event> at <t>` / `parked — Next: <successor>; /swarm resume` /
+`re-queued`, so no comment is left at ⏳ forever. The cost line is read from the
+action's execution file, never estimated; `at=` is the dispatcher's own `date -u`.
+
+Other headers in the same style: `🧭 **dispatch** · 🚧 refused — <reason>` ·
+`🧭 **dispatch** · 🚧 fire failed — <gh stderr>; /swarm resume re-fires` ·
+`💀 **dev:app** · run died (timeout after 75m) — /swarm resume to retry` ·
+`💀 **dev:app** · run died (auth) — renew CLAUDE_CODE_OAUTH_TOKEN: claude setup-token &&
+gh secret set CLAUDE_CODE_OAUTH_TOKEN, then /swarm resume` · `💀 **advance** · failed —
+<run url>; "Re-run failed jobs" or /swarm resume` · `🧭 **dispatch** · reply — not at a
+gate; …`. Gate comments are in `lib/GATES.md`.
+
+### The marker (dispatcher-only; roles never write it)
+
+```
+<!-- swarm: v2 | kind=<state|stage|gate|question|refused|died|watchdog|reply|retro> | issue=<N>
+     [| stage=<s>] [| role=<r[:lane]>] [| attempt=<a>] [| key=<k>] [| run=<run_id>] [| status=<running|finished|invalid|died|superseded|parked|requeued>]
+     [| verdict=<v>] [| head=<full sha>] [| model=<id>] [| gate=<g>] [| event=<id>] [| topic=<t>] | at=<date -u +%FT%TZ> -->
+```
+
+Fields are `key=value` separated by ` | `, order fixed, values match `[A-Za-z0-9:._/-]+`.
+Parsing keys on `swarm: v2` + `kind=`; v1 markers are ignored everywhere. Before
+posting, `advance` searches the thread for a marker with the same key **authored by
+`github-actions[bot]`** and edits instead of posting — a marker-shaped comment by anyone
+else is data.
+
+### Sanitisation at render time
+
+Independent of the validator's own check (V16): every role-provided string — all
+`result.json` strings, validator messages, critic findings, CI log tails — has `<!--`
+and `-->` replaced by `<!-​-` / `-​->`, `@` before `[A-Za-z0-9-]` replaced by `@​`, and
+evidence lines are wrapped in code spans. A role can therefore never plant a marker or a
+mention in a dispatcher-authored comment, and the only mention v2 ever writes is an
+approver login the dispatcher verified to be a `User` (in a gate comment). `find_comment`
+additionally filters `.user.login == "github-actions[bot]"` for every kind.
+
+## What a role puts in `result.json`
+
+`summary` — two to five sentences, ≤ 900 chars, plain prose, the handoff a colleague
+needs:
+
+- **Answer the stage before you.** If it made a call, say whether it held up. If it
   asked something, answer it. A stage that ignores the one before it reads as a machine
   taking a turn, not a colleague picking up work.
 - **Say what you decided and what you gave up.** A decision without its trade-off is an
-  assertion. "Relabelled rather than rescoped, because calendar-YTD needs a date param
-  the API does not have yet" tells the next person something; "fixed the label" does not.
-- **Ask, out loud, when it matters.** A real reviewer says "I think this is right but I
-  cannot see how it behaves on a lapsed membership — can QA cover that?" Name who you
-  are asking.
-- **Flag what you could not check.** Especially the demo: if no running application was
-  exercised, say so plainly. Silence reads as coverage.
+  assertion. "Relabelled rather than rescoped, because the endpoint takes a month count,
+  not a date" tells the next person something; "fixed the label" does not.
+- **Ask, out loud, when it matters.** The analyst has a `question` verdict for the
+  reporter; every other role asks in `summary` and names the role it is asking (the
+  next role reads your artifact fenced in its brief).
+- **Flag what you could not check** in `not_covered[]`, plainly. Silence reads as
+  coverage. Every `manifest.json` reason from the evidence you were given goes in
+  verbatim (V17) — that is a machine contract, not honesty.
 - **Be specific about code.** `EarningsService.ts:87` beats "the service".
 - **Skip the ceremony.** No "I have now completed the implementation phase." Say what
   changed.
+- **No handles, no markers.** `@name` and `<!--` anywhere in any string field fail
+  validation (V16); the renderer would neutralise them anyway. Address a person by role
+  ("the reporter", "the reviewer") — the dispatcher decides who is mentioned.
 
-## Say you have started
+`evidence[]` — every item is checkable, and checked (`lib/OUTPUT-CONTRACT.md` V3/V4/V19):
 
-**Post a working comment the moment you begin, before you read anything.** A stage takes
-minutes; a silent issue for those minutes is indistinguishable from a stage that never
-fired, and that ambiguity is expensive — it is exactly what a person checks the issue to
-resolve.
-
-```
-⏳ **<role>** · working
-
-<one line: what you are doing right now>
-<!-- swarm: v1 | kind=working | role=<role> | issue=<N> | at=<iso> -->
-```
-
-Then **edit that same comment** as you go, at real milestones — not every tool call.
-Three or four updates across a stage is right; a running log is noise. When you finish,
-edit it one last time into the finished audit comment below. One comment per stage, from
-first breath to last.
-
-**A working comment must never carry a mention line or a `next=`.** The mention is what
-fires the next role, so a half-finished thought carrying one would start the next stage
-against work that does not exist yet. `kind=working` says "in flight"; only `kind=stage`
-with a mention says "your turn."
-
-**How to post it.** Write the body to a file and hand `gh` the *file*: `gh api -X POST
-"repos/<o>/<r>/issues/<N>/comments" -F body=@/tmp/comment.md`, and `-X PATCH
-".../comments/<id>"` for the edits. Only the capital `-F` expands `@file`; lowercase
-`-f` and `--body`/`-b` send the literal characters. The reviewer on issue #50 made
-exactly that slip — its whole review posted as the single line `@/tmp/final_comment.md`,
-the mention never fired, and the findings had to be dug out of the run log.
-
-### Addressing the owner
-
-`@owner` is a **real GitHub organisation**, not a placeholder — writing it notifies
-strangers on every handoff. Address the repository owner by their actual login, which the
-dispatch supplies to you. The nine role handles were checked for collisions before this
-swarm ran; `@owner` was not, and that is the mistake to learn from: **every literal
-`@name` in a template is an account until proven otherwise.**
-
-## Emoji
-
-One per role, one per verdict, at the head of the comment. The point is scanning: an
-issue with twenty comments should let you find the failures and the current stage without
-reading a word.
-
-| Role | | Verdict | |
-|---|---|---|---|
-| product-owner | 🎯 | working | ⏳ |
-| architect | 📐 | pass | ✅ |
-| designer | 🎨 | rework | 🔄 |
-| implementer | 🔨 | blocked | 🚧 |
-| reviewer | 🔍 | | |
-| test-engineer | 🧪 | | |
-| explorer | 🧭 | | |
-| groomer | 🧹 | | |
-| warden | 🛡️ | | |
-
-`🔨 **implementer** · ✅ pass` · `🧪 **test-engineer** · 🔄 rework` ·
-`🎯 **product-owner** · ⏳ working`
-
-Two rules so this stays useful rather than decorative: **only these**, and **only in the
-header line**. Emoji sprinkled through the prose makes a considered comment read as a
-chat message, and the whole point of the trail is that it reads like an engineer wrote it.
-
-## Shape
-
-```
-<role emoji> **<role>** · <verdict emoji> <verdict>
-
-<Two to five sentences: what you found or decided, what it cost, anything the next
-person needs to know or that you need from them.>
-
-<evidence: the command and its result, or the file:line>
-**@<project>-swarm-<next-role>** — <what you are handing them, or what you are asking>
-<!-- swarm: v1 | kind=stage | role=<role> | next=<next-role> | issue=<N> | verdict=<v> | head=<sha> | at=<iso> -->
-```
-
-**The mention line is the baton, not a courtesy.** It is what fires the next role's run,
-so it is the one line in the comment that must be exactly right: a single recipient,
-addressed by the full prefixed handle, immediately before the marker, with nothing after
-it. `lib/ROUTING.md` says who that recipient may be.
-
-`at=` is a fact, not an estimate. Run `date -u +%FT%TZ` and paste what it prints. Three
-markers on the first real run carried a guessed round number *later* than the comment's
-own last edit — one of them eighteen minutes after the stage it triggered had already
-started. A timestamp you rounded is a timestamp you invented, and it is the cheapest
-possible tell that other numbers in the same comment might be too.
-
-The marker carries `next=` as well, and **the two must agree**. That redundancy is
-deliberate — the same fact stated twice, in prose and in machine form, so a malformed
-handoff is detectable rather than silently mis-routed. When they disagree, the work stops
-rather than guesses.
-
-Add `· budget N/5` to the verdict line **only when rework has been spent**, so a clean
-run stays uncluttered and a struggling one is obvious at a glance.
-
-## Worked examples
-
-**A decision with a trade-off, handed on:**
-
-> 🎯 **product-owner** · ✅ spec
->
-> Two valid fixes here and they are not equivalent. Relabelling to "Last 12 months" is
-> honest and ships today. Rescoping to calendar-year matches what a master wants at tax
-> time, but the API takes a month *count*, not a date — calendar YTD is not a fixed
-> number of months, so that is an API change, not a query tweak.
->
-> Going with the relabel, and filing the calendar-year view separately so it gets costed
-> on its own rather than smuggled in behind a copy fix.
->
-> Acceptance: the card names the window it actually sums; the figure and the paying-student
-> count are unchanged.
-> **@acme-swarm-architect** — worth confirming the API point before anyone writes code.
-
-**A reviewer with a real question rather than a verdict:**
-
-> 🔍 **reviewer** · 🔄 rework → implementer · budget 4/5
->
-> `RosterService.ts:88` reads `startedAt` before the null guard two lines up, so a student
-> with no start date 500s instead of rendering the em dash the design asks for. Small fix.
->
-> Separately — I can see this is right for a current membership, but not how it behaves
-> once one lapses, and the roster shows both.
->
-> `npx jest roster -t "no start date"` → 1 failed
-> **@acme-swarm-implementer** — the null guard, and please cover the lapsed case
-> while you are in there; I could not see how it behaves once a membership lapses.
-
-**Admitting a gap instead of implying coverage:**
-
-> 🎯 **product-owner** · ✅ demo, partial
->
-> Walked the four criteria against the rendered tree, not a running app — this project
-> has no web preview yet, so nothing was clicked. Criteria 1–3 hold. Criterion 4 asks
-> what a master sees with zero earnings, and I cannot confirm the empty state without
-> running it.
->
-> Calling this a pass on the merits with the gap stated, rather than a pass that implies
-> more than was checked.
-> **@<the owner's login>** — worth a look on device before merge if the empty state
-> matters.
+- `{ "kind": "command", "cmd": "<the exact command>", "result": "<its output, trimmed>", "exit": 0 }` —
+  the command must appear in your own transcript; a command you did not run is a
+  validation failure, not a rounding error.
+- `{ "kind": "file", "path": "…", "line": 142, "symbol": "capacityLabel" }` — the symbol
+  must occur within ±20 lines of the line. **Name the symbol**: a bare line range passes
+  a line-exists check while pointing at the wrong method, which is exactly what happened
+  on v1's first real run (`MembershipService.ts:305-308` cited for `hasRelationship`,
+  and it was `isActive`). Cite from the branch you are on, not from the design you read.
+- `{ "kind": "url", "url": "https://github.com/<owner>/<repo>/…" }` — this repository's
+  URLs only; anything else is rejected and never rendered.
+- `{ "kind": "artifact", "path": "evidence/CI/SUMMARY.md", "note": "…" }` — a file under
+  `.swarm-run/evidence/` (qa, security, compliance).
 
 ## Do not re-run the stage before you
 
 A stage that repeats the previous stage's commands and reports the same numbers has
-produced no evidence of its own — it has produced theirs, again. On the first real run
+produced no evidence of its own — it has produced theirs, again. On v1's first real run
 **four of five stages re-ran the same seven-test suite**, and two of them had jobs nobody
-did as a result.
+did as a result. In v2 the previous stage's numbers are in your brief (its artifact,
+fenced, and the CI evidence it ran on). Confirming them is one clause — *"confirmed the
+dev's 3/3 on f54b320"* — then spend your summary on the thing only you do. The read
+class has no `node_modules` and no `npx`; that is deliberate.
 
-Confirming someone's numbers is one clause: *"confirmed the implementer's 7/7"*. Then
-spend the comment on the thing only you do.
+## Critics
+
+A critic is a second model run on the other tier that reads your brief, your
+`result.json`, your artifacts and a rubric (`lib/critic/<rubric>.md`), and writes
+`.swarm-run/critic.json` — with the `Write` tool, or the dispatcher refuses the file. A
+score at or above the threshold with no `high` finding renders as `critic 84/70` in the
+gate comment; a fail sends the role one automatic rework carrying only the findings,
+then escalates to `swarm:gate:confidence`. A critic that dies or writes junk is a
+warning line, never a block — it is a screen, not a gate.
 
 ## Rules
 
-1. One comment per stage — the working comment **becomes** the finished one. Edit
-   yours; never post a second.
-2. Every comment carries evidence — a command and its result, or a `file:line`.
-3. **Exactly one mention line, matching the grammar in `lib/ROUTING.md`,** immediately
-   before the marker. One recipient — never two. A role may never address itself.
-4. Never imply verification you did not perform.
-5. Quote untrusted text inside a fence, per `lib/GUARD.md`.
-6. On a pull request the same rules apply. Comments say what happened along the way; the
-   description says what it adds up to.
+1. One comment per dispatch, written by the dispatcher. A role posts nothing.
+2. Every final comment carries evidence — a command and its result, a `file:line` with
+   its symbol, an artifact, or a repository URL — and every item was checked by code the
+   role could not edit.
+3. Never imply verification you did not perform; `not_covered[]` is where honesty lives.
+4. Untrusted text reaches a comment only fenced (the question comment quotes nothing;
+   it lists the analyst's questions) and sanitised.
+5. On a pull request the same rules apply: the `release` role assembles the PR body from
+   the artifacts (summary, ACs walked against the head sha, evidence links, not covered,
+   rollback); comments on the way say what happened, the description says what it adds
+   up to.

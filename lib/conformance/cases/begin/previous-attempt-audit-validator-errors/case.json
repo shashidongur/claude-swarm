@@ -1,0 +1,19 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:dev:app:2",
+    "SWARM_SKIP_INSTALL": "1"
+  },
+  "fixtures": [
+    "begin"
+  ],
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/previous-attempt.md": "Last assistant message"
+    },
+    "stdout_contains": [
+      "PROBE: begin exit 0"
+    ]
+  }
+}

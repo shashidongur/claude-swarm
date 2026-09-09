@@ -1,0 +1,817 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-swarm/schema/pipeline.schema.json",
+  "title": "claude-swarm pipeline.json (v2 routing data, spec §16.1.2)",
+  "description": "Shape of pipeline.yml / pipeline.json. Stage and role names are the swarm's own vocabulary; lane names, workflow names and project paths never appear here (they come from the project's .github/swarm.yml and are validated at runtime).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "v",
+    "models",
+    "limits",
+    "protected_paths",
+    "restore_from_base",
+    "classes",
+    "deny_paths",
+    "bash_deny",
+    "critic_defaults",
+    "emoji",
+    "stages",
+    "paths",
+    "memory_fenced",
+    "verdict_edges",
+    "edges"
+  ],
+  "definitions": {
+    "tier": {
+      "type": "string",
+      "enum": [
+        "cheap",
+        "default",
+        "strong"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "roleRef": {
+      "description": "A role name, optionally lane-qualified with the literal placeholder <lane>, or the analyst's feedback mode.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(:<lane>)?$"
+    },
+    "stageList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/name"
+      },
+      "uniqueItems": true,
+      "minItems": 2,
+      "allOf": [
+        {
+          "contains": {
+            "const": "triage"
+          }
+        },
+        {
+          "contains": {
+            "const": "retro"
+          }
+        }
+      ]
+    },
+    "globList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "onShortStage": {
+      "type": "string",
+      "enum": [
+        "run",
+        "skip"
+      ]
+    },
+    "onShortRole": {
+      "type": "string",
+      "enum": [
+        "run",
+        "skip",
+        "when_scan_changed",
+        "sensitive_only"
+      ]
+    },
+    "toolClass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "permissions",
+        "allowed",
+        "disallowed",
+        "write_roots"
+      ],
+      "properties": {
+        "permissions": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write"
+          ]
+        },
+        "allowed": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disallowed": {
+          "type": "string"
+        },
+        "write_roots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "critic": {
+      "oneOf": [
+        {
+          "const": "none"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rubric",
+            "threshold"
+          ],
+          "properties": {
+            "rubric": {
+              "type": "string",
+              "enum": [
+                "requirements",
+                "architecture",
+                "release",
+                "design",
+                "plan",
+                "report",
+                "generic"
+              ]
+            },
+            "threshold": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "on_short": {
+              "$ref": "#/definitions/onShortStage"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "must_differ_from": {
+              "$ref": "#/definitions/name"
+            },
+            "rework_to": {
+              "$ref": "#/definitions/roleRef"
+            },
+            "job": {
+              "type": "string",
+              "enum": [
+                "same",
+                "separate"
+              ]
+            },
+            "turns": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "tier": {
+              "description": "Overrides models.critic_tier_for[<role tier>] for this critic (used where the mapped tier would equal a must_differ_from role's tier).",
+              "$ref": "#/definitions/tier"
+            }
+          }
+        }
+      ]
+    },
+    "gate": {
+      "oneOf": [
+        {
+          "const": "none"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "reject_to"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "requirements",
+                "architecture",
+                "release"
+              ]
+            },
+            "on_short": {
+              "$ref": "#/definitions/onShortStage"
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "command",
+                "merge"
+              ]
+            },
+            "reject_to": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            }
+          }
+        }
+      ]
+    },
+    "evidenceBefore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "workflow",
+        "on_failure",
+        "max_fires"
+      ],
+      "properties": {
+        "workflow": {
+          "description": "Key into the project's `evidence:` map (ci|test|security) — never a workflow name.",
+          "type": "string",
+          "enum": [
+            "ci",
+            "test",
+            "security"
+          ]
+        },
+        "on_short": {
+          "$ref": "#/definitions/onShortStage"
+        },
+        "when": {
+          "description": "Config key holding the touch globs that enable the fire; absent = always.",
+          "type": "string",
+          "pattern": "^[a-z_]+$"
+        },
+        "on_failure": {
+          "type": "string",
+          "enum": [
+            "run_role",
+            "rework",
+            "block"
+          ]
+        },
+        "max_fires": {
+          "description": "A limits.* key or a literal count.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z_]+$"
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            }
+          ]
+        }
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "tier",
+        "class",
+        "turns",
+        "timeout",
+        "artifacts",
+        "reads",
+        "memory",
+        "critic",
+        "verdicts"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "tier": {
+          "$ref": "#/definitions/tier"
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write"
+          ]
+        },
+        "turns": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timeout": {
+          "description": "Step timeout in minutes.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9<][A-Za-z0-9<>._-]*(/[A-Za-z0-9<][A-Za-z0-9<>._-]*)*$"
+          },
+          "uniqueItems": true
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*$"
+          },
+          "uniqueItems": true
+        },
+        "memory": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._*-]*)*$"
+          },
+          "uniqueItems": true
+        },
+        "critic": {
+          "$ref": "#/definitions/critic"
+        },
+        "verdicts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "rework",
+              "blocked",
+              "question",
+              "duplicate"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "contains": {
+            "const": "blocked"
+          }
+        },
+        "on_short": {
+          "$ref": "#/definitions/onShortRole"
+        },
+        "per_lane": {
+          "type": "boolean"
+        },
+        "must_differ_from": {
+          "$ref": "#/definitions/name"
+        },
+        "rework_to": {
+          "$ref": "#/definitions/roleRef"
+        },
+        "rework_max": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "requires_ci": {
+          "type": "string",
+          "enum": [
+            "success"
+          ]
+        },
+        "requires_evidence": {
+          "type": "string",
+          "enum": [
+            "success"
+          ]
+        },
+        "requires_scan": {
+          "type": "string",
+          "enum": [
+            "success"
+          ]
+        },
+        "can_escalate_path": {
+          "type": "boolean"
+        },
+        "creates_subissues": {
+          "type": "boolean"
+        },
+        "opens_pr": {
+          "type": "boolean"
+        },
+        "evidence_after": {
+          "type": "string",
+          "enum": [
+            "ci"
+          ]
+        },
+        "ci_on_failure": {
+          "type": "string",
+          "pattern": "^(continue|rework:[a-z][a-z0-9-]*(:<lane>)?)$"
+        },
+        "specialist": {
+          "type": "boolean"
+        },
+        "lands_pending": {
+          "type": "boolean"
+        },
+        "writes_memory": {
+          "type": "string",
+          "enum": [
+            "pr"
+          ]
+        },
+        "retry": {
+          "description": "false disables the in-job retry step (§7.4); default true.",
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "verdicts": {
+                "type": "array",
+                "contains": {
+                  "const": "rework"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "rework_to"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "class": {
+                "const": "write"
+              },
+              "critic": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "critic"
+            ]
+          },
+          "then": {
+            "properties": {
+              "critic": {
+                "type": "object",
+                "required": [
+                  "job"
+                ],
+                "properties": {
+                  "job": {
+                    "const": "separate"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "label",
+        "on_short",
+        "gate",
+        "roles"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "label": {
+          "type": "string",
+          "pattern": "^swarm:[a-z][a-z0-9-]*$"
+        },
+        "on_short": {
+          "$ref": "#/definitions/onShortStage"
+        },
+        "gate": {
+          "$ref": "#/definitions/gate"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/role"
+          },
+          "minItems": 1
+        },
+        "evidence_before": {
+          "$ref": "#/definitions/evidenceBefore"
+        },
+        "trigger": {
+          "type": "string",
+          "enum": [
+            "merged"
+          ]
+        },
+        "once_per_merge": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "properties": {
+    "v": {
+      "const": 2
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tiers",
+        "critic_tier_for",
+        "retry_tier_for"
+      ],
+      "properties": {
+        "tiers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cheap",
+            "default",
+            "strong"
+          ],
+          "properties": {
+            "cheap": {
+              "type": "string",
+              "pattern": "^claude-[a-z0-9.-]+$"
+            },
+            "default": {
+              "type": "string",
+              "pattern": "^claude-[a-z0-9.-]+$"
+            },
+            "strong": {
+              "type": "string",
+              "pattern": "^claude-[a-z0-9.-]+$"
+            }
+          }
+        },
+        "critic_tier_for": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cheap",
+            "default",
+            "strong"
+          ],
+          "properties": {
+            "cheap": {
+              "$ref": "#/definitions/tier"
+            },
+            "default": {
+              "$ref": "#/definitions/tier"
+            },
+            "strong": {
+              "$ref": "#/definitions/tier"
+            }
+          }
+        },
+        "retry_tier_for": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cheap",
+            "default",
+            "strong"
+          ],
+          "properties": {
+            "cheap": {
+              "$ref": "#/definitions/tier"
+            },
+            "default": {
+              "$ref": "#/definitions/tier"
+            },
+            "strong": {
+              "$ref": "#/definitions/tier"
+            }
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rework_budget",
+        "runaway_per_hour",
+        "cost_usd_per_issue",
+        "runner_minutes_month",
+        "usd_month",
+        "question_rounds",
+        "critic_rework",
+        "pr_lines",
+        "pr_files",
+        "open_prs",
+        "pushes_per_pr_per_day",
+        "evidence_fires_per_issue",
+        "ratelimit_backoff_minutes"
+      ],
+      "properties": {
+        "rework_budget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "runaway_per_hour": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cost_usd_per_issue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "runner_minutes_month": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "usd_month": {
+          "type": "number",
+          "minimum": 0
+        },
+        "question_rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "critic_rework": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pr_lines": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pr_files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "open_prs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pushes_per_pr_per_day": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence_fires_per_issue": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ratelimit_backoff_minutes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "protected_paths": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/globList"
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ]
+    },
+    "restore_from_base": {
+      "$ref": "#/definitions/globList"
+    },
+    "classes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read",
+        "write",
+        "critic"
+      ],
+      "properties": {
+        "read": {
+          "$ref": "#/definitions/toolClass"
+        },
+        "write": {
+          "$ref": "#/definitions/toolClass"
+        },
+        "critic": {
+          "$ref": "#/definitions/toolClass"
+        }
+      }
+    },
+    "deny_paths": {
+      "$ref": "#/definitions/globList"
+    },
+    "bash_deny": {
+      "$ref": "#/definitions/globList"
+    },
+    "critic_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turns",
+        "timeout"
+      ],
+      "properties": {
+        "turns": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "emoji": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 8
+      },
+      "required": [
+        "critic",
+        "dispatch",
+        "gate",
+        "watchdog"
+      ]
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/stage"
+      },
+      "minItems": 2
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "full",
+        "short"
+      ],
+      "properties": {
+        "full": {
+          "$ref": "#/definitions/stageList"
+        },
+        "short": {
+          "$ref": "#/definitions/stageList"
+        }
+      }
+    },
+    "memory_fenced": {
+      "$ref": "#/definitions/globList"
+    },
+    "verdict_edges": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^([a-z][a-z0-9-]*|\\*)\\.(pass|rework|blocked|question|duplicate)$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^(next|block:[a-z-]+|park:[a-z-]+|gate:[a-z-]+|rework:([a-z][a-z0-9-]*(:<lane>)?|\\{result\\.rework_to\\}))$"
+      },
+      "required": [
+        "*.pass",
+        "*.blocked"
+      ]
+    },
+    "edges": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "free_rework",
+        "budgeted"
+      ],
+      "properties": {
+        "free_rework": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        },
+        "budgeted": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

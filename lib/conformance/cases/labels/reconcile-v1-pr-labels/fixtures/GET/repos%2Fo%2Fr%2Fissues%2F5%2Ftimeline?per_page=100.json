@@ -1,0 +1,16 @@
+[
+  {
+    "event": "cross-referenced",
+    "source": {
+      "type": "issue",
+      "issue": {
+        "number": 8,
+        "state": "closed",
+        "pull_request": {
+          "url": "https://api.github.com/repos/o/r/pulls/8",
+          "merged_at": null
+        }
+      }
+    }
+  }
+]

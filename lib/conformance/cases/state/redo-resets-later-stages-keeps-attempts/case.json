@@ -1,0 +1,42 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "redo",
+    "--arg",
+    "stage",
+    "architecture",
+    "--arg",
+    "role",
+    "architect",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "reason",
+    "the migration must be reversible",
+    "--arg",
+    "swarm_sha",
+    "1111111111111111111111111111111111111111"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "stage": "architecture",
+      "next.key": "7:architecture:architect:2",
+      "swarm_sha": "1111111111111111111111111111111111111111",
+      "rework.spent": 0,
+      "stages.build.status": "pending",
+      "stages.build.attempts.dev:app": 1,
+      "stages.build.attempts.dev:api": 2,
+      "stages.architecture.approved": null,
+      "stages.requirements.status": "done",
+      "owner_reason.kind": "redo"
+    }
+  }
+}

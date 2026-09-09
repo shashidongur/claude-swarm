@@ -1,0 +1,27 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": [
+    "calls"
+  ],
+  "env": {
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~first comment",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:triage:triage:1\"",
+      "PATCH repos/o/r/issues/comments/1001",
+      "~edited comment",
+      "POST repos/o/r/issues/7/labels",
+      "!DELETE *",
+      "!PUT repos/o/r/contents/issues/7.json",
+      "!~never posted"
+    ],
+    "stdout_contains": [
+      "PROBE: comment 1001"
+    ]
+  }
+}

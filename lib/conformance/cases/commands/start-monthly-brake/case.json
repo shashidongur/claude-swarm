@@ -1,0 +1,23 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "SWARM_TOKEN": "fake-pat"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~monthly budget: 1400/1500 min",
+      "~/swarm start force",
+      "!PUT repos/o/r/contents/issues/7.json",
+      "!workflow run *"
+    ]
+  }
+}

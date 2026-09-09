@@ -1,0 +1,31 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:design:a11y:2",
+    "SC_PR": "none",
+    "SC_HANDOFF": "a11y-rework",
+    "SC_RESULT_PATCH": ".attempt = 2",
+    "SC_STATE_PATCH": ".rework.log = [{from: \"a11y\", to: \"ux\", at: \"2026-09-06T12:00:00Z\", key: \"7:design:ux:2\"}] | .rework.spent = 1",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "workflow run swarm-dispatch.yml",
+      "~7:architecture:architect:1"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:architecture:architect:1",
+      "stages.design.status": "done"
+    }
+  }
+}

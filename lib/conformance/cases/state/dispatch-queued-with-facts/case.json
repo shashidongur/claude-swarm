@@ -1,0 +1,40 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-queued",
+    "--arg",
+    "stage",
+    "test",
+    "--arg",
+    "role",
+    "qa",
+    "--arg",
+    "from_key",
+    "7:build:code-review:app:1",
+    "--arg",
+    "done_stage",
+    "build",
+    "--arg",
+    "done_lane",
+    "app"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "stage": "test",
+      "next.key": "7:test:qa:1",
+      "stages.build.status": "done",
+      "stages.build.lanes.app": "done",
+      "stages.test.status": "running",
+      "stages.test.attempts.qa": 1,
+      "dispatches.2.key": "7:test:qa:1",
+      "dispatches.2.status": "queued"
+    }
+  }
+}

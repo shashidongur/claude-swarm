@@ -1,0 +1,9 @@
+{
+  "script": "lib/sh/redact.sh",
+  "stdin": "@fixtures/redact/transcript.txt",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["x-access-token:***@github.com", "GH_TOKEN=***", "CLAUDE_CODE_OAUTH_TOKEN=***", "PAT=***", "total_cost_usd", "and the short one is abc."],
+    "stdout_not_contains": ["ghs_abcdef", "ghp_ABCDEF", "sk-ant-oat01", "github_pat_11"]
+  }
+}

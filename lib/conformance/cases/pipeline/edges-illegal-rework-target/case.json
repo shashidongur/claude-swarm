@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "edges-legal",
+    "--mutate",
+    ".stages[2].roles[1].rework_to = \"nobody\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: edges-legal — role a11y (stage design): rework_to nobody is not a role"
+    ]
+  }
+}

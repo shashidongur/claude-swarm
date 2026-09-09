@@ -1,0 +1,10 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["reply-twice"],
+  "env": { "ISSUE": "7", "SWARM_NOW": "2026-09-06T14:41:39Z" },
+  "expect": {
+    "exit": 0,
+    "calls": ["POST repos/o/r/issues/7/comments", "~kind=reply | issue=7 | event=555 |", "!~second answer"],
+    "stdout_contains": ["already replied to event 555 (comment 1001)", "PROBE: reply ids 1001 1001"]
+  }
+}

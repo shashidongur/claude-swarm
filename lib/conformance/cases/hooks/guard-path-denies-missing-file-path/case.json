@@ -1,0 +1,13 @@
+{
+  "script": "lib/hooks/guard-path.sh",
+  "env": {
+    "SWARM_WRITE_ROOTS": "."
+  },
+  "stdin": "{\"tool_name\":\"Write\",\"tool_input\":{\"content\":\"x\"}}",
+  "expect": {
+    "exit": 2,
+    "stdout_contains": [
+      "names no file_path"
+    ]
+  }
+}

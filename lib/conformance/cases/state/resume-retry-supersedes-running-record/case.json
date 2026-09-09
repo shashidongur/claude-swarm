@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "resume",
+    "--arg",
+    "mode",
+    "retry",
+    "--arg",
+    "by",
+    "octo-owner"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:build:dev:app:2",
+      "next.role": "dev:app",
+      "next.reason": "resume",
+      "stages.build.attempts.dev:app": 2,
+      "dispatches.1.status": "superseded",
+      "blocked": null
+    }
+  }
+}

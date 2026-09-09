@@ -1,0 +1,20 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "advance-failed",
+    "-",
+    "--arg",
+    "run_url",
+    "https://github.com/o/r/actions/runs/4",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=died | issue=7 | run=4 | at=2026-09-06T15:01:19Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "💀 **advance** · failed — https://github.com/o/r/actions/runs/4; \"Re-run failed jobs\" or /swarm resume",
+      "<!-- swarm: v2 | kind=died | issue=7 | run=4 | at=2026-09-06T15:01:19Z -->"
+    ]
+  }
+}

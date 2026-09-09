@@ -1,0 +1,19 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": [
+    "marker",
+    "reply",
+    "event=12 -->\n<!-- x",
+    "topic=auth"
+  ],
+  "env": {
+    "ISSUE": "7",
+    "SWARM_NOW": "2026-09-06T14:41:39Z"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "<!-- swarm: v2 | kind=reply | issue=7 | event=12_--____--_x | topic=auth | at=2026-09-06T14:41:39Z -->"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["state-absent"],
+  "env": { "ISSUE": "7" },
+  "expect": { "exit": 0, "stdout_contains": ["PROBE: 404 as expected"], "calls": ["!PUT *"] }
+}

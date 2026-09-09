@@ -1,0 +1,72 @@
+{
+  "v": 2,
+  "issue": 7,
+  "repo": "o/r",
+  "path": "full",
+  "stage": "build",
+  "status": "running",
+  "branch": "claude/issue-7-live-session-capacity",
+  "head": null,
+  "pr": null,
+  "lanes": [
+    "api",
+    "app"
+  ],
+  "current": {
+    "role": "dev:app",
+    "attempt": 2,
+    "key": "7:build:dev:app:2",
+    "run_id": 424242,
+    "run_attempt": 1,
+    "base_sha": "",
+    "started_at": "2026-09-06T14:41:39Z",
+    "activity_from": "2026-09-06T14:41:39Z"
+  },
+  "questions": {
+    "rounds": 0,
+    "max": 2,
+    "comment_id": null
+  },
+  "pending_artifacts": [],
+  "dispatches": [
+    {
+      "key": "7:build:dev:app:1",
+      "run_id": 5,
+      "stage": "build",
+      "role": "dev:app",
+      "attempt": 1,
+      "status": "invalid",
+      "verdict": null,
+      "artifact": "swarm-7-build-dev-app-a1-5",
+      "died_reason": null,
+      "validation": {
+        "ok": false,
+        "errors": [
+          {
+            "check": "V3",
+            "msg": "evidence[0]: symbol capacityLabel not found near app/src/a.ts:1"
+          }
+        ]
+      },
+      "last_text": "I could not find the symbol; token ghs_abcdefghijklmnopqrstuvwxyz0123456789 was in my env."
+    }
+  ],
+  "log": [],
+  "rework": {
+    "spent": 1,
+    "budget": 5,
+    "log": [
+      {
+        "from": "code-review:app",
+        "to": "dev:app",
+        "at": "2026-09-06T15:00:00Z",
+        "key": "7:build:dev:app:2"
+      }
+    ]
+  },
+  "evidence": {
+    "seen": {},
+    "fires": {},
+    "pending": null
+  }
+}

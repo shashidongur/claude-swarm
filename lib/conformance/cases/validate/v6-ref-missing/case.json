@@ -1,0 +1,22 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-analyst.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    "REQS.md": "@fixtures/validate/REQS.md",
+    ".swarm-run/artifacts/requirements.md": "@fixtures/validate/requirements.md",
+    ".swarm-run/result.json": "@fixtures/validate/results/analyst-pass-bad-ref.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V6\""
+    },
+    "stdout_contains": [
+      "is not found in"
+    ]
+  }
+}

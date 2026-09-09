@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "resume",
+    "--arg",
+    "mode",
+    "next"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "parked": null,
+      "next.key": "7:build:code-review:app:1"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "gate-reject",
+    "--arg",
+    "name",
+    "architecture",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "reason",
+    "the migration must be reversible",
+    "--arg",
+    "stage",
+    "architecture",
+    "--arg",
+    "role",
+    "architect"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "stage": "architecture",
+      "next.key": "7:architecture:architect:2",
+      "next.reason": "reject",
+      "rework.spent": 0,
+      "rework.reset_at": "2026-09-06T15:00:00Z",
+      "owner_reason.text": "the migration must be reversible",
+      "gate": null,
+      "rework.log.1.free": true
+    }
+  }
+}

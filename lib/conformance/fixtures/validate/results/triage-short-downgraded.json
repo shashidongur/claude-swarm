@@ -1,0 +1,29 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "triage",
+  "role": "triage",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "A medium feature across both lanes that asks for the short path.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "app/src/screens/LiveSessions.tsx",
+      "line": 3,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "artifacts": [
+    "triage.json"
+  ],
+  "not_covered": [],
+  "triage": {
+    "type": "feature",
+    "size": "M",
+    "area": "both",
+    "prio": "P2",
+    "path": "short"
+  },
+  "duplicates": []
+}

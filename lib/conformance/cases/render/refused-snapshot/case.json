@@ -1,0 +1,19 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "refused",
+    "-",
+    "--arg",
+    "reason",
+    "not at a gate; running `dev:app` since 10:41 — https://github.com/o/r/actions/runs/1",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=refused | issue=7 | event=101 | at=2026-09-06T15:01:19Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **dispatch** · 🚧 refused — not at a gate; running `dev:app` since 10:41 — https://github.com/o/r/actions/runs/1"
+    ]
+  }
+}

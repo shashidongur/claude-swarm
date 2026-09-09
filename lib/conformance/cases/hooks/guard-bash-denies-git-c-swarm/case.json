@@ -1,0 +1,10 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "stdin": "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git -C .swarm checkout -- lib/sh/validate-result.sh\"}}",
+  "expect": {
+    "exit": 2,
+    "stdout_contains": [
+      "matches the denied pattern"
+    ]
+  }
+}

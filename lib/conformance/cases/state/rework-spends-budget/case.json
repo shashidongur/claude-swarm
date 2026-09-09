@@ -1,0 +1,39 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "rework",
+    "--arg",
+    "from",
+    "code-review:app",
+    "--arg",
+    "to",
+    "dev:app",
+    "--arg",
+    "stage",
+    "build",
+    "--arg",
+    "reason",
+    "double-tap race in the capacity button",
+    "--arg",
+    "from_key",
+    "7:build:code-review:app:1"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:build:dev:app:2",
+      "next.reason": "rework",
+      "rework.spent": 2,
+      "totals.reworks": 2,
+      "stages.build.lanes.app": "running",
+      "rework.log.1.from": "code-review:app",
+      "rework.log.1.key": "7:build:dev:app:2"
+    }
+  }
+}

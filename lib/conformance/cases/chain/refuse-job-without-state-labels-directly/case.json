@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/refuse.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "ISSUE": "7",
+    "BLOCK": "bad-handoff",
+    "REASON": "config: .github/swarm.yml not found on main of o/r",
+    "EVENT_ID": "run-424242"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~🚧 refused — config:",
+      "POST repos/o/r/issues/7/labels",
+      "~blocked:bad-handoff",
+      "!PUT *"
+    ]
+  }
+}

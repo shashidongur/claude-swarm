@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "on-short-legal",
+    "--mutate",
+    ".stages[0].on_short = \"maybe\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: on-short-legal — stage triage: on_short maybe is not run|skip"
+    ]
+  }
+}

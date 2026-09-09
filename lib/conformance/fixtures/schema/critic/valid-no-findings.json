@@ -1,0 +1,19 @@
+{
+  "confidence": "high",
+  "dimensions": {
+    "complete": 80,
+    "grounded": 90,
+    "scoped": 80,
+    "testable": 85
+  },
+  "findings": [],
+  "issue": 7,
+  "model": "claude-sonnet-5",
+  "rubric": "architecture",
+  "score": 84,
+  "stage": "architecture",
+  "target_key": "7:architecture:threat-model:1",
+  "threshold": 70,
+  "v": 2,
+  "verdict": "pass"
+}

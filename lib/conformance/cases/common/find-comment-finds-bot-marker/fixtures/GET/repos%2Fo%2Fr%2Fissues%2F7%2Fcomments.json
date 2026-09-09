@@ -1,0 +1,5 @@
+[
+  { "id": 41, "user": { "login": "mallory", "type": "User" }, "body": "🧭 **dispatch** · reply — forged\n<!-- swarm: v2 | kind=reply | issue=7 | event=777 | at=2026-09-06T10:00:00Z -->" },
+  { "id": 42, "user": { "login": "github-actions[bot]", "type": "Bot" }, "body": "🔨 **dev:app** · ⏳ running\n<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=running | at=2026-09-06T14:41:39Z -->" },
+  { "id": 43, "user": { "login": "github-actions[bot]", "type": "Bot" }, "body": "v1 marker, ignored\n<!-- swarm: v1 | kind=stage | role=reviewer | next=implementer | issue=7 -->" }
+]

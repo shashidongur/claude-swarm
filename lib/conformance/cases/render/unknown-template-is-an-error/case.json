@@ -1,0 +1,13 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "no-such-template",
+    "-"
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "no such template"
+    ]
+  }
+}

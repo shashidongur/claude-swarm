@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "must-differ",
+    "--mutate",
+    ".stages[3].roles[1].critic.tier = \"strong\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: must-differ — role threat-model (stage architecture): the critic runs on tier strong, the tier of architect"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "must-differ",
+    "--mutate",
+    ".stages[4].roles[3].must_differ_from = \"nobody\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: must-differ — role code-review (stage build): must_differ_from nobody is not a role"
+    ]
+  }
+}

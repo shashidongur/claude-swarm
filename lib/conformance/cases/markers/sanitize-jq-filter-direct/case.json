@@ -1,0 +1,19 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": [
+    "sanitize"
+  ],
+  "stdin": "a @b <!-- c --> d@e.f",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "a @​b <!-​- c -​-> d@​e.f",
+      "RC=0"
+    ],
+    "stdout_not_contains": [
+      "<!--",
+      "-->",
+      "@b"
+    ]
+  }
+}

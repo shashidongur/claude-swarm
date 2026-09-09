@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!workflow run *",
+      "!PUT *",
+      "POST repos/o/r/issues/7/labels",
+      "~blocked:perimeter",
+      "POST repos/o/r/issues/1/comments",
+      "~#7: state signature invalid"
+    ],
+    "stdout_contains": [
+      "#7 signature invalid: labelled blocked:perimeter, nothing fired"
+    ]
+  }
+}

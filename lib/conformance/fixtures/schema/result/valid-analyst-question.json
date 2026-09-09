@@ -1,0 +1,22 @@
+{
+  "artifacts": [
+    "requirements.md"
+  ],
+  "attempt": 1,
+  "issue": 7,
+  "questions": [
+    {
+      "q": "Should a master with an expired grant still see the capacity counter?",
+      "to": "reporter"
+    }
+  ],
+  "reason": "One acceptance criterion cannot be written without guessing the expiry behaviour.",
+  "refs": [
+    "FR-LIV-03"
+  ],
+  "role": "analyst",
+  "stage": "requirements",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "question"
+}

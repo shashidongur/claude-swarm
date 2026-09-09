@@ -1,0 +1,13 @@
+{
+  "databaseId": 424242,
+  "status": "in_progress",
+  "conclusion": null,
+  "jobs": [
+    { "name": "resolve", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T14:58:00Z", "completedAt": "2026-09-06T14:59:00Z", "steps": [] },
+    { "name": "run-write", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T15:00:00Z", "completedAt": "2026-09-06T15:04:00Z",
+      "steps": [
+        { "name": "begin", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T15:00:05Z", "completedAt": "2026-09-06T15:01:00Z" },
+        { "name": "Run claude", "status": "completed", "conclusion": "failure", "startedAt": "2026-09-06T15:01:00Z", "completedAt": "2026-09-06T15:03:40Z" }
+      ] }
+  ]
+}

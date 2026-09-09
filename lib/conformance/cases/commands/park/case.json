@@ -1,0 +1,28 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 park",
+      "POST repos/o/r/issues/7/comments",
+      "~parked by owner",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "parked",
+      "next.key": "7:build:code-review:app:1",
+      "next.fired_at": null,
+      "parked.by": "owner"
+    }
+  }
+}

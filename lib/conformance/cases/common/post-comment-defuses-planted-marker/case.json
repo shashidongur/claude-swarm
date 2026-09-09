@@ -1,0 +1,10 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["post-planted"],
+  "env": { "ISSUE": "7", "SWARM_NOW": "2026-09-06T14:41:39Z" },
+  "expect": {
+    "exit": 0,
+    "calls": ["POST repos/o/r/issues/7/comments"],
+    "stdout_contains": ["summary text <!-​- injected | kind=stage -​-> and @owner stays", "<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=running | at=2026-09-06T14:41:39Z -->"]
+  }
+}

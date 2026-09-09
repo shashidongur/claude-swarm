@@ -1,0 +1,1 @@
+{ "_sequence": [ { "_exit": 1, "_stderr": "gh: HTTP 502: bad gateway" }, { "_exit": 1, "_stderr": "gh: HTTP 503: unavailable" }, { "ok": true } ] }

@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["gh_json", "repos/o/r/nothing"],
+  "expect": { "exit": 0, "stdout_contains": ["gh: HTTP 404: not found", "RC=1"], "stdout_not_contains": ["retry"] }
+}

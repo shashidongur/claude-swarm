@@ -1,0 +1,20 @@
+{
+  "script": "lib/conformance/fixtures/begin/audit-probe.sh",
+  "env": {
+    "EXEC": "/nonexistent/execution.json"
+  },
+  "project_files": {
+    ".swarm-run/result.json": "{\"v\":2}\n"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: collect exit 0",
+      "no execution file for the role step (tolerated",
+      "PROBE: file perimeter.txt"
+    ],
+    "files": {
+      ".swarm-run/audit/execution.json.gz": "absent"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SWARM_SKIP_INSTALL": "1"
+  },
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "PROBE: begin exit 1",
+      "refusing to land it"
+    ],
+    "files": {
+      "docs/swarm/7/review-app-a1.md": "absent"
+    }
+  }
+}

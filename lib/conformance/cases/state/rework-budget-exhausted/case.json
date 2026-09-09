@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "rework",
+    "--arg",
+    "from",
+    "qa",
+    "--arg",
+    "to",
+    "dev:app",
+    "--arg",
+    "stage",
+    "build"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: rework budget exhausted (5/5)"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

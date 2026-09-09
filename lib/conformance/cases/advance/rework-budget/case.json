@@ -1,0 +1,28 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:code-review:app:1",
+    "SC_HANDOFF": "code-review-app-rework",
+    "SC_STATE_PATCH": ".rework.spent = 5",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "budget",
+      "rework.spent": 5
+    }
+  }
+}

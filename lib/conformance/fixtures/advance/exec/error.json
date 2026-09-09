@@ -1,0 +1,38 @@
+[
+  {
+    "type": "system",
+    "subtype": "init",
+    "model": "claude-sonnet-5"
+  },
+  {
+    "type": "assistant",
+    "message": {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "The tool call failed and the session ended."
+        },
+        {
+          "type": "tool_use",
+          "id": "b1",
+          "name": "Bash",
+          "input": {
+            "command": "npm run test:ci -- Issue7"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "type": "result",
+    "subtype": "error_during_execution",
+    "is_error": true,
+    "num_turns": 12,
+    "total_cost_usd": 0.3,
+    "duration_ms": 600000,
+    "modelUsage": {
+      "claude-sonnet-5": {}
+    }
+  }
+]

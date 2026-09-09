@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "gate-enter",
+    "--arg",
+    "name",
+    "question",
+    "--arg",
+    "comment_id",
+    "77"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "question rounds exhausted (2/2)"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

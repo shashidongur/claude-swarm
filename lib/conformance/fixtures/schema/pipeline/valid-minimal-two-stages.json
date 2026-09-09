@@ -1,0 +1,238 @@
+{
+  "bash_deny": [
+    "pulls/[0-9]+/merge",
+    "--method",
+    "-X ?(PUT|PATCH|DELETE|POST)",
+    "push .*:(refs/heads/)?(main|master|swarm/state)",
+    "push .*\\+",
+    "push --force",
+    "push -f\\b",
+    "curl|wget .*api\\.github\\.com",
+    "git -C \\.swarm",
+    "\\.swarm/lib",
+    "\\$RUNNER_TEMP|claude-execution-output",
+    "(^|[;&|] *)(env|printenv)( |$)",
+    "/proc/self/environ"
+  ],
+  "classes": {
+    "critic": {
+      "allowed": "Read,Glob,Grep,LS,TodoWrite,Write,Edit,Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git status:*),Bash(git fetch:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(jq:*),Bash(yq:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh run view:*),Bash(gh run list:*),Bash(gh api repos/*/issues/*:*),Bash(gh search:*),Bash(date:*),Bash(mkdir:*)",
+      "disallowed": "",
+      "permissions": "read",
+      "write_roots": [
+        ".swarm-run/critic.json"
+      ]
+    },
+    "read": {
+      "allowed": "Read,Glob,Grep,LS,TodoWrite,Write,Edit,Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git status:*),Bash(git fetch:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(jq:*),Bash(yq:*),Bash(node:*),Bash(npm test:*),Bash(npm run:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh run view:*),Bash(gh run list:*),Bash(gh api repos/*/issues/*:*),Bash(gh search:*),Bash(date:*),Bash(mkdir:*)",
+      "disallowed": "",
+      "permissions": "read",
+      "write_roots": [
+        ".swarm-run/artifacts",
+        ".swarm-run/result.json"
+      ]
+    },
+    "write": {
+      "allowed": "Read,Glob,Grep,LS,TodoWrite,Write,Edit,MultiEdit,Bash",
+      "disallowed": "Bash(git push --force*),Bash(git push -f*),Bash(git push origin main*),Bash(git push origin HEAD:main*),Bash(git push origin HEAD:refs/heads/main*),Bash(gh pr merge*),Bash(gh pr review*),Bash(gh secret*),Bash(gh repo edit*),Bash(gh workflow*),Bash(gh label*),Bash(gh issue edit*),Bash(gh issue close*),Bash(gh api -X PATCH*),Bash(gh api -X PUT*),Bash(gh api -X DELETE*),Bash(gh api --method*),Bash(rm -rf .git*)",
+      "permissions": "write",
+      "write_roots": [
+        ".",
+        ".swarm-run/artifacts",
+        ".swarm-run/result.json"
+      ]
+    }
+  },
+  "critic_defaults": {
+    "timeout": 15,
+    "turns": 40
+  },
+  "deny_paths": [
+    ".swarm-run/brief.md",
+    ".swarm-run/state.json",
+    ".swarm-run/pipeline.json",
+    ".swarm-run/config.json",
+    ".swarm-run/settings.json",
+    ".swarm-run/evidence/**",
+    ".swarm-run/validation.json",
+    ".swarm-run/previous-attempt.md"
+  ],
+  "edges": {
+    "budgeted": [
+      "code-review",
+      "qa",
+      "security",
+      "compliance",
+      "a11y",
+      "threat-model",
+      "critic",
+      "ci-red"
+    ],
+    "free_rework": [
+      "owner-reject",
+      "owner-redo"
+    ]
+  },
+  "emoji": {
+    "a11y": "♿",
+    "analyst": "🎯",
+    "architect": "📐",
+    "code-review": "🔍",
+    "compliance": "📋",
+    "critic": "⚖️",
+    "dev": "🔨",
+    "dispatch": "🧭",
+    "gate": "🛎️",
+    "planner": "🗺️",
+    "qa": "✅",
+    "release": "🚀",
+    "retro": "📓",
+    "security": "🔐",
+    "test-writer": "🧪",
+    "threat-model": "🛡️",
+    "triage": "🔎",
+    "ux": "🎨",
+    "watchdog": "🐕"
+  },
+  "limits": {
+    "cost_usd_per_issue": 75,
+    "critic_rework": 1,
+    "evidence_fires_per_issue": 2,
+    "open_prs": 3,
+    "pr_files": 25,
+    "pr_lines": 800,
+    "pushes_per_pr_per_day": 10,
+    "question_rounds": 2,
+    "ratelimit_backoff_minutes": 180,
+    "rework_budget": 5,
+    "runaway_per_hour": 10,
+    "runner_minutes_month": 1500,
+    "usd_month": 200
+  },
+  "memory_fenced": [
+    "gotchas/auto/**",
+    "postmortems/**",
+    "runs/**"
+  ],
+  "models": {
+    "critic_tier_for": {
+      "cheap": "default",
+      "default": "strong",
+      "strong": "default"
+    },
+    "retry_tier_for": {
+      "cheap": "cheap",
+      "default": "default",
+      "strong": "default"
+    },
+    "tiers": {
+      "cheap": "claude-haiku-4-5",
+      "default": "claude-sonnet-5",
+      "strong": "claude-opus-5"
+    }
+  },
+  "paths": {
+    "full": [
+      "triage",
+      "retro"
+    ],
+    "short": [
+      "triage",
+      "retro"
+    ]
+  },
+  "protected_paths": [
+    ".github/**",
+    ".swarm/**",
+    ".swarm-run/**",
+    ".claude/**",
+    "**/.claude/**",
+    "CLAUDE.md",
+    ".mcp.json",
+    ".claude-plugin/**",
+    "**/*.pem",
+    "**/*.p8",
+    "**/*.key",
+    ".env*",
+    "**/*.keystore"
+  ],
+  "restore_from_base": [
+    ".claude",
+    "CLAUDE.md",
+    ".mcp.json",
+    ".claude-plugin"
+  ],
+  "stages": [
+    {
+      "gate": "none",
+      "label": "swarm:triage",
+      "name": "triage",
+      "on_short": "run",
+      "roles": [
+        {
+          "artifacts": [
+            "triage.json"
+          ],
+          "class": "read",
+          "critic": "none",
+          "memory": [
+            "conventions.md",
+            "decisions.md"
+          ],
+          "name": "triage",
+          "reads": [],
+          "tier": "cheap",
+          "timeout": 10,
+          "turns": 40,
+          "verdicts": [
+            "pass",
+            "duplicate",
+            "blocked"
+          ]
+        }
+      ]
+    },
+    {
+      "gate": "none",
+      "label": "swarm:retro",
+      "name": "retro",
+      "on_short": "run",
+      "once_per_merge": true,
+      "roles": [
+        {
+          "artifacts": [
+            "postmortem.md"
+          ],
+          "class": "read",
+          "critic": "none",
+          "memory": [
+            "MEMORY.md",
+            "postmortems/INDEX.md",
+            "adrs/INDEX.md"
+          ],
+          "name": "retro",
+          "reads": [
+            "requirements.md",
+            "adr.md",
+            "qa-report.md",
+            "release.md"
+          ],
+          "tier": "default",
+          "timeout": 20,
+          "turns": 60,
+          "verdicts": [
+            "pass",
+            "blocked"
+          ],
+          "writes_memory": "pr"
+        }
+      ],
+      "trigger": "merged"
+    }
+  ],
+  "v": 2,
+  "verdict_edges": {
+    "*.blocked": "block:agent-output",
+    "*.pass": "next"
+  }
+}

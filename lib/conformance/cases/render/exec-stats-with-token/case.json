@@ -1,0 +1,20 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "exec.json"
+  ],
+  "project_files": {
+    "exec.json": "@fixtures/exec/with-token.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"present\": true",
+      "***"
+    ],
+    "stdout_not_contains": [
+      "ghs_AbCd",
+      "sk-ant-oat01"
+    ]
+  }
+}

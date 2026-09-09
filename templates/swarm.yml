@@ -1,0 +1,97 @@
+# .github/swarm.yml — the project's half of the swarm configuration (pipeline v2).
+#
+# Copy this file to .github/swarm.yml on the default branch. The dispatcher reads it
+# fresh on every event; every key you omit takes the default shown here (see
+# lib/schema/swarm-config.defaults.json; unknown keys are warnings). This is the ONLY
+# place the swarm learns lane names, evidence workflow names, commands, the pin marker,
+# test paths and the requirement-id pattern — it never guesses them.
+#
+# Never edit this file from a swarm run: it is under .github/, a protected path.
+
+v: 2                                   # required; the config grammar version
+
+# Logins allowed to command the swarm (comments and the swarm:ready label). Each list
+# falls back to `default`; an empty `default` falls back to the repository owner — on a
+# user-owned repository only. An organisation-owned repository MUST list approvers.
+# Every login is verified once, at start, to be a User (bots never command).
+approvers:
+  default: []                          # start / resume / redo / skip / park / drop / hands-off / path / status / budget gate
+  requirements: []                     # gate 1 (/swarm approve | /swarm reject <why>)
+  architecture: []                     # gate 2
+  release: []                          # /swarm reject at the release gate — and the ONLY logins whose PR merge counts as gate 3
+  confidence: []                       # critic escalations (/swarm approve pushes through)
+
+reporter_may_answer: true              # the issue author may answer at swarm:gate:question (approvers always may)
+require_model_map: false               # true → blocked:model when the model actually used differs from the one requested
+
+default_branch: main                   # PRs are opened against it; artifacts commits branch from it
+branch_prefix: claude/issue-           # integration branch = <prefix><N>-<slug>; one branch per issue, never a second
+state_branch: swarm/state              # orphan branch holding issues/<N>.json (create it once: lib/sh/state.sh init-branch)
+artifacts_dir: docs/swarm              # committed per-issue artifacts land under <artifacts_dir>/<N>/
+requirements_doc: REQS.md              # the document a cited requirement id must appear in (grep target)
+requirement_id_pattern: "^(FR|NFR)-[A-Z]+-[0-9]+$"   # what a requirement id looks like in your project (ERE)
+pin_marker: "it.failing("              # how the test-writer pins a red test before the fix (counted before and after dev)
+
+test_paths:                            # the only paths the test-writer may touch (globs, relative to the repo root)
+  - "CHANGE-ME/**/__tests__/**"
+
+protected_paths:                       # merged with the swarm's built-ins (.github/**, .swarm/**, .swarm-run/**, .claude/**,
+  - "CHANGE-ME/test-baseline.json"     #   CLAUDE.md, .mcp.json, .claude-plugin/**, key/cert files, .env*). List here every file
+  - "scripts/**"                       #   the CI gate reads — baselines, thresholds, scanner allow-lists, gate scripts — so a dev
+                                       #   cannot make CI green by editing the gate (a change → blocked:perimeter).
+gate_manifests: ["CHANGE-ME/package.json"]   # manifest files whose gate scripts and test-runner block may not change on a branch
+gate_scripts: ["test:ci", "test", "lint", "typecheck", "type-check"]   # the `scripts` entries of those manifests that are frozen
+delete_merged_branches: true           # retro deletes the integration branch after the PR merges
+
+# Lanes: one per independently testable part of the tree, in EXECUTION ORDER (the first
+# lane's dev and review finish before the second lane starts). Lane names are yours; the
+# planner assigns work to them, triage uses them for area:<lane>, and `both` is reserved.
+lanes:
+  CHANGE-ME:
+    paths: ["CHANGE-ME/**"]            # globs owned by the lane (used to scope reviews and to pick the lane on the short path)
+    specialist: agents/CHANGE-ME.md    # optional: a specialist file, relative to the project's memory folder in the swarm repo
+    commands:                          # injected into the dev / test-writer / qa briefs verbatim; verify each one by running it
+      cwd: CHANGE-ME                   # directory the commands run in
+      install: "npm ci"                # run by the dispatcher before a write role starts (with a dependency cache)
+      typecheck: "npm run typecheck"
+      test: "npm run test:ci"          # the full suite, the way CI runs it (a subset distorts the coverage gate)
+      lint: "npm run lint"
+
+# Evidence workflows, by the `name:` in their workflow file (which must live on the default
+# branch and be listed in the stub's workflow_run.workflows). `ci` runs on pull_request and
+# is matched by head sha; `test` and `security` are optional, fired by the dispatcher with
+# inputs issue/ref/key, and must follow templates/evidence-workflow.md.
+evidence:
+  ci: CI
+  # test: CHANGE-ME                    # e.g. a device walkthrough; fired before qa on the full path
+  # security: CHANGE-ME                # e.g. dependency / filesystem / DAST scans; fired before the security role
+walkthrough_when: []                   # touch globs that enable the `test` evidence (full path only); empty = always
+contract_command: null                 # optional command qa runs and cites (client/server contract diff); null = "no contract check configured"
+sensitive_paths: []                    # compliance runs on the SHORT path only when a touched path matches (full path: always)
+  # - "CHANGE-ME/src/**/*payment*"
+  # - "CHANGE-ME/src/auth/**"
+
+# Brakes. A project may LOWER any of these below the swarm's defaults, never raise them.
+limits:
+  rework_budget: 5                     # automatic reworks per issue across all edges (owner reject/redo resets it)
+  runaway_per_hour: 10                 # dispatches recorded in state within an hour → blocked:runaway
+  cost_usd_per_issue: 75               # summed model cost; reaching it is the swarm:gate:budget wait-state, not a block (0 = off)
+  runner_minutes_month: 1500           # monthly brake on the account's Actions minutes (the whole account counts)
+  usd_month: 200                       # monthly brake on model spend
+  question_rounds: 2                   # analyst question rounds before gate 1 proceeds on assumptions
+  critic_rework: 1                     # automatic reworks after a failed critic before swarm:gate:confidence
+  pr_lines: 800                        # blast radius: release refused above this diff size (split it)
+  pr_files: 25
+  open_prs: 3                          # a fourth swarm PR parks the new issue
+  pushes_per_pr_per_day: 10
+  evidence_fires_per_issue: 2          # per evidence workflow per issue; beyond it the stage runs on CI evidence only
+  ratelimit_backoff_minutes: 180       # re-queue delay after a model usage-limit death
+
+watchdog:                              # the twice-daily schedule in the stub
+  gate_reminder_days: 3                # first reminder at a gate; then every 7 days, editing the same comment
+  queued_refire_minutes: 30            # a queued dispatch whose run was cancelled is re-fired after this
+  evidence_timeout_minutes: 120        # pending evidence older than this → blocked:evidence
+  running_stall_minutes: 20            # running with no live run for this long → blocked:stalled
+
+memory:
+  path: null                           # memory folder in the swarm repo; null = memory/github.com/<owner>/<repo> (set for forks)

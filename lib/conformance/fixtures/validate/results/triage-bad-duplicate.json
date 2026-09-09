@@ -1,0 +1,31 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "triage",
+  "role": "triage",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "A small bug in one lane: short path.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "app/src/screens/LiveSessions.tsx",
+      "line": 3,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "artifacts": [
+    "triage.json"
+  ],
+  "not_covered": [],
+  "triage": {
+    "type": "bug",
+    "size": "S",
+    "area": "app",
+    "prio": "P2",
+    "path": "short"
+  },
+  "duplicates": [
+    4
+  ]
+}

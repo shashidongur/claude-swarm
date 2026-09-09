@@ -1,0 +1,12 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "roles-have-files"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "OK: roles-have-files"
+    ]
+  }
+}

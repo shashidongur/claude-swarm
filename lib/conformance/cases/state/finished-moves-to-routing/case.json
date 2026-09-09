@@ -1,0 +1,40 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-finished",
+    "--arg",
+    "key",
+    "7:build:dev:app:1",
+    "--arg",
+    "run_id",
+    "2",
+    "--arg",
+    "verdict",
+    "pass",
+    "--argjson",
+    "stats",
+    "{\"cost_usd\": 4.12, \"turns\": 88, \"duration_s\": 1180, \"job_minutes\": 21, \"overhead_minutes\": 3, \"model_requested\": \"claude-sonnet-5\", \"model_actual\": \"claude-opus-5\", \"head\": \"aaaa320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b\", \"last_text\": \"done\", \"validation\": {\"ok\": true, \"errors\": []}}"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "routing",
+      "current.key": "7:build:dev:app:1",
+      "dispatches.1.status": "finished",
+      "dispatches.1.verdict": "pass",
+      "dispatches.1.cost_usd": 4.12,
+      "dispatches.1.finished_at": "2026-09-06T15:00:00Z",
+      "totals.cost_usd": 18.32,
+      "totals.runner_minutes": 82,
+      "totals.overhead_minutes": 12,
+      "totals.turns": 699,
+      "models.honoured": false,
+      "head": "aaaa320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b"
+    }
+  }
+}

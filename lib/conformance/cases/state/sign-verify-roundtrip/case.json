@@ -1,0 +1,17 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "sign-roundtrip"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: signed document verifies",
+      "PROBE: reordered document verifies",
+      "PROBE: tampered rc=6",
+      "PROBE: unsigned rc=6",
+      "PROBE: foreign key rc=6",
+      "PROBE: signing is deterministic"
+    ]
+  }
+}

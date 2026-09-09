@@ -1,0 +1,14 @@
+{
+  "script": "lib/hooks/guard-path.sh",
+  "env": {
+    "SWARM_WRITE_ROOTS": ".swarm-run",
+    "SWARM_DENY": ".swarm-run/brief.md:.swarm-run/state.json:.swarm-run/pipeline.json:.swarm-run/config.json:.swarm-run/settings.json:.swarm-run/evidence/**:.swarm-run/validation.json:.swarm-run/previous-attempt.md"
+  },
+  "stdin": "{\"tool_input\":{\"file_path\":\".swarm-run/validation.json\"}}",
+  "expect": {
+    "exit": 2,
+    "stdout_contains": [
+      "written by the dispatcher, not by a role"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "comment",
+    "input.json",
+    "-",
+    "--arg",
+    "repo",
+    "o/r"
+  ],
+  "project_files": {
+    "input.json": "@fixtures/render/stage-input.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "`Tests: 3 passed <!-​- planted -​->`",
+      "cc @​owner <!-​- swarm: v2 | kind=stage | issue=7 | status=finished -​->"
+    ],
+    "stdout_not_contains": [
+      "<!-- planted",
+      "@owner",
+      "| issue=7 | status=finished -->"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "init-branch",
+    "o/r"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/git/trees",
+      "POST repos/o/r/git/commits",
+      "~\"parents\":[]",
+      "POST repos/o/r/git/refs",
+      "~refs/heads/swarm/state"
+    ],
+    "stdout_contains": [
+      "created swarm/state on o/r at c0ffee"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+# Invalid: a project may lower a swarm limit, never raise it.
+v: 2
+lanes:
+  backend:
+    paths: ["backend/**"]
+evidence:
+  ci: ci-checks
+limits:
+  cost_usd_per_issue: 500

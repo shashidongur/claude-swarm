@@ -1,0 +1,33 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_SCRIPT": "advance-failed",
+    "SC_HANDOFF": "none",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~block",
+      "POST repos/o/r/issues/7/comments",
+      "~advance** · failed"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "stalled",
+      "current.key": "7:build:dev:app:1",
+      "current.run_id": 424242,
+      "dispatches.0.status": "running"
+    }
+  }
+}

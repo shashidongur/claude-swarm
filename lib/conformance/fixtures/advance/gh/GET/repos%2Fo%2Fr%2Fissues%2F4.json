@@ -1,0 +1,9 @@
+{
+  "number": 4,
+  "title": "Sessions can be overbooked",
+  "state": "open",
+  "user": {
+    "login": "reporter",
+    "type": "User"
+  }
+}

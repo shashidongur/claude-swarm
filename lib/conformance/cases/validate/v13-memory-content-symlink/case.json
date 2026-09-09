@@ -1,0 +1,26 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "env": {
+    "SC_SYMLINK": ".swarm-run/artifacts/linked.md=../../README.md"
+  },
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-retro.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/artifacts/postmortem.md": "---\nname: postmortem-7\ndescription: capacity — full path\nmetadata: { type: postmortem, issue: 7 }\n---\n## Asked\nCapacity.\n\n```sh\nnpm run test:ci -- Issue7   # verified against app/src/a.ts:1\n```\n",
+    ".swarm-run/artifacts/mem-1.md": "---\nname: capacity-label-timing\ndescription: the label renders after the query settles\nmetadata:\n  type: gotcha\n---\n**Why**: timing.\n**How to apply**: await the query.\n",
+    "app/src/screens/LiveSessions.tsx": "export const session = load();\nexport const seats = 12;\nexport const capacityLabel = `${seats} seats`;\n",
+    ".swarm-run/result.json": "@fixtures/validate/results/retro-symlink-content.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V13\""
+    },
+    "stdout_contains": [
+      "content_file does not resolve"
+    ]
+  }
+}

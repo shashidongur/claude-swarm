@@ -1,0 +1,43 @@
+{
+  "v": 2,
+  "issue": 7,
+  "repo": "o/r",
+  "path": "full",
+  "stage": "build",
+  "status": "running",
+  "branch": "claude/issue-7-live-session-capacity",
+  "head": null,
+  "pr": null,
+  "lanes": [
+    "api",
+    "app"
+  ],
+  "current": {
+    "role": "dev:app",
+    "attempt": 1,
+    "key": "7:build:dev:app:1",
+    "run_id": 1,
+    "run_attempt": 1,
+    "base_sha": "",
+    "started_at": "2026-09-06T14:41:39Z",
+    "activity_from": "2026-09-06T14:41:39Z"
+  },
+  "questions": {
+    "rounds": 0,
+    "max": 2,
+    "comment_id": null
+  },
+  "pending_artifacts": [],
+  "dispatches": [],
+  "log": [],
+  "rework": {
+    "spent": 0,
+    "budget": 5,
+    "log": []
+  },
+  "evidence": {
+    "seen": {},
+    "fires": {},
+    "pending": null
+  }
+}

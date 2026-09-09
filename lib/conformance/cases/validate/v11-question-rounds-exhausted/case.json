@@ -1,0 +1,23 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "env": {
+    "ATTEMPT": "1"
+  },
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-analyst-rounds-exhausted.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "@fixtures/validate/results/analyst-question.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V11\""
+    },
+    "stdout_contains": [
+      "rounds exhausted"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "artifacts": [
+    "test-plan.md",
+    "pr-body.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "npm run test:ci -- Issue7",
+      "exit": 0,
+      "kind": "command",
+      "result": "Tests: 3 passed"
+    },
+    {
+      "cmd": "gh pr create --draft --base main --head claude/issue-7-live-session-capacity",
+      "exit": 0,
+      "kind": "command",
+      "result": "https://github.com/o/r/pull/9"
+    }
+  ],
+  "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+  "issue": 7,
+  "refs": [
+    "AC-7-1",
+    "AC-7-2"
+  ],
+  "role": "test-writer",
+  "stage": "build",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "touches": [
+    "api/__tests__/Issue7.capacity.test.ts",
+    "app/src/screens/__tests__/Issue7.capacity.test.tsx"
+  ],
+  "v": 2,
+  "verdict": "pass"
+}

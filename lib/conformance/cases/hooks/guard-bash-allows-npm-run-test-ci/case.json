@@ -1,0 +1,7 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "stdin": "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"npm run test:ci -- Issue7\"}}",
+  "expect": {
+    "exit": 0
+  }
+}

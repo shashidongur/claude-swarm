@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false",
+      "finalize": "true",
+      "key": "7:build:dev:app:1",
+      "role": "dev:app",
+      "class": "write",
+      "model": "claude-sonnet-5",
+      "critic_model": ""
+    },
+    "calls": [
+      "!POST *",
+      "!PUT repos/o/r/contents/issues/7.json",
+      "!workflow run *"
+    ]
+  }
+}

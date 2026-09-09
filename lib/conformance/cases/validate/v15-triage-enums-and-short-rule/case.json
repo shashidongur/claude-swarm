@@ -1,0 +1,19 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-triage.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/artifacts/triage.json": "{\"type\":\"bug\"}\n",
+    "app/src/screens/LiveSessions.tsx": "export const session = load();\nexport const seats = 12;\nexport const capacityLabel = `${seats} seats`;\n",
+    ".swarm-run/result.json": "@fixtures/validate/results/triage-pass.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "true"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"ok\": true"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:requirements:analyst:2",
+    "OWNER": "owner"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: begin exit 0"
+    ],
+    "files": {
+      ".swarm-run/brief.md": "answer by owner (comment 103"
+    }
+  }
+}

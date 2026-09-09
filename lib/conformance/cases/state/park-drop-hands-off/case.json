@@ -1,0 +1,20 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "park-drop"
+  ],
+  "env": {
+    "ISSUE": "7",
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: park rc=0 status=parked from=queued fired_at=null",
+      "PROBE: hands-off rc=0 flag=true",
+      "PROBE: drop rc=0 status=dropped",
+      "PROBE: drop again rc=5",
+      "PROBE: park after drop rc=5"
+    ]
+  }
+}

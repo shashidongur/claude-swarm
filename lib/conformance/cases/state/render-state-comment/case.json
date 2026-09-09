@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "render",
+    "state-in.json"
+  ],
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "SWARM_REF": "v2"
+  },
+  "project_files": {
+    "state-in.json": "@fixtures/state/running.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **swarm** · build · running `dev:app` (attempt 1) · $14.20 · 61 min runner (+9 overhead) · rework 1/5",
+      "<!-- swarm: v2 | kind=state | issue=7 | at=2026-09-06T15:00:00Z -->",
+      "swarm `v2@0a1b2c3`"
+    ]
+  }
+}

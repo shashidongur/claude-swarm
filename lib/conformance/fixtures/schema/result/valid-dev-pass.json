@@ -1,0 +1,40 @@
+{
+  "artifacts": [],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "npm run test:ci -- Issue7",
+      "exit": 0,
+      "kind": "command",
+      "result": "Tests: 3 passed"
+    },
+    {
+      "kind": "file",
+      "line": 142,
+      "path": "app/src/screens/LiveSessions.tsx",
+      "symbol": "capacityLabel"
+    },
+    {
+      "kind": "url",
+      "url": "https://github.com/o/r/actions/runs/1"
+    }
+  ],
+  "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+  "issue": 7,
+  "not_covered": [
+    "device walkthrough not run in this stage"
+  ],
+  "refs": [
+    "FR-LIV-03",
+    "AC-7-2"
+  ],
+  "role": "dev:app",
+  "stage": "build",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "touches": [
+    "app/src/screens/LiveSessions.tsx",
+    "app/src/screens/__tests__/Issue7.capacity.test.tsx"
+  ],
+  "v": 2,
+  "verdict": "pass"
+}

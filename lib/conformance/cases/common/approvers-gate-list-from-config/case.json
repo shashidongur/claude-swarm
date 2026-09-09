@@ -1,0 +1,7 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["approvers_for", "requirements"],
+  "env": { "OWNER": "owner", "CONFIG_JSON": "config.json" },
+  "project_files": { "config.json": "@fixtures/config/org-owned.json" },
+  "expect": { "exit": 0, "stdout_contains": ["octo-owner\nocto-pm\nRC=0"], "stdout_not_contains": ["octo-lead"] }
+}

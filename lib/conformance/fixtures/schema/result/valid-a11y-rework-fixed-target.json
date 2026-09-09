@@ -1,0 +1,21 @@
+{
+  "artifacts": [
+    "a11y.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 88,
+      "path": "docs/swarm/7/design.md",
+      "symbol": "capacity badge"
+    }
+  ],
+  "issue": 7,
+  "reason": "The capacity badge relies on colour alone (1.4.1) and has no accessible name (4.1.2).",
+  "role": "a11y",
+  "stage": "design",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "rework"
+}

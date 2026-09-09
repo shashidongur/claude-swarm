@@ -1,0 +1,11 @@
+{
+  "colour": "blue",
+  "lanes": {
+    "api": {
+      "paths": [
+        "api/**"
+      ]
+    }
+  },
+  "v": 2
+}

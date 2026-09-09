@@ -1,0 +1,20 @@
+{
+  "artifacts": [
+    "qa-report.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "artifact",
+      "note": "12/12 flows",
+      "path": "evidence/test/junit.xml"
+    }
+  ],
+  "issue": 7,
+  "rework_to": "dev:api",
+  "role": "qa",
+  "stage": "test",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "rework"
+}

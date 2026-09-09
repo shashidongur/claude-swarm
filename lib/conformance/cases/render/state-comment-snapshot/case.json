@@ -1,0 +1,36 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "state",
+    "state.json",
+    "-",
+    "--arg",
+    "cap",
+    "75",
+    "--arg",
+    "artifacts_dir",
+    "docs/swarm",
+    "--arg",
+    "at",
+    "2026-09-06T14:41:39Z"
+  ],
+  "project_files": {
+    "state.json": "@fixtures/schema/state/valid-running-build.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **swarm** · build · running `dev:app` (attempt 1) · $14.20 · 61 min runner (+9 overhead) · rework 1/5 · cap $75",
+      "- [x] triage — short? no (feature, M, both)",
+      "- [x] requirements — analyst ✓ · approved by octo-owner 2026-09-06T14:41:39Z · critic 84",
+      "- [x] architecture — architect ✓ · threat-model ✓ · approved by octo-owner 2026-09-06T14:41:39Z · critic 79",
+      "- [ ] build — planner ✓ · test-writer ✓ · dev:api ✓ · code-review:api ✓ · **dev:app ⏳** · code-review:app · PR #9",
+      "- [ ] test · [ ] security · [ ] release · [ ] retro",
+      "Branch `claude/issue-7-live-session-capacity` · head `f54b320` · PR #9 · artifacts `docs/swarm/7/` · state `swarm/state:issues/7.json` · swarm `v2@0a1b2c3`",
+      "Last run: https://github.com/o/r/actions/runs/2",
+      "<details><summary>state (machine)</summary>",
+      "\"key\": \"7:build:dev:app:1\"",
+      "<!-- swarm: v2 | kind=state | issue=7 | at=2026-09-06T14:41:39Z -->"
+    ]
+  }
+}

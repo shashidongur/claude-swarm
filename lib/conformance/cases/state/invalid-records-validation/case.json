@@ -1,0 +1,28 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-invalid",
+    "--arg",
+    "key",
+    "7:build:dev:app:1",
+    "--arg",
+    "run_id",
+    "2",
+    "--argjson",
+    "stats",
+    "{\"validation\": {\"ok\": false, \"errors\": [{\"check\": \"V3\", \"msg\": \"symbol not found\"}]}, \"last_text\": \"ghs_abcdefghijklmnopqrstuvwxyz0123 leaked?\"}"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "routing",
+      "dispatches.1.status": "invalid",
+      "dispatches.1.validation.errors.0.check": "V3"
+    }
+  }
+}

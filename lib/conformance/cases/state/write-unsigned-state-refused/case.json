@@ -1,0 +1,17 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "log",
+    "--arg",
+    "event",
+    "x"
+  ],
+  "expect": {
+    "exit": 6,
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

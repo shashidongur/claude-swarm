@@ -1,0 +1,18 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "month-totals",
+    "o/r",
+    "2026-08"
+  ],
+  "fixtures": [
+    "state-month"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"runner_minutes\": 140",
+      "\"cost_usd\": 42.5"
+    ]
+  }
+}

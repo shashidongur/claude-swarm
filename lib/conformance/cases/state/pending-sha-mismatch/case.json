@@ -1,0 +1,20 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "pending-tamper"
+  ],
+  "env": {
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "sha256 mismatch",
+      "PROBE: copy rc=8",
+      "PROBE: tampered file not copied"
+    ],
+    "calls": [
+      "!DELETE *"
+    ]
+  }
+}

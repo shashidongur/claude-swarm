@@ -1,0 +1,30 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:retro:retro:1",
+    "SC_HANDOFF": "retro-pass",
+    "SC_MEMORY": "1",
+    "SC_STATE_PATCH": ".merged_at = \"2026-09-07T09:12:00Z\" | .merged_pr = 9 | .merged_by = \"stranger\" | .merge_sha = \"abc123\"",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true",
+    "SWARM_TOKEN": "fake-pat"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "!DELETE repos/o/r/git/refs/heads/*",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~done"
+    ],
+    "state_after": {
+      "status": "done"
+    }
+  }
+}

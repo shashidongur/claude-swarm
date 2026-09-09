@@ -1,0 +1,6 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["stdin"],
+  "stdin": "hello from case",
+  "expect": { "exit": 0, "stdout_contains": ["PROBE: stdin was: hello from case"] }
+}

@@ -1,0 +1,40 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "apply",
+    "null",
+    "start",
+    "--arg",
+    "issue",
+    "7",
+    "--arg",
+    "repo",
+    "o/r",
+    "--arg",
+    "by",
+    "owner",
+    "--arg",
+    "stage",
+    "requirements",
+    "--arg",
+    "role",
+    "analyst",
+    "--arg",
+    "path",
+    "short",
+    "--arg",
+    "now",
+    "2026-09-06T09:58:12Z"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"key\": \"7:requirements:analyst:1\"",
+      "\"path_source\": \"owner\"",
+      "\"status\": \"queued\""
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "artifacts": [
+    "review-app-a1.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 142,
+      "path": "app/src/screens/LiveSessions.tsx",
+      "symbol": "capacityLabel"
+    },
+    {
+      "cmd": "npm run test:ci -- capacity",
+      "exit": 1,
+      "kind": "command",
+      "result": "1 failed: double tap decrements twice"
+    }
+  ],
+  "issue": 7,
+  "reason": "Double-tap on the join button decrements capacity twice; the handler is not debounced (see the review file).",
+  "refs": [
+    "AC-7-3"
+  ],
+  "rework_to": "dev:app",
+  "role": "code-review:app",
+  "stage": "build",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "rework"
+}

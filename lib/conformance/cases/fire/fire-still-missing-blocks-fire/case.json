@@ -1,0 +1,41 @@
+{
+  "script": "lib/sh/fire.sh",
+  "args": [
+    "7",
+    "build",
+    "code-review:app",
+    "7:build:code-review:app:1",
+    "chain"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 1,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~next-firing",
+      "workflow run swarm-dispatch.yml",
+      "workflow run swarm-dispatch.yml",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 block",
+      "POST repos/o/r/issues/7/comments",
+      "~\ud83d\udea7 fire failed",
+      "~kind=died | issue=7 | stage=build | role=code-review:app | key=7:build:code-review:app:1"
+    ],
+    "stdout_contains": [
+      "::error::fire: no verified run for 7:build:code-review:app:1 after a re-fire"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "fire",
+      "blocked.comment_id": "*",
+      "next.key": "7:build:code-review:app:1",
+      "next.fired_at": null,
+      "next.fired_by": null,
+      "next.fired_run_id": null
+    }
+  }
+}

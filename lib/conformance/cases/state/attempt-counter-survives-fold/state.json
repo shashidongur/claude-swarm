@@ -1,0 +1,864 @@
+{
+  "branch": "claude/issue-7-live-session-capacity",
+  "config_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+  "created_at": "2026-09-06T09:58:12Z",
+  "current": {
+    "activity_from": "2026-09-06T14:41:39Z",
+    "attempt": 1,
+    "base_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+    "comment_id": 1,
+    "key": "7:build:code-review:app:61",
+    "role": "dev:app",
+    "run_attempt": 1,
+    "run_id": 1,
+    "started_at": "2026-09-06T14:41:39Z"
+  },
+  "dispatches": [
+    {
+      "key": "7:build:old:1",
+      "run_id": 1,
+      "stage": "build",
+      "role": "old",
+      "attempt": 1,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:2",
+      "run_id": 2,
+      "stage": "build",
+      "role": "old",
+      "attempt": 2,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:3",
+      "run_id": 3,
+      "stage": "build",
+      "role": "old",
+      "attempt": 3,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:4",
+      "run_id": 4,
+      "stage": "build",
+      "role": "old",
+      "attempt": 4,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:5",
+      "run_id": 5,
+      "stage": "build",
+      "role": "old",
+      "attempt": 5,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:6",
+      "run_id": 6,
+      "stage": "build",
+      "role": "old",
+      "attempt": 6,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:7",
+      "run_id": 7,
+      "stage": "build",
+      "role": "old",
+      "attempt": 7,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:8",
+      "run_id": 8,
+      "stage": "build",
+      "role": "old",
+      "attempt": 8,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:9",
+      "run_id": 9,
+      "stage": "build",
+      "role": "old",
+      "attempt": 9,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:10",
+      "run_id": 10,
+      "stage": "build",
+      "role": "old",
+      "attempt": 10,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:11",
+      "run_id": 11,
+      "stage": "build",
+      "role": "old",
+      "attempt": 11,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:12",
+      "run_id": 12,
+      "stage": "build",
+      "role": "old",
+      "attempt": 12,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:13",
+      "run_id": 13,
+      "stage": "build",
+      "role": "old",
+      "attempt": 13,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:14",
+      "run_id": 14,
+      "stage": "build",
+      "role": "old",
+      "attempt": 14,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:15",
+      "run_id": 15,
+      "stage": "build",
+      "role": "old",
+      "attempt": 15,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:16",
+      "run_id": 16,
+      "stage": "build",
+      "role": "old",
+      "attempt": 16,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:17",
+      "run_id": 17,
+      "stage": "build",
+      "role": "old",
+      "attempt": 17,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:18",
+      "run_id": 18,
+      "stage": "build",
+      "role": "old",
+      "attempt": 18,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:19",
+      "run_id": 19,
+      "stage": "build",
+      "role": "old",
+      "attempt": 19,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:20",
+      "run_id": 20,
+      "stage": "build",
+      "role": "old",
+      "attempt": 20,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:21",
+      "run_id": 21,
+      "stage": "build",
+      "role": "old",
+      "attempt": 21,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:22",
+      "run_id": 22,
+      "stage": "build",
+      "role": "old",
+      "attempt": 22,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:23",
+      "run_id": 23,
+      "stage": "build",
+      "role": "old",
+      "attempt": 23,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:24",
+      "run_id": 24,
+      "stage": "build",
+      "role": "old",
+      "attempt": 24,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:25",
+      "run_id": 25,
+      "stage": "build",
+      "role": "old",
+      "attempt": 25,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:26",
+      "run_id": 26,
+      "stage": "build",
+      "role": "old",
+      "attempt": 26,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:27",
+      "run_id": 27,
+      "stage": "build",
+      "role": "old",
+      "attempt": 27,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:28",
+      "run_id": 28,
+      "stage": "build",
+      "role": "old",
+      "attempt": 28,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:29",
+      "run_id": 29,
+      "stage": "build",
+      "role": "old",
+      "attempt": 29,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:30",
+      "run_id": 30,
+      "stage": "build",
+      "role": "old",
+      "attempt": 30,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:31",
+      "run_id": 31,
+      "stage": "build",
+      "role": "old",
+      "attempt": 31,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:32",
+      "run_id": 32,
+      "stage": "build",
+      "role": "old",
+      "attempt": 32,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:33",
+      "run_id": 33,
+      "stage": "build",
+      "role": "old",
+      "attempt": 33,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:34",
+      "run_id": 34,
+      "stage": "build",
+      "role": "old",
+      "attempt": 34,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:35",
+      "run_id": 35,
+      "stage": "build",
+      "role": "old",
+      "attempt": 35,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:36",
+      "run_id": 36,
+      "stage": "build",
+      "role": "old",
+      "attempt": 36,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:37",
+      "run_id": 37,
+      "stage": "build",
+      "role": "old",
+      "attempt": 37,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:38",
+      "run_id": 38,
+      "stage": "build",
+      "role": "old",
+      "attempt": 38,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:39",
+      "run_id": 39,
+      "stage": "build",
+      "role": "old",
+      "attempt": 39,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:40",
+      "run_id": 40,
+      "stage": "build",
+      "role": "old",
+      "attempt": 40,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:41",
+      "run_id": 41,
+      "stage": "build",
+      "role": "old",
+      "attempt": 41,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:42",
+      "run_id": 42,
+      "stage": "build",
+      "role": "old",
+      "attempt": 42,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:43",
+      "run_id": 43,
+      "stage": "build",
+      "role": "old",
+      "attempt": 43,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:44",
+      "run_id": 44,
+      "stage": "build",
+      "role": "old",
+      "attempt": 44,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:45",
+      "run_id": 45,
+      "stage": "build",
+      "role": "old",
+      "attempt": 45,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:46",
+      "run_id": 46,
+      "stage": "build",
+      "role": "old",
+      "attempt": 46,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:47",
+      "run_id": 47,
+      "stage": "build",
+      "role": "old",
+      "attempt": 47,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:48",
+      "run_id": 48,
+      "stage": "build",
+      "role": "old",
+      "attempt": 48,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:49",
+      "run_id": 49,
+      "stage": "build",
+      "role": "old",
+      "attempt": 49,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:50",
+      "run_id": 50,
+      "stage": "build",
+      "role": "old",
+      "attempt": 50,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:51",
+      "run_id": 51,
+      "stage": "build",
+      "role": "old",
+      "attempt": 51,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:52",
+      "run_id": 52,
+      "stage": "build",
+      "role": "old",
+      "attempt": 52,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:53",
+      "run_id": 53,
+      "stage": "build",
+      "role": "old",
+      "attempt": 53,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:54",
+      "run_id": 54,
+      "stage": "build",
+      "role": "old",
+      "attempt": 54,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:55",
+      "run_id": 55,
+      "stage": "build",
+      "role": "old",
+      "attempt": 55,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:56",
+      "run_id": 56,
+      "stage": "build",
+      "role": "old",
+      "attempt": 56,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:57",
+      "run_id": 57,
+      "stage": "build",
+      "role": "old",
+      "attempt": 57,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:58",
+      "run_id": 58,
+      "stage": "build",
+      "role": "old",
+      "attempt": 58,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:59",
+      "run_id": 59,
+      "stage": "build",
+      "role": "old",
+      "attempt": 59,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    },
+    {
+      "key": "7:build:old:60",
+      "run_id": 60,
+      "stage": "build",
+      "role": "old",
+      "attempt": 60,
+      "at": "2026-09-06T10:00:00Z",
+      "status": "finished",
+      "verdict": "pass",
+      "cost_usd": 0.5
+    }
+  ],
+  "evidence": {
+    "fires": {
+      "security": 0,
+      "test": 1
+    },
+    "pending": null,
+    "seen": {
+      "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b": {
+        "CI": {
+          "pull_request": {
+            "at": "2026-09-06T14:41:39Z",
+            "conclusion": "success",
+            "run_id": 1,
+            "url": "https://github.com/o/r/actions/runs/1"
+          }
+        }
+      }
+    }
+  },
+  "flags": {
+    "hands_off": false,
+    "v1_history": false
+  },
+  "gate": null,
+  "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+  "issue": 7,
+  "lanes": [
+    "api",
+    "app"
+  ],
+  "log": [
+    {
+      "at": "2026-09-06T14:41:39Z",
+      "by": "octo-owner",
+      "event": "reject",
+      "note": "too vague"
+    }
+  ],
+  "memory": {
+    "artifact": null,
+    "pr": null,
+    "proposed": []
+  },
+  "merge_sha": null,
+  "merged_at": null,
+  "merged_by": null,
+  "merged_pr": null,
+  "models": {
+    "honoured": true
+  },
+  "next": null,
+  "path": "full",
+  "path_source": "triage",
+  "pending_artifacts": [
+    {
+      "file": "review-app-a1.md",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    },
+    {
+      "file": "critic/architecture-a1.json",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    }
+  ],
+  "pipeline_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+  "pr": 9,
+  "questions": {
+    "comment_id": null,
+    "max": 2,
+    "rounds": 0
+  },
+  "refusals": {
+    "someone-else": "2026-09-06"
+  },
+  "repo": "o/r",
+  "rework": {
+    "budget": 5,
+    "log": [
+      {
+        "at": "2026-09-06T14:41:39Z",
+        "from": "code-review:api",
+        "key": "7:build:dev:api:2",
+        "to": "dev:api"
+      }
+    ],
+    "reset_at": null,
+    "spent": 1
+  },
+  "stage": "build",
+  "stages": {
+    "architecture": {
+      "approved": {
+        "at": "2026-09-06T14:41:39Z",
+        "by": "octo-owner",
+        "comment_id": 2
+      },
+      "attempts": {
+        "architect": 1,
+        "threat-model": 1
+      },
+      "critic": {
+        "score": 79,
+        "threshold": 70
+      },
+      "status": "done"
+    },
+    "build": {
+      "attempts": {
+        "code-review:api": 1,
+        "dev:api": 2,
+        "dev:app": 61,
+        "planner": 1,
+        "test-writer": 1
+      },
+      "lanes": {
+        "api": "done",
+        "app": "running"
+      },
+      "status": "running"
+    },
+    "design": {
+      "attempts": {
+        "a11y": 1,
+        "ux": 1
+      },
+      "status": "done"
+    },
+    "release": {
+      "status": "pending"
+    },
+    "requirements": {
+      "approved": {
+        "at": "2026-09-06T14:41:39Z",
+        "by": "octo-owner",
+        "comment_id": 1
+      },
+      "attempts": {
+        "analyst": 1
+      },
+      "critic": {
+        "score": 84,
+        "threshold": 70
+      },
+      "critic_reworks": 0,
+      "status": "done"
+    },
+    "retro": {
+      "status": "pending"
+    },
+    "security": {
+      "status": "pending"
+    },
+    "test": {
+      "status": "pending"
+    },
+    "triage": {
+      "attempts": {
+        "triage": 1
+      },
+      "status": "done"
+    }
+  },
+  "state_comment_id": 1,
+  "status": "routing",
+  "subissues": {
+    "api": 12,
+    "app": 13,
+    "flat": false
+  },
+  "swarm_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+  "totals": {
+    "cost_usd": 14.2,
+    "overhead_minutes": 9,
+    "reworks": 1,
+    "role_seconds": 4321,
+    "runner_minutes": 61,
+    "turns": 611,
+    "wakeups": 2
+  },
+  "triage": {
+    "area": "both",
+    "duplicates": [],
+    "prio": "P2",
+    "size": "M",
+    "type": "feature"
+  },
+  "v": 2
+}
