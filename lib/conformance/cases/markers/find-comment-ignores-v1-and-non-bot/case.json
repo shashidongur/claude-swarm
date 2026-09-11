@@ -1,0 +1,18 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "find",
+    "7",
+    "stage",
+    "key=7:build:dev:app:1"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "RC=1"
+    ],
+    "stdout_not_contains": [
+      "FOUND"
+    ]
+  }
+}

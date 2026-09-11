@@ -1,0 +1,32 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:requirements:analyst:2",
+    "SC_PR": "none",
+    "SC_HANDOFF": "analyst-pass",
+    "SC_RESULT_PATCH": ".attempt = 2",
+    "SC_CRITIC": "requirements-fail",
+    "SC_STATE_PATCH": ".stages.requirements.critic_reworks = 1 | .rework.spent = 1",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~gate=confidence",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "gate",
+      "gate.name": "confidence"
+    }
+  }
+}

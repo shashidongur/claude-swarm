@@ -1,89 +1,133 @@
-# Routing — who hands to whom
+# Routing — data, not prose
 
-The single source of truth for the pipeline graph. Before this file, forward routing was
-undefined: the orchestrator was told to "spawn the role by name … and so on", and only
-three of nine roles named a successor, all of them backwards. Routing is now data.
+Routing is data: `pipeline.yml` is the source, `pipeline.json` is generated from it, and
+the dispatcher reads only the JSON. Nothing a role writes carries the baton. A role
+writes `.swarm-run/result.json` and its artifacts; `advance` reads the verdict, looks up
+the edge in `pipeline.json`, writes the next key into the signed state, **claims the
+fire**, and runs `gh workflow run` on the project's stub. The mention grammar of v1 is
+gone, and with it the whole class of stalls where a malformed line meant no next run.
 
-Two things carry the baton, deliberately:
+## The stage table
 
-- **The mention** — a line addressed to the next role. It is what fires the next run.
-- **The label** — the stage the work has moved to. It is what lets the work be recovered
-  if a mention is malformed or a run dies.
+Rendered from `pipeline.json` by `lib/conformance/render-routing.sh` and diffed in CI
+against the block below, so this table can never drift from what the dispatcher runs.
+To change routing, change `pipeline.yml`, regenerate `pipeline.json`, re-render this
+block; do not edit the table by hand.
 
-Neither is decoration. If they disagree, the work stops.
+Columns: `#`, `Stage / label`, `Roles in order` (`role:<lane>` = one run per lane in
+the project's configured lane order; `evidence <workflow> →` = an evidence workflow is
+fired before the stage's first role), `Tier` and `Class` per role, `Artifacts` the roles
+must produce under `.swarm-run/artifacts/`, `Critic / check` (the critic slot with its
+rubric and threshold, `(off)` when present but disabled, and the mechanical
+preconditions `requires_ci` / `requires_evidence` / `requires_scan`), `Rework edges`
+(`role rework → target ×max`, `CI red after role → target`, `critic → target`, and the
+owner's free reject edge), `Gate after`, and `Short path` (the stage's `on_short` plus
+the per-role, evidence and critic exceptions).
 
-## The mention grammar
+<!-- routing-table -->
+| # | Stage / label | Roles in order | Tier | Class | Artifacts | Critic / check | Rework edges | Gate after | Short path |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | `triage` / `swarm:triage` | `triage` | cheap | read | `triage.json` | — | — | none | runs |
+| 2 | `requirements` / `swarm:requirements` | `analyst` | default | read | `requirements.md` | critic `requirements` ≥ 70 (full only) | owner reject → `analyst` (free) | `requirements` (full only) | runs; no gate; no critic |
+| 3 | `design` / `swarm:design` | `ux` → `a11y` | default, default | read, read | `design.md`, `a11y.md` | critic `design` ≥ 65 (off) (full only) | `a11y` rework → `ux` ×1 | none | **skipped** |
+| 4 | `architecture` / `swarm:architecture` | `architect` → `threat-model` | strong, default | read, read | `adr.md`, `openapi.yaml`, `migration-plan.md`, `flags.md`, `rollback.md`, `threat-model.md` | critic `architecture` ≥ 70 (full only) | `threat-model` rework → `architect` ×1; critic → `architect`; owner reject → `architect` (free) | `architecture` (full only) | **skipped** |
+| 5 | `build` / `swarm:build` | `planner` → `test-writer` → `dev:<lane>` → `code-review:<lane>` | default, default, default, strong | read, write, write, read | `plan.md`, sub-issues, `test-plan.md`, `pr-body.md`, draft PR, `review-<lane>-a<attempt>.md` | critic `plan` ≥ 60 (off); check: CI success before `code-review:<lane>` | CI red after `dev:<lane>` → `dev:<lane>`; `code-review:<lane>` rework → `dev:<lane>` | none | runs; `planner` skipped |
+| 6 | `test` / `swarm:test` | evidence `test` → `qa` | default | read | `qa-report.md` | critic `report` ≥ 65 (off); check: CI success before `qa`; check: evidence success for `qa` | `qa` rework → `dev:<lane>` | none | runs; no `test` evidence |
+| 7 | `security` / `swarm:security` | evidence `security` → `security` → `compliance` | default, strong | read, read | `security-report.md`, `compliance.md` | check: scan success for `security` | `security` rework → `dev:<lane>`; `compliance` rework → `dev:<lane>` | none | runs; `security` when_scan_changed; `compliance` sensitive_only; no `security` evidence |
+| 8 | `release` / `swarm:release` | `release` | default | write | `release.md`, `pr-body.md` | critic `release` ≥ 70, separate job | owner reject → `analyst-feedback` (free) | `release` = merge by an approver | runs |
+| 9 | `retro` / `swarm:retro` | `retro` | default | read | `postmortem.md` | — | — | none | runs |
+<!-- /routing-table -->
 
-    **@<project>-swarm-<role>** — <one line: what you are handing them, or asking>
+Tiers: `cheap` = `claude-haiku-4-5`, `default` = `claude-sonnet-5`, `strong` =
+`claude-opus-5` (`pipeline.yml models.tiers`). A critic runs on the *other* tier from
+the role it scores (`critic_tier_for`), and `must_differ_from` is conformance-checked —
+`code-review` is strong precisely because `dev` is default: reviewer ≠ author by model,
+not only by instance. Lane names are the project's (`.github/swarm.yml lanes`, in the
+order written there); the swarm never names them.
 
-Exactly one such line, immediately before the marker comment, and nothing after it. The
-project prefix is read from the project's `conventions.md`; for
-a project called `acme` it is `acme`, giving `@acme-swarm-reviewer`.
+## What a verdict does
 
-The prefix exists so one swarm working three repositories never crosses wires, and so a
-mention can never collide with a real GitHub account. **Before a project's first run,
-confirm none of its handles exist** — `gh api /users/<handle>` must 404 for every role.
-A collision means every handoff notifies a stranger.
+`pipeline.yml verdict_edges` is the whole rule, per role:
 
-## The table
+| Verdict | Edge |
+|---|---|
+| `pass` | the next role in the stage; then the stage's `evidence_after` wait (CI on the pushed head), then the stage's gate, then the next stage on the path (firing its `evidence_before` workflow first when configured) |
+| `rework` | the role's `rework_to` target at attempt+1 — fixed in `pipeline.yml` for `a11y` (→ `ux`), `threat-model` (→ `architect`) and `code-review` (→ `dev:<lane>`); named by the role in `result.rework_to` for `qa`, `security`, `compliance` (must be a lane of this issue) |
+| `blocked` | `swarm:blocked` + `blocked:agent-output`; a `reason` starting `injection:` is `blocked:injection` instead |
+| `question` | analyst only: `swarm:gate:question`, the questions posted to the issue author; their next plain comment resumes the analyst |
+| `duplicate` | triage only: `swarm:parked` + `blocked:duplicate`, the duplicates named in a comment |
 
-| Role, at this stage | On `pass` | On `rework` |
-|---|---|---|
-| *(issue filed / labelled `swarm:triage`)* | `product-owner` | — |
-| `product-owner` — spec | `architect`, plus `designer` first if it has an interface | — |
-| `designer` | `architect` | — |
-| `architect` | `implementer` | — |
-| `implementer` | `reviewer` | — |
-| `reviewer` | `test-engineer` | `implementer` |
-| `test-engineer` | `product-owner` *(for the demo)* | `implementer` |
-| `product-owner` — demo | opens the PR, then `owner` | `architect` *(re-specs first)* |
-| `owner`, commenting on a swarm PR | `product-owner` — **always** | — |
-
-`owner` is the human. It is the only address that is not a role — and it is written as
-**their actual login**, which the dispatch supplies. Never the literal `@owner`: that is a
-real GitHub organisation, and addressing it notifies strangers on every handoff.
-
-The role handles were all checked for collisions before the first run (`gh api /users/<h>`
-→ 404 for each). `@owner` was not, and slipped through. Check every literal handle in a
-template, including the ones that look like placeholders.
-
-**Why your feedback goes to the product-owner rather than straight to the implementer:**
-it is not yet known whether you found an implementation problem or a specification one.
-Sending a specification misunderstanding to the implementer gets it rebuilt, not
-re-specified. The product-owner triages and routes on — which also means you never have
-to decide which kind of problem you found.
-
-## Three rules that keep the graph safe
-
-1. **A role may never address itself.** A comment whose `next=` equals its own `role=` is
-   refused, and the issue is set `blocked:self-dispatch`. This is the shortest possible
-   infinite loop and it is worth a specific guard.
-2. **Only a role in this table may be addressed.** An unrecognised mention is ignored,
-   never guessed at. A typo should stall the work visibly, not route it somewhere
-   plausible.
-3. **Exactly one mention line per comment.** Fan-out has no defined join — nothing in
-   this design knows how to wait for two roles to finish — so a comment naming two
-   recipients is rejected rather than half-honoured.
+A critic's `fail` is not a verdict of the role; it is handled by `advance` (§ Critics
+in `lib/AUDIT.md`): one automatic rework at attempt+1 carrying only the findings, then
+`swarm:gate:confidence`.
 
 ## Rework, and where the budget lives
 
-`reviewer → implementer`, `test-engineer → implementer`, and
-`product-owner (demo) → architect` are the three backward edges. They share **one budget
-of five per issue**.
+Every backward edge — `code-review`, `qa`, `security`, `compliance`, `a11y`,
+`threat-model`, a critic rework, a CI-red rework — shares **one budget of five per
+issue**, stored as `rework.spent` in the state file (never derived from comments; v1
+counted its own noise). Spent ≥ budget when about to fire a rework edge →
+`swarm:blocked` + `blocked:budget`.
 
-There is no orchestrator holding that count any more, so it is **derived**: count the
-comments on the issue whose marker carries `verdict=rework`. Five or more, and the next
-dispatch refuses and sets `blocked:budget` instead of running.
+The owner's own `/swarm reject <why>` and `/swarm redo <stage>` are **free and reset
+the counter** — without the reset, late feedback would block almost immediately, and the
+owner's own comment would be the thing that stopped the work.
 
-The owner's own feedback is **never counted and resets the budget**, which in the derived
-model means: only count `verdict=rework` markers posted *after* the most recent comment
-authored by the owner.
+## Gates
+
+Three, and they are comments or a merge, never a job that waits (`lib/GATES.md`):
+
+| After | Label | Approve with |
+|---|---|---|
+| `requirements` (full path only) | `swarm:gate:requirements` | `/swarm approve` |
+| `architecture` (full path only) | `swarm:gate:architecture` | `/swarm approve` |
+| `release` (both paths) | `swarm:gate:release` | **an approver merges the PR** |
+
+Three wait-states look like gates and are resumed the same way: `question` (the analyst
+needs the reporter), `confidence` (a critic failed twice), `budget` (the per-issue cost
+cap was reached; `/swarm approve` raises it by one envelope).
+
+## The short path
+
+`triage` chooses it, and only when `size:S` ∧ `type ∈ {bug, chore}` ∧ one lane
+(validator check V15 downgrades anything else to `full` and records it). Short skips
+`design`, `architecture`, the `planner`, gates 1 and 2, every critic but `release`'s,
+the `test` and `security` evidence workflows; the `security` role runs only when CI's
+audit/SAST counts differ from the baselines, and `compliance` only when the touches
+intersect `sensitive_paths`. The analyst may escalate (`hints.path: full`); the owner
+may override either way with `/swarm path full|short` while the stage is still
+`requirements` or earlier.
+
+## Four rules that keep the graph safe
+
+1. **A role never routes.** No mention, no label, no marker, no `next`: `result.json` has
+   no field for it, and a `summary` that tries to smuggle one is sanitised at render
+   time. The only thing a role decides is its verdict, and the edge for that verdict is
+   data the role cannot edit (`pipeline.json` reaches the run job as an artifact and
+   `advance` re-reads it from a fresh checkout).
+2. **An unknown stage, role or edge is refused, never guessed.** A `dispatch_role` not in
+   `pipeline.json`, a `rework_to` outside the issue's lanes, a `/swarm redo` naming a
+   stage off the path → `blocked:bad-handoff`. A typo stalls the work visibly, not
+   somewhere plausible.
+3. **One dispatch per `(key, run_id)`.** The idempotency key is
+   `<issue>:<stage>:<role>[:<lane>]:<attempt>`; the attempt is a monotonic counter in
+   state, never a count of past records. A run that never claimed its key touches
+   nothing; a finished `(key, run_id)` re-run is a no-op; a key that reappears is a
+   distinct error.
+4. **The fire is claimed before it happens.** `next-firing` is CAS-written into the
+   signed state *before* `gh workflow run`, then the run is verified by the key at the
+   end of the stub's `run-name`. Two writers (advance and a watchdog tick, `start`
+   racing itself, `/swarm resume` typed during queue lag) can never both fire; a fire
+   with no verified run is `blocked:fire` and a red job, never a log line.
 
 ## Starting and ending
 
-**Starting.** Applying `swarm:triage` to an issue dispatches the `product-owner`. A human
-may also start it by writing the mention directly.
+**Starting.** An approver adds `swarm:ready` or comments `/swarm start [full|short]`.
+The dispatcher creates the state file and the state comment, removes `swarm:ready`, and
+fires `triage` (or `requirements` when a path is forced). A hand-added `swarm:triage`
+gets one reply explaining this; it never starts anything.
 
-**Ending.** The `product-owner` opens the PR and addresses `owner`. The swarm then stops
-and waits. There is no automatic path past your merge — that is the single gate, and it
-is not something a role can address its way through.
+**Ending.** `release` readies the PR; an approver merges it; the merge fires `retro`
+exactly once, which proposes memory as a pull request on this repository and ends the
+issue at `swarm:done`. There is no automatic path past the merge, and the merge counts
+only when an approver made it (`lib/GATES.md`, gate 3).

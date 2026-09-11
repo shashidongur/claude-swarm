@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/pack-tree.sh",
+  "args": [
+    "slice",
+    "pipeline.json",
+    "build",
+    "code-review:app",
+    "2"
+  ],
+  "project_files": {
+    "pipeline.json": "@../../pipeline.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"review-app-a2.md\"",
+      "\"class\": \"read\"",
+      "\"lane\": \"app\"",
+      "\"restore_from_base\""
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "number": 13,
+  "title": "[#7/app] Capacity counter on the session screen",
+  "state": "open",
+  "labels": [
+    {
+      "name": "swarm:lane"
+    },
+    {
+      "name": "swarm:hands-off"
+    }
+  ],
+  "user": {
+    "login": "github-actions[bot]",
+    "type": "Bot"
+  },
+  "body": "Tracking sub-issue of #7"
+}

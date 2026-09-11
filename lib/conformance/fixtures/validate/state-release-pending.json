@@ -1,0 +1,37 @@
+{
+  "v": 2,
+  "issue": 7,
+  "repo": "o/r",
+  "path": "full",
+  "stage": "release",
+  "status": "running",
+  "branch": "claude/issue-7-live-session-capacity",
+  "head": null,
+  "pr": 9,
+  "lanes": [
+    "api",
+    "app"
+  ],
+  "current": {
+    "role": "release",
+    "attempt": 1,
+    "key": "7:release:release:1",
+    "run_id": 424242,
+    "run_attempt": 1,
+    "base_sha": "",
+    "started_at": "2026-09-06T14:41:39Z",
+    "activity_from": "2026-09-06T14:41:39Z"
+  },
+  "questions": {
+    "rounds": 0,
+    "max": 2,
+    "comment_id": null
+  },
+  "pending_artifacts": [
+    {
+      "file": "qa-report.md",
+      "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+    }
+  ],
+  "dispatches": []
+}

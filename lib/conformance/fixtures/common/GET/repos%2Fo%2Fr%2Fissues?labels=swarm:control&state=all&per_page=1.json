@@ -1,0 +1,10 @@
+[
+  {
+    "number": 1,
+    "title": "swarm control",
+    "state": "open",
+    "labels": [ { "name": "swarm:control" } ],
+    "user": { "login": "owner", "type": "User" },
+    "body": "config lives in .github/swarm.yml; limits in pipeline.yml of the swarm"
+  }
+]

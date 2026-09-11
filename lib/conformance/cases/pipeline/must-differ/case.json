@@ -1,0 +1,12 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "must-differ"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "OK: must-differ"
+    ]
+  }
+}

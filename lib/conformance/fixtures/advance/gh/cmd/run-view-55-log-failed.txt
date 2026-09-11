@@ -1,0 +1,3 @@
+mobile	Test	2026-09-06T14:57:00Z FAIL app/src/__tests__/Issue7.test.ts
+  ● capacity › refuses the 13th booking
+    Expected: 12 Received: 13

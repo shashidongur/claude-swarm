@@ -1,0 +1,19 @@
+[
+  {
+    "number": 7,
+    "title": "Live session capacity",
+    "state": "open",
+    "labels": [
+      {
+        "name": "swarm:build"
+      },
+      {
+        "name": "swarm:hands-off"
+      }
+    ],
+    "user": {
+      "login": "reporter",
+      "type": "User"
+    }
+  }
+]

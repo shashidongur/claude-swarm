@@ -1,0 +1,40 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_HANDOFF": "dev-app-pass",
+    "SC_BRANCH_FILES": "app/src/screens/LiveSessions.tsx=export const capacityLabel = 1;\n",
+    "SC_STATUS": "queued",
+    "SC_STATE_PATCH": ".merged_at = \"2026-09-06T14:59:00Z\" | .merged_pr = 9 | .merged_by = \"owner\" | .merge_sha = \"1234567890abcdef1234567890abcdef12345678\" | .stage = \"retro\" | .stages.release.status = \"done\" | .stages.retro = {status: \"running\", attempts: {retro: 1}} | .next = {stage: \"retro\", role: \"retro\", key: \"7:retro:retro:1\", fired_at: \"2026-09-06T14:59:10Z\", fired_by: 9000, fired_run_id: 9028, not_before: null, reason: \"merged\"} | .evidence.seen[.head].CI.pull_request = {run_id: 55, conclusion: \"success\", at: \"2026-09-06T14:58:00Z\", url: \"https://github.com/o/r/actions/runs/55\"}",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-finished",
+      "PATCH repos/o/r/issues/comments/101",
+      "~queued for retro (7:retro:retro:1) after the merge",
+      "!workflow run *",
+      "!PUT repos/o/r/contents/issues/7.json\t*dispatch-queued*"
+    ],
+    "state_after": {
+      "status": "queued",
+      "stage": "retro",
+      "next.key": "7:retro:retro:1",
+      "next.fired_run_id": 9028,
+      "dispatches.0.status": "finished",
+      "dispatches.0.verdict": "pass",
+      "dispatches.0.stage": "build",
+      "merged_pr": 9
+    }
+  }
+}

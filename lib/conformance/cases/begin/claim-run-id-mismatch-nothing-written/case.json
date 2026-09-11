@@ -1,0 +1,17 @@
+{
+  "script": "lib/sh/begin.sh",
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 1,
+    "files": {
+      ".swarm-run": "absent"
+    },
+    "stdout_contains": [
+      "run_id: 1",
+      "does not hold the claim"
+    ]
+  }
+}

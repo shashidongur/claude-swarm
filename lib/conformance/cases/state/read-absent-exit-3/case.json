@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "read",
+    "7"
+  ],
+  "expect": {
+    "exit": 3,
+    "stdout_contains": [
+      "state #7: absent"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

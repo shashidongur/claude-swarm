@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "edges-legal",
+    "--mutate",
+    "del(.stages[2].roles[1].rework_to) | del(.verdict_edges[\"a11y.rework\"])"
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: edges-legal — role a11y (stage design): verdict rework has no edge"
+    ]
+  }
+}

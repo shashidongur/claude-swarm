@@ -1,0 +1,23 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "dev:app",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Adjusted the label formatting for the lane after review; no test changes were needed.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "app/src/a.ts",
+      "line": 1,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "artifacts": [],
+  "not_covered": [],
+  "touches": [
+    "app/src/a.ts"
+  ],
+  "head": "0000000000000000000000000000000000000000"
+}

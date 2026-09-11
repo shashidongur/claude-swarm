@@ -1,0 +1,16 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:dev:app:2",
+    "SWARM_SKIP_INSTALL": "1"
+  },
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/previous-attempt.md": "symbol capacityLabel not found near app/src/a.ts:1"
+    },
+    "stdout_contains": [
+      "PROBE: begin exit 0"
+    ]
+  }
+}

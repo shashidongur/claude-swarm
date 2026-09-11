@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["gh_json", "repos/o/r/flaky"],
+  "expect": { "exit": 0, "stdout_contains": ["\"ok\": true", "RC=0", "retry 1", "retry 2"] }
+}

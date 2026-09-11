@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "json-equals-yaml",
+    "--mutate",
+    ".v = 3"
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: json-equals-yaml — pipeline.json differs from pipeline.yml"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "log",
+    "--arg",
+    "event",
+    "fifty-first"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "log.49.event": "fifty-first",
+      "log.50": null,
+      "log.0.event": "e2"
+    }
+  }
+}

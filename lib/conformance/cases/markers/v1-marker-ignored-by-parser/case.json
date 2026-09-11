@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "get",
+    "kind"
+  ],
+  "stdin": "🔨 implementer done\n<!-- swarm: v1 | kind=stage | issue=56 | role=implementer | next=reviewer -->\n",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "VALUE=[]"
+    ]
+  }
+}

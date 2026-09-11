@@ -1,0 +1,341 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-swarm/schema/swarm-config.schema.json",
+  "title": "Project-side swarm config: .github/swarm.yml (v2, spec §14)",
+  "description": "Read fresh from the default branch on every event; defaults from swarm-config.defaults.json apply for every missing key; unknown keys are warnings (so additional properties are tolerated). This is the only place lane names, evidence workflow names, commands, the pin marker, test paths and the requirement-id pattern come from — the schema never enumerates them. `limits` may lower the swarm's defaults, never raise them (config.sh checks that against pipeline.json).",
+  "type": "object",
+  "required": [
+    "v"
+  ],
+  "definitions": {
+    "login": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,38}$"
+    },
+    "loginList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/login"
+      },
+      "uniqueItems": true
+    },
+    "glob": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "pattern": "^/|(^|/)\\.\\.(/|$)"
+      }
+    },
+    "globList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/glob"
+      },
+      "uniqueItems": true
+    },
+    "relPath": {
+      "type": "string",
+      "pattern": "^([A-Za-z0-9_]|\\.[A-Za-z0-9_-])[A-Za-z0-9._-]*(/([A-Za-z0-9_]|\\.[A-Za-z0-9_-])[A-Za-z0-9._-]*)*$"
+    },
+    "branch": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-][A-Za-z0-9._/-]*$",
+      "not": {
+        "pattern": "\\.\\.|//|@\\{|[\\s~^:?*\\[\\\\]|/$|\\.lock$"
+      }
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflowName": {
+      "description": "The `name:` of a workflow file on the default branch (must also appear in the stub's workflow_run.workflows).",
+      "type": "string",
+      "minLength": 1
+    },
+    "lane": {
+      "type": "object",
+      "required": [
+        "paths"
+      ],
+      "properties": {
+        "paths": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/globList"
+            },
+            {
+              "type": "array",
+              "minItems": 1
+            }
+          ]
+        },
+        "specialist": {
+          "description": "Specialist memory file, relative to the project's memory folder.",
+          "$ref": "#/definitions/relPath"
+        },
+        "commands": {
+          "description": "Injected into the dev / test-writer / qa briefs verbatim; never guessed.",
+          "type": "object",
+          "properties": {
+            "cwd": {
+              "type": "string"
+            },
+            "install": {
+              "$ref": "#/definitions/command"
+            },
+            "typecheck": {
+              "$ref": "#/definitions/command"
+            },
+            "test": {
+              "$ref": "#/definitions/command"
+            },
+            "lint": {
+              "$ref": "#/definitions/command"
+            }
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/command"
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "v": {
+      "const": 2
+    },
+    "approvers": {
+      "description": "Logins allowed to command the swarm; an empty list falls back to `default`, and an empty `default` to the repository owner (user-owned repositories only).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "$ref": "#/definitions/loginList"
+        },
+        "requirements": {
+          "$ref": "#/definitions/loginList"
+        },
+        "architecture": {
+          "$ref": "#/definitions/loginList"
+        },
+        "release": {
+          "$ref": "#/definitions/loginList"
+        },
+        "confidence": {
+          "$ref": "#/definitions/loginList"
+        }
+      }
+    },
+    "reporter_may_answer": {
+      "type": "boolean"
+    },
+    "require_model_map": {
+      "type": "boolean"
+    },
+    "default_branch": {
+      "$ref": "#/definitions/branch"
+    },
+    "branch_prefix": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
+      "not": {
+        "pattern": "\\.\\.|//"
+      },
+      "description": "Prefix of the integration branch. The dispatcher's cheap event gate carries the default literal; an overridden prefix is still matched through the Swarm-Issue trailer in pull request bodies and the swarm run name, so no event is lost."
+    },
+    "state_branch": {
+      "$ref": "#/definitions/branch"
+    },
+    "artifacts_dir": {
+      "$ref": "#/definitions/relPath"
+    },
+    "requirements_doc": {
+      "$ref": "#/definitions/relPath"
+    },
+    "requirement_id_pattern": {
+      "description": "ERE a requirement id must match (V6).",
+      "type": "string",
+      "minLength": 1
+    },
+    "pin_marker": {
+      "description": "How a red test is pinned before the fix (V8/V9).",
+      "type": "string",
+      "minLength": 1
+    },
+    "test_paths": {
+      "$ref": "#/definitions/globList"
+    },
+    "protected_paths": {
+      "description": "Merged with the swarm's built-in protected paths (G29a).",
+      "$ref": "#/definitions/globList"
+    },
+    "gate_manifests": {
+      "description": "Manifest files whose gate scripts / test-runner blocks may not change on a branch (G29b).",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/relPath"
+      },
+      "uniqueItems": true
+    },
+    "gate_scripts": {
+      "description": "Manifest `scripts` entries the CI gate depends on. The pre<name>/post<name> npm hooks around each, and the install lifecycle, are added automatically.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "gate_blocks": {
+      "description": "Top-level manifest blocks that configure the CI gate — the test runner's own settings, where they live in the manifest rather than a separate file. Changing one moves the gate without touching a gate script, so it is compared like the scripts are.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "delete_merged_branches": {
+      "type": "boolean"
+    },
+    "lanes": {
+      "description": "Key order = execution order.",
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z0-9_-]+$",
+        "not": {
+          "const": "both"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/lane"
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ci": {
+          "$ref": "#/definitions/workflowName"
+        },
+        "test": {
+          "$ref": "#/definitions/workflowName"
+        },
+        "security": {
+          "$ref": "#/definitions/workflowName"
+        }
+      }
+    },
+    "walkthrough_when": {
+      "description": "Touch globs that enable the `test` evidence workflow (full path only); empty = always.",
+      "$ref": "#/definitions/globList"
+    },
+    "contract_command": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sensitive_paths": {
+      "$ref": "#/definitions/globList"
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rework_budget": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "runaway_per_hour": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cost_usd_per_issue": {
+          "type": "number",
+          "minimum": 0
+        },
+        "runner_minutes_month": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "usd_month": {
+          "type": "number",
+          "minimum": 0
+        },
+        "question_rounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "critic_rework": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pr_lines": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pr_files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "open_prs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "pushes_per_pr_per_day": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence_fires_per_issue": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ratelimit_backoff_minutes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "watchdog": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gate_reminder_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "queued_refire_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence_timeout_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "running_stall_minutes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "description": "Memory folder in the swarm repo; null = derived from the repository (memory/github.com/<owner>/<repo>).",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/relPath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

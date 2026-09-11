@@ -1,0 +1,15 @@
+[
+  {
+    "number": 1,
+    "title": "swarm control",
+    "state": "open",
+    "labels": [
+      {
+        "name": "swarm:control"
+      },
+      {
+        "name": "swarm:halt-pipeline"
+      }
+    ]
+  }
+]

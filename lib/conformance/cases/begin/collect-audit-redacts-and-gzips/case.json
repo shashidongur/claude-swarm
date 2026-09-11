@@ -1,0 +1,36 @@
+{
+  "script": "lib/conformance/fixtures/begin/audit-probe.sh",
+  "env": {
+    "EXEC": "exec.json",
+    "CLAUDE_CODE_OAUTH_TOKEN": "hunter2-super-secret-value",
+    "ROLE_GH_TOKEN": "ghs_abcdefghijklmnopqrstuvwxyz0123456789",
+    "BRANCH": "claude/issue-7-x"
+  },
+  "project_files": {
+    "exec.json": "@fixtures/exec/with-token.json",
+    ".swarm-run/brief.md": "brief with hunter2-super-secret-value inside\n",
+    ".swarm-run/result.json": "{\"v\":2}\n",
+    ".swarm-run/evidence/index.json": "{}\n"
+  },
+  "commit_project_files": false,
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: collect exit 0",
+      "PROBE: file execution.json.gz",
+      "PROBE: file brief.md",
+      "PROBE: file perimeter.txt",
+      "PROBE: file result.json",
+      "PROBE: execution.json.gz redacted",
+      "PROBE: execution.json.gz has stars",
+      "PROBE: perimeter has porcelain"
+    ],
+    "stdout_not_contains": [
+      "carries a token"
+    ],
+    "files": {
+      ".swarm-run/audit/brief.md": "brief with *** inside",
+      ".swarm-run/audit/evidence-index.json": "{}"
+    }
+  }
+}

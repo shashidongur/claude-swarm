@@ -1,0 +1,11 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["state-roundtrip"],
+  "env": { "ISSUE": "7" },
+  "expect": {
+    "exit": 0,
+    "calls": ["PUT repos/o/r/contents/issues/7.json", "~swarm #7 probe"],
+    "state_after": { "status": "queued", "next.key": "7:build:code-review:app:1", "next.fired_at": null, "current.role": "dev:app", "log.0.event": "probe", "sig": "*" },
+    "stdout_contains": ["PROBE: state written"]
+  }
+}

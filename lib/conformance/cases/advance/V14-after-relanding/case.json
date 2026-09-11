@@ -1,0 +1,38 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:release:release:1",
+    "SC_HANDOFF": "release-pass",
+    "SC_RESULT_PATCH": ".touches = [\"docs/swarm/7/release.md\", \"docs/swarm/7/review-app-a1.md\"]",
+    "SC_BRANCH_FILES": "docs/swarm/7/release.md=# release\ndocs/swarm/7/review-app-a1.md=# review\n",
+    "SC_STATE_PATCH": ".pending_artifacts = [{file: \"review-app-a1.md\", sha256: \"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\"}]",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~pending-clear",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-finished",
+      "POST repos/o/r/issues/9/comments",
+      "~gate · release",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~gate-enter"
+    ],
+    "state_after": {
+      "status": "gate",
+      "gate.name": "release",
+      "pending_artifacts": [],
+      "stages.release.status": "done"
+    }
+  }
+}

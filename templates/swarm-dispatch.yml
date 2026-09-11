@@ -1,35 +1,80 @@
-# Swarm dispatch — the whole of a project's half.
+# Swarm dispatch — the project's half of the swarm pipeline (v2).
 #
 # GitHub only runs workflows that live in the repository receiving the event, so this
-# file has to exist here. It does not have to contain anything: the guards, the routing,
-# the loop brakes and the role delivery all live in the swarm repo and are called below.
-# Copy this file, change `mention_prefix`, and that is the installation.
+# file has to exist here. Everything else — guards, state, routing, the role runs, the
+# brakes — lives in the swarm repo and is called below. The `on:` block is the whole of
+# what this project tells the swarm about its events; keep it as it is.
 #
-# Requires two secrets on this repository:
-#   CLAUDE_CODE_OAUTH_TOKEN  — from `claude setup-token`
-#   SWARM_TOKEN              — a fine-grained PAT with contents:read on the swarm repo only
+# Secrets this repository must hold (passed BY NAME below, never `secrets: inherit`):
+#   CLAUDE_CODE_OAUTH_TOKEN  — from `claude setup-token` (expires ~yearly; renew with
+#                              `gh secret set CLAUDE_CODE_OAUTH_TOKEN`; the pipeline says
+#                              `blocked:auth` when it is rejected)
+#   SWARM_TOKEN              — fine-grained PAT on the swarm repo: Contents read+write,
+#                              Pull requests read+write (the retro's memory PR);
+#                              optionally the account permission Plan: read, so the monthly
+#                              brake can read the billing endpoint
+#   SWARM_STATE_KEY          — `gh secret set SWARM_STATE_KEY --body "$(openssl rand -hex 32)"`;
+#                              the HMAC key of the signed state file on `swarm/state`
+#
+# Keep `workflow_run.workflows` equal to the workflow names in `.github/swarm.yml`
+# (`evidence.ci`, `evidence.test`, `evidence.security`): a workflow_run for a name not
+# listed here never reaches the dispatcher, and an issue stays at swarm:waiting:evidence.
+#
+# The `schedule` is the watchdog. Delete it to save ≈ 2 billed minutes a day — and lose
+# gate reminders, the cancelled-pending backstop, the ratelimit back-off and the monthly
+# usage line on the control issue.
+#
+# Set the repository's Actions → Workflow permissions to "Read repository contents and
+# packages"; every job that needs more declares it, and a forgotten `permissions:` block
+# in a project workflow must not restore write.
+#
+# Switch-on order: this file must be on the DEFAULT branch before the first write-class
+# role (test-writer, dev, release) runs. The Claude App token those jobs use is minted
+# through an OIDC exchange that refuses a calling workflow file which is not identical
+# to the one on the default branch ("Workflow validation failed"); read-class roles run
+# from any branch. The App token's reach (which repositories, whether it can merge a PR
+# or push a workflow file) is measured at switch-on with templates/swarm-probe.yml's
+# `write` job, once this file is on the default branch.
 
 name: Swarm dispatch
-
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch'
+      && format('swarm {0} #{1} {2}', inputs.reason, inputs.issue, inputs.key)
+      || format('swarm {0} {1}', github.event_name, github.event.action) }}
 on:
-  issue_comment:
-    types: [created, edited]
-  pull_request_review:
-    types: [submitted]
-  pull_request_review_comment:
-    types: [created]
   issues:
-    types: [labeled]
+    types: [labeled]                       # swarm:ready (approver) — and hand-added swarm:* labels get an answer
+  issue_comment:
+    types: [created]                       # /swarm … (human); answers at the question gate
+  pull_request_review:
+    types: [submitted]                     # /swarm … as the first line of a review body (human)
+  pull_request:
+    types: [closed]                        # merged → retro (once); closed unmerged → parked
+  workflow_run:
+    workflows: [CHANGE-ME]                 # evidence completed — must equal .github/swarm.yml evidence.* names, e.g. [CI, walkthrough, security]
+    types: [completed]
+  workflow_dispatch:                       # the baton, and manual resume from the Actions tab
+    inputs:
+      issue:  { description: 'issue number', required: true, type: string }
+      stage:  { description: 'stage to run', required: false, type: string, default: '' }
+      role:   { description: 'role (with :lane) to run', required: false, type: string, default: '' }
+      key:    { description: 'idempotency key expected by state.next (or state.current for finalize)', required: false, type: string, default: '' }
+      reason: { description: 'chain|resume|redo|rework|retry|watchdog|evidence|finalize|manual', required: false, type: string, default: manual }
+  schedule:
+    - cron: '23 5,17 * * *'                # watchdog, twice a day (≈ 2 billed minutes/day); delete to disable
 
 jobs:
   dispatch:
-    uses: shashidongur/claude-swarm/.github/workflows/dispatch.yml@main
+    uses: shashidongur/claude-swarm/.github/workflows/dispatch.yml@v2    # or @<full sha> once stable
     with:
-      mention_prefix: CHANGE-ME-swarm      # e.g. acme-swarm → @acme-swarm-reviewer
-    secrets: inherit
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-      id-token: write
-      actions: read
+      swarm_ref: v2                       # must match the @ref above
+      dispatch_issue:  ${{ inputs.issue }}
+      dispatch_stage:  ${{ inputs.stage }}
+      dispatch_role:   ${{ inputs.role }}
+      dispatch_key:    ${{ inputs.key }}
+      dispatch_reason: ${{ inputs.reason }}
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      SWARM_TOKEN: ${{ secrets.SWARM_TOKEN }}
+      SWARM_STATE_KEY: ${{ secrets.SWARM_STATE_KEY }}
+    permissions: { contents: write, issues: write, pull-requests: write, actions: write, checks: read, id-token: write }

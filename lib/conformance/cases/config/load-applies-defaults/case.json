@@ -1,0 +1,9 @@
+{
+  "script": "lib/sh/config.sh",
+  "args": ["load", "--out", "out.json", "--file", "swarm.yml"],
+  "project_files": { "swarm.yml": "@fixtures/config/org-owned.yml" },
+  "expect": {
+    "exit": 0,
+    "files": { "out.json": "\"queued_refire_minutes\": 30" }
+  }
+}

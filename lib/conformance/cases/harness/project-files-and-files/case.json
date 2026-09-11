@@ -1,0 +1,10 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["files"],
+  "project_files": { "REQS.md": "ID-1 the requirement\n", "docs/notes.md": "@fixtures/redact/transcript.txt" },
+  "expect": {
+    "exit": 0,
+    "files": { ".swarm-run/result.json": "\"verdict\":\"pass\"", "REQS.md": "exists", "nope.txt": "absent", "docs/notes.md": "total_cost_usd" },
+    "stdout_contains": ["PROBE: REQS.md says ID-1", "PROBE: commits 3", "PROBE: tracked docs/notes.md"]
+  }
+}

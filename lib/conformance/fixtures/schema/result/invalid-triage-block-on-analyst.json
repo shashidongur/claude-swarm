@@ -1,0 +1,27 @@
+{
+  "artifacts": [
+    "requirements.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 142,
+      "path": "app/src/screens/LiveSessions.tsx",
+      "symbol": "capacityLabel"
+    }
+  ],
+  "issue": 7,
+  "role": "analyst",
+  "stage": "requirements",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "triage": {
+    "area": "both",
+    "path": "full",
+    "prio": "P2",
+    "size": "M",
+    "type": "feature"
+  },
+  "v": 2,
+  "verdict": "pass"
+}

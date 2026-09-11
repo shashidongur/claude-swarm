@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["matches_glob", "src/keys/a.pem.txt", "**/*.pem", ".env*", "CLAUDE.md"],
+  "expect": { "exit": 0, "stdout_contains": ["RC=1"] }
+}

@@ -1,0 +1,16 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:triage:triage:1"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: begin exit 0",
+      "no integration branch yet"
+    ],
+    "files": {
+      ".swarm-run/brief.md": "role: **triage**"
+    }
+  }
+}

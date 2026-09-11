@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "roles-have-files",
+    "--mutate",
+    ".stages[0].roles[0].name = \"ghost\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: roles-have-files — no role file"
+    ]
+  }
+}

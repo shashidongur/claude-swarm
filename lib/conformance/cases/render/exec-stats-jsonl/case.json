@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "exec.jsonl"
+  ],
+  "project_files": {
+    "exec.jsonl": "@fixtures/exec/healthy.jsonl"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"total_cost_usd\": 4.12",
+      "\"messages\": 13"
+    ]
+  }
+}

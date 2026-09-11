@@ -1,0 +1,10 @@
+{
+  "script": "lib/sh/config.sh",
+  "args": ["load", "--out", "config.json"],
+  "fixtures": ["config-user-owned"],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["config.json"],
+    "files": { "config.json": "\"config_sha\": \"abc123def4567890abc123def4567890abc123de\"", "github-env-marker": "absent" }
+  }
+}

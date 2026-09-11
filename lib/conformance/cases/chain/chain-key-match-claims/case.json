@@ -1,0 +1,63 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "true",
+      "finalize": "false",
+      "block": "",
+      "issue": "7",
+      "stage": "build",
+      "role": "code-review:app",
+      "lane": "app",
+      "class": "read",
+      "attempt": "1",
+      "key": "7:build:code-review:app:1",
+      "model": "claude-opus-5",
+      "retry_model": "claude-sonnet-5",
+      "critic_model": "",
+      "max_turns": "80",
+      "timeout": "25",
+      "retry_timeout": "20",
+      "retry_allowed": "true",
+      "job_timeout": "55",
+      "branch": "claude/issue-7-live-session-capacity",
+      "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "pr": "9",
+      "path": "full",
+      "swarm_sha": "0a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d",
+      "base_sha": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "working_comment_id": "*",
+      "write_roots": ".swarm-run/artifacts:.swarm-run/result.json"
+    },
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-running",
+      "POST repos/o/r/issues/7/comments",
+      "~🔍 **code-review:app** · ⏳ running · attempt 1",
+      "~kind=stage | issue=7 | stage=build | role=code-review:app | attempt=1 | key=7:build:code-review:app:1 | run=424242 | status=running",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~comment-id",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "running",
+      "current.key": "7:build:code-review:app:1",
+      "current.run_id": 424242,
+      "current.comment_id": "*",
+      "current.base_sha": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "next": null,
+      "dispatches.2.status": "running",
+      "dispatches.2.run_id": 424242
+    }
+  }
+}

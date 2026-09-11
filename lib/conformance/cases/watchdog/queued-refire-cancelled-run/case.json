@@ -1,0 +1,32 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~next-firing",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:build:code-review:app:1\"",
+      "~\"reason=watchdog\"",
+      "POST repos/o/r/issues/1/comments",
+      "~kind=watchdog | issue=1 | topic=control"
+    ],
+    "stdout_contains": [
+      "#7 fired 7:build:code-review:app:1"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.fired_run_id": 9014,
+      "next.fired_by": 424242
+    }
+  }
+}

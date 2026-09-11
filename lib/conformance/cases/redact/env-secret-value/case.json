@@ -1,0 +1,10 @@
+{
+  "script": "lib/sh/redact.sh",
+  "stdin": "@fixtures/redact/transcript.txt",
+  "env": { "CLAUDE_CODE_OAUTH_TOKEN": "hunter2-super-secret-value", "ROLE_GH_TOKEN": "ghs_abcdefghijklmnopqrstuvwxyz0123456789" },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["was *** and", "x-access-token:***@"],
+    "stdout_not_contains": ["hunter2", "ghs_abcdef"]
+  }
+}

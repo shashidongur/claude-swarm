@@ -1,0 +1,19 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "reply",
+    "-",
+    "--argjson",
+    "text",
+    "{\"a\":[1,2]}",
+    "--arg",
+    "marker",
+    "m"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🧭 **dispatch** · reply — {\"a\":[1,2]}"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "rework",
+    "--arg",
+    "from",
+    "ci-red",
+    "--arg",
+    "to",
+    "dev:app",
+    "--arg",
+    "stage",
+    "build",
+    "--arg",
+    "free",
+    "true"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "rework.spent": 5,
+      "rework.log.1.free": true
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "artifacts": [
+    "plan.md",
+    "sub-api.md",
+    "sub-app.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 12,
+      "path": "docs/swarm/7/adr.md",
+      "symbol": "Decision"
+    }
+  ],
+  "hints": {
+    "lanes": [
+      "api",
+      "app"
+    ],
+    "walkthrough": true
+  },
+  "issue": 7,
+  "role": "planner",
+  "stage": "build",
+  "subissues": [
+    {
+      "body_file": "artifacts/sub-api.md",
+      "lane": "api",
+      "title": "Capacity column and validation"
+    },
+    {
+      "body_file": "artifacts/sub-app.md",
+      "lane": "app",
+      "title": "Capacity label on the session card"
+    }
+  ],
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "pass"
+}

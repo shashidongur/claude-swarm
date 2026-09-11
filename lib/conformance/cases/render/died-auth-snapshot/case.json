@@ -1,0 +1,36 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "died",
+    "-",
+    "--arg",
+    "role",
+    "dev:app",
+    "--arg",
+    "cause",
+    "auth",
+    "--arg",
+    "advice",
+    "renew CLAUDE_CODE_OAUTH_TOKEN: claude setup-token && gh secret set CLAUDE_CODE_OAUTH_TOKEN, then /swarm resume",
+    "--arg",
+    "attempt",
+    "1",
+    "--arg",
+    "run_url",
+    "https://github.com/o/r/actions/runs/1",
+    "--arg",
+    "details",
+    "Log tail: 401 authentication_error: OAuth token has expired",
+    "--arg",
+    "marker",
+    "<!-- swarm: v2 | kind=died | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=died | at=2026-09-06T15:01:19Z -->"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "💀 **dev:app** · run died (auth) — renew CLAUDE_CODE_OAUTH_TOKEN: claude setup-token && gh secret set CLAUDE_CODE_OAUTH_TOKEN, then /swarm resume · attempt 1 · https://github.com/o/r/actions/runs/1",
+      "Log tail: 401 authentication_error: OAuth token has expired",
+      "<!-- swarm: v2 | kind=died | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=died | at=2026-09-06T15:01:19Z -->"
+    ]
+  }
+}

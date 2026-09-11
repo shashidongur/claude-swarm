@@ -1,0 +1,23 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-queued",
+    "--arg",
+    "stage",
+    "test",
+    "--arg",
+    "role",
+    "qa"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: status is running, not routing/evidence"
+    ]
+  }
+}

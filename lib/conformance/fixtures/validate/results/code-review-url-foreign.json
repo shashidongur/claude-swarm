@@ -1,0 +1,19 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "code-review:app",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Reviewed the lane: the capacity label is derived from the session record and the pinned test now passes.",
+  "evidence": [
+    {
+      "kind": "url",
+      "url": "https://example.com/o/r/actions/runs/1"
+    }
+  ],
+  "artifacts": [
+    "review-app-a1.md"
+  ],
+  "not_covered": []
+}

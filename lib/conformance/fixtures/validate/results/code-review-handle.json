@@ -1,0 +1,21 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "code-review:app",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Reviewed the lane: the capacity label is derived from the session record and the pinned test now passes.",
+  "evidence": [
+    {
+      "kind": "command",
+      "cmd": "npm run test:ci -- Issue7",
+      "result": "Tests: 3 passed, thanks @octo-owner",
+      "exit": 0
+    }
+  ],
+  "artifacts": [
+    "review-app-a1.md"
+  ],
+  "not_covered": []
+}

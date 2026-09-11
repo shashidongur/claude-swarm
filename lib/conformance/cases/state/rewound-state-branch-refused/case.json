@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "refusal",
+    "--arg",
+    "login",
+    "mallory"
+  ],
+  "env": {
+    "SWARM_STATE_RACE_HOOK": "[ -f \"$SWARM_FAKE_GH/once\" ] || { touch \"$SWARM_FAKE_GH/once\"; f=\"$SWARM_FAKE_GH/state/issues-7.json\"; jq '.seq = 2' \"$f\" | \"$SWARM_ROOT/lib/sh/state.sh\" sign > \"$f.new\" && mv \"$f.new\" \"$f\"; }",
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "went backwards (seq 5 → 2)",
+      "the state branch was rewound"
+    ],
+    "state_after": {
+      "seq": 2,
+      "refusals.mallory": null
+    }
+  }
+}

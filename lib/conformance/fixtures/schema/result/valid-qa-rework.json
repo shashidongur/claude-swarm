@@ -1,0 +1,33 @@
+{
+  "artifacts": [
+    "qa-report.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "artifact",
+      "note": "12/12 flows",
+      "path": "evidence/test/junit.xml"
+    },
+    {
+      "kind": "artifact",
+      "note": "CI success on head",
+      "path": "evidence/CI/SUMMARY.md"
+    }
+  ],
+  "issue": 7,
+  "not_covered": [
+    "emulator boot timeout",
+    "no baseline images"
+  ],
+  "reason": "AC-7-4 has no passing test: the renewal path returns 200 for an expired grant (repro in the report).",
+  "refs": [
+    "AC-7-4"
+  ],
+  "rework_to": "dev:api",
+  "role": "qa",
+  "stage": "test",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "rework"
+}

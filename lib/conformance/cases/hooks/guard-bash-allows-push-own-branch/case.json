@@ -1,0 +1,7 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "stdin": "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"git push origin HEAD:refs/heads/claude/issue-7-live-session-capacity\"}}",
+  "expect": {
+    "exit": 0
+  }
+}

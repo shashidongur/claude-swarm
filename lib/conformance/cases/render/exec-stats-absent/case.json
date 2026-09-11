@@ -1,0 +1,12 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "nope.json"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "{\"present\":false,\"reason\":\"absent\"}"
+    ]
+  }
+}

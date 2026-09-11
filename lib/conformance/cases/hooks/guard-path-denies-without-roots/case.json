@@ -1,0 +1,10 @@
+{
+  "script": "lib/hooks/guard-path.sh",
+  "stdin": "{\"tool_input\":{\"file_path\":\"x.md\"}}",
+  "expect": {
+    "exit": 2,
+    "stdout_contains": [
+      "no write root is configured"
+    ]
+  }
+}

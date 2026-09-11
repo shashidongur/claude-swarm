@@ -1,0 +1,31 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 block",
+      "POST repos/o/r/issues/7/comments",
+      "~blocked:perimeter",
+      "~git revert -m 1 1234567890abcdef1234567890abcdef12345678",
+      "!issue close *",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "perimeter",
+      "merged_at": null,
+      "stages.retro.status": "pending",
+      "blocked.comment_id": "*"
+    }
+  }
+}

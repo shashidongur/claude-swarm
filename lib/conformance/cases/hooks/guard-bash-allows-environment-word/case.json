@@ -1,0 +1,7 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "stdin": "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"grep -rn environment src/\"}}",
+  "expect": {
+    "exit": 0
+  }
+}

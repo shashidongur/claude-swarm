@@ -1,0 +1,30 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "next-fired",
+    "--arg",
+    "key",
+    "7:build:dev:api:1",
+    "--arg",
+    "run_id",
+    "777"
+  ],
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!PUT *"
+    ],
+    "stdout_contains": [
+      "changed nothing"
+    ],
+    "state_after": {
+      "status": "running",
+      "current.fired_run_id": null
+    }
+  }
+}

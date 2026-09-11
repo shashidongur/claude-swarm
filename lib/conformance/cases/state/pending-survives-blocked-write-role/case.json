@@ -1,0 +1,22 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "pending-blocked-role"
+  ],
+  "env": {
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!DELETE *"
+    ],
+    "stdout_contains": [
+      "PROBE: entries after a blocked attempt 1",
+      "PROBE: the next attempt re-lands the same file"
+    ],
+    "state_after": {
+      "pending_artifacts.0.file": "qa-report.md"
+    }
+  }
+}

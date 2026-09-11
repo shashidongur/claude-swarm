@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["gh_json", "--paginate", "repos/o/r/issues/7/comments"],
+  "expect": { "exit": 0, "stdout_contains": ["\"id\": 41", "\"id\": 43", "RC=0"] }
+}

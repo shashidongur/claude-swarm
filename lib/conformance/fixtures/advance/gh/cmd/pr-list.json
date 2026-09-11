@@ -1,0 +1,8 @@
+[
+  {
+    "number": 9,
+    "isDraft": true,
+    "baseRefName": "main",
+    "headRefName": "claude/issue-7-live-session-capacity"
+  }
+]

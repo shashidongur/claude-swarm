@@ -1,0 +1,7 @@
+{
+  "script": "lib/sh/config.sh",
+  "args": ["get", ".lanes.api.commands.test"],
+  "env": { "CONFIG_JSON": "config.json" },
+  "project_files": { "config.json": "@fixtures/config/user-owned.json" },
+  "expect": { "exit": 0, "stdout_contains": ["npm run test:ci"] }
+}

@@ -1,0 +1,19 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "requirements",
+  "role": "analyst",
+  "attempt": 1,
+  "verdict": "question",
+  "summary": "One question blocks a testable acceptance criterion about expired grants.",
+  "evidence": [],
+  "artifacts": [],
+  "not_covered": [],
+  "reason": "Cannot write AC-7-3 without knowing how an expired grant counts.",
+  "questions": [
+    {
+      "to": "reporter",
+      "q": "Should a master with an expired grant still see the capacity counter?"
+    }
+  ]
+}

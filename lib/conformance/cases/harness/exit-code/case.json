@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["fail"],
+  "expect": { "exit": 3, "stdout_contains": ["PROBE: failing on purpose"] }
+}

@@ -1,0 +1,20 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "architecture",
+  "role": "threat-model",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "evidence": [
+    {
+      "kind": "command",
+      "cmd": "npm run test:ci -- Issue7",
+      "result": "Tests: 3 passed",
+      "exit": 0
+    }
+  ],
+  "artifacts": [
+    "threat-model.md"
+  ]
+}

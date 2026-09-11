@@ -1,0 +1,37 @@
+{
+  "script": "lib/sh/refuse.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "ISSUE": "7",
+    "BLOCK": "runaway",
+    "REASON": "runaway: 10 dispatches in the last hour (limit 10)",
+    "EVENT_ID": "run-424242"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 block",
+      "POST repos/o/r/issues/7/comments",
+      "~🧭 **dispatch** · 🚧 refused — runaway: 10 dispatches",
+      "~kind=refused | issue=7 | event=run-424242",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~comment-id",
+      "POST repos/o/r/issues/7/labels",
+      "~blocked:runaway",
+      "~swarm:blocked"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "runaway",
+      "blocked.comment_id": "*",
+      "next.key": "7:build:code-review:app:1"
+    }
+  }
+}

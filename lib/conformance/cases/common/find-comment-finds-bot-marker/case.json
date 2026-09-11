@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["find_comment", "7", "(.body | test(\"[|] key=7:build:dev:app:1( [|]| -->)\"))"],
+  "expect": { "exit": 0, "stdout_contains": ["\"id\":42", "RC=0"] }
+}

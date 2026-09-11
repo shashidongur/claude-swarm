@@ -1,0 +1,24 @@
+{
+  "databaseId": 555,
+  "displayTitle": "swarm chain #7 7:build:dev:app:1",
+  "status": "completed",
+  "conclusion": "cancelled",
+  "event": "workflow_dispatch",
+  "url": "https://github.com/o/r/actions/runs/555",
+  "jobs": [
+    {
+      "name": "resolve",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-09-06T14:40:00Z",
+      "completedAt": "2026-09-06T14:40:41Z"
+    },
+    {
+      "name": "run-write",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "startedAt": null,
+      "completedAt": null
+    }
+  ]
+}

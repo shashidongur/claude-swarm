@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false"
+    },
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~key `7:build:bogus:9` does not match",
+      "~`build` · `queued`",
+      "~the queued key is `7:build:code-review:app:1`",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "queued",
+      "current": null
+    }
+  }
+}

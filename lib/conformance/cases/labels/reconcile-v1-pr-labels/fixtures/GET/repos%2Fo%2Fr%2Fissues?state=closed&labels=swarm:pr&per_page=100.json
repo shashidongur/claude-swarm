@@ -1,0 +1,20 @@
+[
+  {
+    "number": 4,
+    "state": "closed",
+    "labels": [
+      {
+        "name": "swarm:pr"
+      }
+    ]
+  },
+  {
+    "number": 5,
+    "state": "closed",
+    "labels": [
+      {
+        "name": "swarm:pr"
+      }
+    ]
+  }
+]

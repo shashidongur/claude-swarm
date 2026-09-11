@@ -1,0 +1,30 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "dev:app",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Implemented the capacity label for the lane; the pinned test flips green with the project's test command.",
+  "evidence": [
+    {
+      "kind": "command",
+      "cmd": "npm run test:ci -- Issue7",
+      "result": "Tests: 3 passed",
+      "exit": 0
+    },
+    {
+      "kind": "file",
+      "path": "app/src/a.ts",
+      "line": 1,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "artifacts": [],
+  "not_covered": [],
+  "touches": [
+    "app/src/__tests__/a.test.ts",
+    "app/src/a.ts"
+  ],
+  "head": "0000000000000000000000000000000000000000"
+}

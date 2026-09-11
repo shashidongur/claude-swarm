@@ -1,0 +1,32 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~gate-reject",
+      "POST repos/o/r/issues/7/comments",
+      "~rejected by owner",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:architecture:architect:2\""
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:architecture:architect:2",
+      "rework.spent": 0,
+      "rework.reset_at": "2026-09-06T15:00:00Z",
+      "owner_reason.kind": "reject",
+      "owner_reason.text": "too vague — need the master case",
+      "stages.architecture.attempts.architect": 2
+    }
+  }
+}

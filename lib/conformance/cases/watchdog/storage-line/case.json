@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/1/comments",
+      "~Artifact storage: caches 700 MB · artifacts 2.5 MB"
+    ],
+    "stdout_contains": [
+      "storage: caches 700 MB · artifacts 2.5 MB"
+    ]
+  }
+}

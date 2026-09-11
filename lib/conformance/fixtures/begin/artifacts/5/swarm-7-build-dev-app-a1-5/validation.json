@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "errors": [
+    {
+      "check": "V3",
+      "msg": "evidence[0]: symbol capacityLabel not found near app/src/a.ts:1"
+    }
+  ],
+  "warnings": []
+}

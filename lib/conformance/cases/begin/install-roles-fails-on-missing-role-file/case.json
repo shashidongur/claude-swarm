@@ -1,0 +1,19 @@
+{
+  "script": "lib/sh/install-roles.sh",
+  "args": [
+    "--src",
+    "empty-agents"
+  ],
+  "project_files": {
+    "empty-agents/.keep": ""
+  },
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "role file(s) missing"
+    ],
+    "files": {
+      ".claude/agents/dev.md": "absent"
+    }
+  }
+}

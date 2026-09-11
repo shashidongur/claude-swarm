@@ -1,0 +1,34 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:code-review:app:1",
+    "SC_HANDOFF": "code-review-app-pass",
+    "SC_BASE_FILES": "app/src/screens/LiveSessions.tsx=export const capacityLabel = 1;\n",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "issue close 12",
+      "issue close 13",
+      "workflow run walkthrough",
+      "~7:test:evidence:1"
+    ],
+    "state_after": {
+      "status": "evidence",
+      "evidence.pending.workflow": "test",
+      "evidence.pending.consumer": "qa",
+      "evidence.fires.test": 1,
+      "stages.build.status": "done",
+      "stages.build.lanes.app": "done"
+    }
+  }
+}

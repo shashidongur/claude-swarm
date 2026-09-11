@@ -1,0 +1,17 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 1,
+      "name": "swarm-run-7-build-dev-app-1-556",
+      "expired": false,
+      "size_in_bytes": 512000
+    },
+    {
+      "id": 2,
+      "name": "swarm-7-build-dev-app-a1-556",
+      "expired": false,
+      "size_in_bytes": 1024000
+    }
+  ]
+}

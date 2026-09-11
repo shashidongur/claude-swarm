@@ -1,0 +1,7 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["default_branch"],
+  "env": { "CONFIG_JSON": "config.json" },
+  "project_files": { "config.json": "@fixtures/config/org-owned.json" },
+  "expect": { "exit": 0, "stdout_contains": ["main\nRC=0"] }
+}

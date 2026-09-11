@@ -1,0 +1,10 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "stdin": "{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"gh api -X PUT repos/o/r/pulls/9/merge -f merge_method=merge\"}}",
+  "expect": {
+    "exit": 2,
+    "stdout_contains": [
+      "matches the denied pattern"
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "databaseId": 66,
+  "displayTitle": "CI claude/issue-7-live-session-capacity @f54b320",
+  "status": "completed",
+  "conclusion": "failure",
+  "event": "pull_request",
+  "url": "https://github.com/o/r/actions/runs/66",
+  "jobs": [
+    {
+      "name": "mobile",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-09-06T14:50:00Z",
+      "completedAt": "2026-09-06T14:58:00Z"
+    }
+  ]
+}

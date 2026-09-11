@@ -1,0 +1,15 @@
+{
+  "script": "lib/sh/pack-tree.sh",
+  "env": {
+    "STATE_JSON": "state.json"
+  },
+  "project_files": {
+    "state.json": "@fixtures/validate/state-dev-app.json"
+  },
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "CONFIG_JSON (or --config) is required"
+    ]
+  }
+}

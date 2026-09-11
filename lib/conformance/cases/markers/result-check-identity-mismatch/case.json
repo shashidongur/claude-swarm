@@ -1,0 +1,23 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "check",
+    "res.json",
+    "--arg",
+    "issue",
+    "8",
+    "--arg",
+    "role",
+    "dev:api"
+  ],
+  "project_files": {
+    "res.json": "@fixtures/schema/result/valid-dev-pass.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"check\":\"V1\",\"msg\":\"issue 7 does not equal the brief",
+      "\"check\":\"V1\",\"msg\":\"role dev:app does not equal the brief"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "pr-merged",
+    "--arg",
+    "pr",
+    "9",
+    "--arg",
+    "by",
+    "octo-owner",
+    "--arg",
+    "merge_sha",
+    "aaaa320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+    "--arg",
+    "merged_at",
+    "2026-09-07T09:12:00Z"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "merged_at": "2026-09-07T09:12:00Z",
+      "merged_pr": 9,
+      "merged_by": "octo-owner",
+      "merge_sha": "aaaa320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "status": "queued",
+      "stage": "retro",
+      "next.key": "7:retro:retro:1",
+      "next.reason": "merged",
+      "gate": null,
+      "stages.release.status": "done"
+    }
+  }
+}

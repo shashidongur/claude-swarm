@@ -1,0 +1,22 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "retro-done"
+  ],
+  "env": {
+    "ISSUE": "7",
+    "SWARM_NOW": "2026-09-07T09:40:00Z"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: done rc=0"
+    ],
+    "state_after": {
+      "status": "done",
+      "stages.retro.status": "done",
+      "memory.pr": 41,
+      "next": null
+    }
+  }
+}

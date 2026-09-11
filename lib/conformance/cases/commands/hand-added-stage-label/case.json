@@ -1,0 +1,25 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~labels are written by the dispatcher",
+      "~add `swarm:ready` or comment `/swarm start`",
+      "!PUT repos/o/r/contents/issues/7.json",
+      "!workflow run *"
+    ],
+    "stdout_contains": [
+      "G33"
+    ]
+  }
+}

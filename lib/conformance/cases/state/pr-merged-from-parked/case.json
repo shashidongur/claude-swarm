@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "pr-merged",
+    "--arg",
+    "pr",
+    "9",
+    "--arg",
+    "by",
+    "octo-owner"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:retro:retro:1",
+      "parked": null,
+      "merged_pr": 9
+    }
+  }
+}

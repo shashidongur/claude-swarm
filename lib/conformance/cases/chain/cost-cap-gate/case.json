@@ -1,0 +1,39 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false",
+      "block": ""
+    },
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~gate-enter",
+      "POST repos/o/r/issues/7/comments",
+      "~🛎️ **gate · budget** — @owner",
+      "~$80.25 has reached the cap $75",
+      "~kind=gate | issue=7 | key=7:build:code-review:app:1 | gate=budget",
+      "POST repos/o/r/issues/7/labels",
+      "~swarm:gate:budget",
+      "!workflow run *"
+    ],
+    "stdout_contains": [
+      "SKIP: swarm:gate:budget"
+    ],
+    "state_after": {
+      "status": "gate",
+      "gate.name": "budget",
+      "gate.comment_id": "*",
+      "next.key": "7:build:code-review:app:1"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "planner",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Two lanes in the configured order; the app lane depends on the api lane's contract.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "app/src/screens/LiveSessions.tsx",
+      "line": 3,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "artifacts": [
+    "plan.md"
+  ],
+  "not_covered": [],
+  "subissues": [
+    {
+      "lane": "api",
+      "title": "Capacity column and validation",
+      "body_file": "sub-api.md"
+    },
+    {
+      "lane": "app",
+      "title": "Capacity label on the session screen",
+      "body_file": "sub-app.md"
+    }
+  ]
+}

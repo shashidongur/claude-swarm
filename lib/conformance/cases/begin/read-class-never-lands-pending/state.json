@@ -1,0 +1,48 @@
+{
+  "v": 2,
+  "issue": 7,
+  "repo": "o/r",
+  "path": "full",
+  "stage": "security",
+  "status": "running",
+  "branch": "claude/issue-7-live-session-capacity",
+  "head": null,
+  "pr": 9,
+  "lanes": [
+    "api",
+    "app"
+  ],
+  "current": {
+    "role": "compliance",
+    "attempt": 1,
+    "key": "7:security:compliance:1",
+    "run_id": 424242,
+    "run_attempt": 1,
+    "base_sha": "",
+    "started_at": "2026-09-06T14:41:39Z",
+    "activity_from": "2026-09-06T14:41:39Z"
+  },
+  "questions": {
+    "rounds": 0,
+    "max": 2,
+    "comment_id": null
+  },
+  "pending_artifacts": [
+    {
+      "file": "review-app-a1.md",
+      "sha256": "5a4433b4b8ef36af40532182962365feea21731b2f42398d0f80c9b57c05072f"
+    }
+  ],
+  "dispatches": [],
+  "log": [],
+  "rework": {
+    "spent": 0,
+    "budget": 5,
+    "log": []
+  },
+  "evidence": {
+    "seen": {},
+    "fires": {},
+    "pending": null
+  }
+}

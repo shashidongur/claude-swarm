@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "redo",
+    "--arg",
+    "stage",
+    "build",
+    "--arg",
+    "role",
+    "planner",
+    "--arg",
+    "by",
+    "octo-owner"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: status is running; wait for the stage to finish or park first"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "block",
+    "--arg",
+    "reason",
+    "stalled",
+    "--arg",
+    "detail",
+    "advance failed"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "stalled",
+      "current.key": "7:build:dev:app:1",
+      "current.run_id": 2,
+      "dispatches.1.status": "running"
+    }
+  }
+}

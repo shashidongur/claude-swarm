@@ -1,0 +1,11 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["state-stale-sha"],
+  "env": { "ISSUE": "7" },
+  "expect": {
+    "exit": 0,
+    "calls": ["PUT repos/o/r/contents/issues/7.json"],
+    "state_after": { "status": "running", "issue": 7 },
+    "stdout_contains": ["PROBE: got 409 as expected", "gh: HTTP 409: issues/7.json does not match"]
+  }
+}

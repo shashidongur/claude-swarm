@@ -1,0 +1,23 @@
+{
+  "artifacts": [
+    "review-app-a1.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 142,
+      "path": "app/src/screens/LiveSessions.tsx",
+      "symbol": "capacityLabel"
+    }
+  ],
+  "issue": 7,
+  "role": "code-review:app",
+  "stage": "build",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "touches": [
+    "app/src/screens/LiveSessions.tsx"
+  ],
+  "v": 2,
+  "verdict": "pass"
+}

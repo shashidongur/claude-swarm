@@ -1,0 +1,23 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "month-totals",
+    "o/r"
+  ],
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "fixtures": [
+    "state-month"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"month\": \"2026-09\"",
+      "\"runner_minutes\": 86",
+      "\"overhead_minutes\": 12",
+      "\"minutes\": 98",
+      "\"cost_usd\": 21.7"
+    ]
+  }
+}

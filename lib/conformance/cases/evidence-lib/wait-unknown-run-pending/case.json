@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/evidence.sh",
+  "args": [
+    "wait",
+    "ci",
+    "aaaa320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+    "code-review:app"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "ISSUE": "7",
+    "CONFIG_JSON": "config.json"
+  },
+  "project_files": {
+    "config.json": "@fixtures/config/user-owned.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "evidence_status": "pending",
+      "evidence_run_id": "0"
+    },
+    "state_after": {
+      "status": "evidence",
+      "evidence.pending.run_id": 0
+    }
+  }
+}

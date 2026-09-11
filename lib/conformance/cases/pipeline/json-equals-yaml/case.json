@@ -1,0 +1,12 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "json-equals-yaml"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "OK: json-equals-yaml"
+    ]
+  }
+}

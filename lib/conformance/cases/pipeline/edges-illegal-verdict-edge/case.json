@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "edges-legal",
+    "--mutate",
+    ".verdict_edges[\"qa.rework\"] = \"rework:nobody\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: edges-legal — verdict_edges[qa.rework] = rework:nobody is not a legal edge"
+    ]
+  }
+}

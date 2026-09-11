@@ -1,0 +1,32 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 drop",
+      "issue close 12",
+      "issue close 13",
+      "POST repos/o/r/issues/9/comments",
+      "~was dropped",
+      "POST repos/o/r/issues/7/comments",
+      "~dropped by owner",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "dropped",
+      "next": null,
+      "branch": "claude/issue-7-live-session-capacity",
+      "pr": 9
+    }
+  }
+}

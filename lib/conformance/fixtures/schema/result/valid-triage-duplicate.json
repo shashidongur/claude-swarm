@@ -1,0 +1,23 @@
+{
+  "artifacts": [
+    "triage.json"
+  ],
+  "attempt": 1,
+  "duplicates": [
+    4
+  ],
+  "issue": 7,
+  "reason": "The same defect is tracked in an open issue with the same stack trace.",
+  "role": "triage",
+  "stage": "triage",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "triage": {
+    "area": "api",
+    "path": "short",
+    "prio": "P2",
+    "size": "S",
+    "type": "bug"
+  },
+  "v": 2,
+  "verdict": "duplicate"
+}

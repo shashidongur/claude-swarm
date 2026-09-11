@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-finished",
+    "--arg",
+    "key",
+    "7:build:dev:api:1",
+    "--arg",
+    "run_id",
+    "1",
+    "--arg",
+    "verdict",
+    "pass"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: current is 7:build:dev:app:1/2"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

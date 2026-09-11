@@ -1,0 +1,4 @@
+# Invalid: at least one lane is required, and evidence.ci must be named.
+v: 2
+approvers:
+  default: [owner]

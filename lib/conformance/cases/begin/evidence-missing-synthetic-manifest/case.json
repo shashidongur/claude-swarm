@@ -1,0 +1,21 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:code-review:app:1"
+  },
+  "fixtures": [
+    "begin"
+  ],
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/evidence/CI/manifest.json": "\"reason\": \"artifact missing\"",
+      ".swarm-run/evidence/index.json": "\"artifact\": \"missing\"",
+      ".swarm-run/evidence/CI/failed.log": "adds capacity",
+      ".swarm-run/brief.md": "failed job log tail"
+    },
+    "stdout_contains": [
+      "PROBE: begin exit 0"
+    ]
+  }
+}

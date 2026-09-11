@@ -1,0 +1,22 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:dev:app:2",
+    "SWARM_SKIP_INSTALL": "1"
+  },
+  "fixtures": [
+    "begin"
+  ],
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/previous-attempt.md": "npm run test:ci -- Issue7"
+    },
+    "stdout_contains": [
+      "PROBE: begin exit 0"
+    ],
+    "stdout_not_contains": [
+      "transcript expired"
+    ]
+  }
+}

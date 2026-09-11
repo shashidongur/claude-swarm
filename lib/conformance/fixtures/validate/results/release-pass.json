@@ -1,0 +1,36 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "release",
+  "role": "release",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "PR body assembled from the artifacts, ACs walked against the head, marked ready for review.",
+  "evidence": [
+    {
+      "kind": "url",
+      "url": "https://github.com/o/r/pull/9"
+    },
+    {
+      "kind": "file",
+      "path": "docs/swarm/7/release.md",
+      "line": 1,
+      "symbol": "Release"
+    }
+  ],
+  "artifacts": [
+    "release.md",
+    "pr-body.md"
+  ],
+  "not_covered": [
+    "iOS not exercised (no macOS runner)"
+  ],
+  "refs": [
+    "AC-7-1"
+  ],
+  "touches": [
+    "docs/swarm/7/pr-body.md",
+    "docs/swarm/7/release.md"
+  ],
+  "head": "0000000000000000000000000000000000000000"
+}

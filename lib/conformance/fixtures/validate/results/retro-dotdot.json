@@ -1,0 +1,28 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "retro",
+  "role": "retro",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "Post-mortem and one gotcha proposed; numbers taken from the dispatch records.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "app/src/screens/LiveSessions.tsx",
+      "line": 3,
+      "symbol": "capacityLabel"
+    }
+  ],
+  "artifacts": [
+    "postmortem.md"
+  ],
+  "not_covered": [],
+  "memory": [
+    {
+      "kind": "postmortem",
+      "path": "postmortems/../decisions.md",
+      "content_file": "postmortem.md"
+    }
+  ]
+}

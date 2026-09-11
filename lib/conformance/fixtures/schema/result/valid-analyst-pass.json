@@ -1,0 +1,28 @@
+{
+  "artifacts": [
+    "requirements.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "kind": "file",
+      "line": 40,
+      "path": "REQS.md",
+      "symbol": "FR-LIV-03"
+    }
+  ],
+  "hints": {
+    "path": "full"
+  },
+  "issue": 7,
+  "not_covered": [],
+  "refs": [
+    "FR-LIV-03",
+    "AC-7-2"
+  ],
+  "role": "analyst",
+  "stage": "requirements",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "pass"
+}

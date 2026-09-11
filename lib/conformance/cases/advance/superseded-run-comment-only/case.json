@@ -1,0 +1,31 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_HANDOFF": "dev-app-pass",
+    "SC_STATE_PATCH": ".current.key = \"7:build:dev:app:2\" | .current.run_id = 999",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-superseded",
+      "PATCH repos/o/r/issues/comments/101",
+      "~superseded",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "dispatches.0.status": "superseded",
+      "current.key": "7:build:dev:app:2"
+    }
+  }
+}

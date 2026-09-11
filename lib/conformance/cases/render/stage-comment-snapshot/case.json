@@ -1,0 +1,34 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "comment",
+    "input.json",
+    "-",
+    "--arg",
+    "repo",
+    "o/r"
+  ],
+  "project_files": {
+    "input.json": "@fixtures/render/stage-input.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "🔨 **dev:app** · ✅ pass · claude-sonnet-5 · $4.12 · 88 turns · 19m40s · 21 job-min · rework 1/5",
+      "Evidence",
+      "- `npm run test:ci -- Issue7` → `Tests: 3 passed <!-​- planted -​->` (exit 0)",
+      "- `app/src/screens/LiveSessions.tsx:142` `capacityLabel`",
+      "- https://github.com/o/r/actions/runs/1",
+      "- artifact `evidence/CI/SUMMARY.md` — CI success on f54b320",
+      "Artifacts: docs/swarm/7/review-app-a1.md (staged, lands with the next push) · head f54b320 · PR #9 · audit swarm-7-build-dev-app-a1-1",
+      "Not covered: iOS not exercised (no macOS runner)",
+      "Next: code-review:app",
+      "<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=finished | verdict=pass | head=f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b | model=claude-sonnet-5 | at=2026-09-06T15:01:19Z -->"
+    ],
+    "stdout_not_contains": [
+      "https://github.com/evil/",
+      "@owner",
+      "<!-- swarm: v2 | kind=stage | issue=7 | status=finished -->"
+    ]
+  }
+}

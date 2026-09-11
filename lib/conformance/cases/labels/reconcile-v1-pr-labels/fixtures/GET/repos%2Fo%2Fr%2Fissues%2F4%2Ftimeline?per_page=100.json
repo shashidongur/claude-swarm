@@ -1,0 +1,16 @@
+[
+  {
+    "event": "cross-referenced",
+    "source": {
+      "type": "issue",
+      "issue": {
+        "number": 6,
+        "state": "closed",
+        "pull_request": {
+          "url": "https://api.github.com/repos/o/r/pulls/6",
+          "merged_at": "2026-08-01T10:00:00Z"
+        }
+      }
+    }
+  }
+]

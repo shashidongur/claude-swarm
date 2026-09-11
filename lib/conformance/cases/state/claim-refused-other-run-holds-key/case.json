@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-running",
+    "--arg",
+    "key",
+    "7:build:code-review:app:1",
+    "--arg",
+    "run_id",
+    "424242"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: fired run is 999"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["say"],
+  "expect": {
+    "exit": 0,
+    "outputs": { "go": "false", "reason": "probe refused", "block": "blocked:agent-output" },
+    "stdout_contains": ["SKIP: probe refused"]
+  }
+}

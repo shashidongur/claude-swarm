@@ -1,0 +1,12 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "write-critic-separate"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "OK: write-critic-separate"
+    ]
+  }
+}

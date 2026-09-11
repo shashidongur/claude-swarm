@@ -1,0 +1,17 @@
+{
+  "databaseId": 424242,
+  "status": "in_progress",
+  "conclusion": null,
+  "jobs": [
+    { "name": "resolve", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T13:58:00Z", "completedAt": "2026-09-06T13:59:10Z",
+      "steps": [ { "name": "Run .swarm/lib/sh/resolve.sh", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T13:58:20Z", "completedAt": "2026-09-06T13:59:00Z" } ] },
+    { "name": "run-write", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T14:00:00Z", "completedAt": "2026-09-06T15:16:30Z",
+      "steps": [
+        { "name": "Set up job", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T14:00:00Z", "completedAt": "2026-09-06T14:00:05Z" },
+        { "name": "begin", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T14:00:05Z", "completedAt": "2026-09-06T14:01:00Z" },
+        { "name": "Run claude", "status": "completed", "conclusion": "failure", "startedAt": "2026-09-06T14:01:00Z", "completedAt": "2026-09-06T15:16:05Z" },
+        { "name": "validate1", "status": "completed", "conclusion": "success", "startedAt": "2026-09-06T15:16:05Z", "completedAt": "2026-09-06T15:16:10Z" }
+      ] },
+    { "name": "advance", "status": "in_progress", "conclusion": null, "startedAt": null, "completedAt": null, "steps": [] }
+  ]
+}

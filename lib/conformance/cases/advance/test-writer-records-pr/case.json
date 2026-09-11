@@ -1,0 +1,36 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:test-writer:1",
+    "SC_PR": "none",
+    "SC_HANDOFF": "test-writer-pass",
+    "SC_BRANCH_FILES": "app/src/__tests__/Issue7.test.ts=it.failing('books', () => {});\n",
+    "SC_STATE_PATCH": ".stages.build.attempts.planner = 1",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-finished",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~pr-opened",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~evidence-pending"
+    ],
+    "state_after": {
+      "pr": 9,
+      "status": "evidence",
+      "evidence.pending.consumer": "dev:api",
+      "pending_artifacts.0.file": "pr-body.md"
+    }
+  }
+}

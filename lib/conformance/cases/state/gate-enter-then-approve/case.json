@@ -1,0 +1,23 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "gate-flow"
+  ],
+  "env": {
+    "ISSUE": "7",
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: gate rc=0 gate=architecture",
+      "PROBE: approve-wrong-gate rc=5",
+      "PROBE: approve rc=0 status=queued next=7:build:planner:1 wakeups=3"
+    ],
+    "state_after": {
+      "stages.architecture.approved.by": "octo-owner",
+      "stages.architecture.status": "done",
+      "gate": null
+    }
+  }
+}

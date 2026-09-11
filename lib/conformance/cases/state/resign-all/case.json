@@ -1,0 +1,22 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "resign-all",
+    "o/r"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "re-signed 1 file(s)"
+    ],
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~re-sign issues/7.json"
+    ],
+    "state_after": {
+      "status": "running",
+      "sig": "*"
+    },
+    "state_issue": 7
+  }
+}

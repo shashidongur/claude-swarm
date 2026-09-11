@@ -1,0 +1,28 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner",
+    "SWARM_STATE_KEY": ""
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false",
+      "block": "bad-handoff",
+      "issue": "7"
+    },
+    "calls": [
+      "!workflow run *",
+      "!PUT *"
+    ],
+    "stdout_contains": [
+      "SWARM_STATE_KEY is empty"
+    ]
+  }
+}

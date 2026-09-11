@@ -1,0 +1,9 @@
+{"type":"system","subtype":"init","model":"claude-sonnet-5"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"toolu_01","name":"Bash","input":{"command":"gh pr merge 9 --merge"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01","is_error":true,"content":"swarm guard-bash: denied — the command matches the denied pattern"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"toolu_02","name":"Write","input":{"file_path":".swarm-run/brief.md","content":"x"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_02","is_error":true,"content":"swarm guard-path: denied — .swarm-run/brief.md is written by the dispatcher, not by a role"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"toolu_03","name":"Write","input":{"file_path":".swarm-run/result.json","content":"{\"v\":2}"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_03","content":"ok"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Two calls were refused by the hooks; result.json is written."}]}}
+{"type":"result","subtype":"error_max_turns","is_error":true,"num_turns":40,"total_cost_usd":1.9

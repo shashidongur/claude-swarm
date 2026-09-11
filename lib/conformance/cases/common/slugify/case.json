@@ -1,0 +1,5 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["slugify", "Live session capacity: Masters & students!! A very long title that keeps going on"],
+  "expect": { "exit": 0, "stdout_contains": ["live-session-capacity-masters-students\nRC=0"] }
+}

@@ -1,0 +1,4 @@
+{"type":"assistant","text":"Pushed with git push https://x-access-token:ghs_abcdefghijklmnopqrstuvwxyz0123456789@github.com/o/r.git"}
+{"type":"tool_result","content":"GH_TOKEN=ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcd\nCLAUDE_CODE_OAUTH_TOKEN=sk-ant-oat01-ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_abcdefghijk-XYZ\nPAT=github_pat_11ABCDEFG0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"}
+{"type":"assistant","text":"The value passed by the job was hunter2-super-secret-value and the short one is abc."}
+{"type":"result","total_cost_usd":0.42,"num_turns":9}

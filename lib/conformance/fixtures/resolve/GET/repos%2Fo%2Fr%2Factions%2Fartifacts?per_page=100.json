@@ -1,0 +1,23 @@
+{
+  "total_count": 3,
+  "artifacts": [
+    {
+      "id": 11,
+      "name": "swarm-7-build-dev-app-a1-2",
+      "expired": false,
+      "size_in_bytes": 524288
+    },
+    {
+      "id": 12,
+      "name": "ci-f54b320",
+      "expired": false,
+      "size_in_bytes": 2097152
+    },
+    {
+      "id": 13,
+      "name": "old",
+      "expired": true,
+      "size_in_bytes": 99999999
+    }
+  ]
+}

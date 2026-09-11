@@ -1,0 +1,23 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "dispatch-running",
+    "--arg",
+    "key",
+    "7:build:code-review:app:1",
+    "--arg",
+    "run_id",
+    "2"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: key reuse"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

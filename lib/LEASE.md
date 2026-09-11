@@ -1,5 +1,10 @@
 # Leasing — claim, renew, reclaim
 
+> **Not used by the v2 pipeline.** Pipeline state is a signed CAS file on `swarm/state`
+> (`lib/STATE.md`), and concurrency between run jobs is the `swarm-run-<issue>` job
+> group. Retained for the sweep lanes (explorer, groomer, warden), which still run from
+> a schedule and still need a claim that two ticks cannot both win.
+
 Labels record state. They cannot lock it: the GitHub API has no compare-and-set on
 labels, so two routines can both read "unclaimed" and both write "claimed".
 

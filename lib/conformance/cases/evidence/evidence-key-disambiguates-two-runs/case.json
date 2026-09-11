@@ -1,0 +1,27 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~evidence-seen",
+      "!workflow run *"
+    ],
+    "stdout_contains": [
+      "does not end with the pending key 7:test:evidence:1"
+    ],
+    "state_after": {
+      "status": "evidence",
+      "evidence.pending.key": "7:test:evidence:1"
+    }
+  }
+}

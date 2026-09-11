@@ -1,0 +1,36 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_HANDOFF": "invalid",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "false",
+    "RETRY_OUTCOME": "failure"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~dispatch-invalid",
+      "PUT repos/o/r/contents/issues/7.json",
+      "~block",
+      "PATCH repos/o/r/issues/comments/101",
+      "~invalid output",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "agent-output",
+      "dispatches.0.status": "invalid",
+      "dispatches.0.validation.ok": false,
+      "dispatches.0.retry": 1
+    }
+  }
+}

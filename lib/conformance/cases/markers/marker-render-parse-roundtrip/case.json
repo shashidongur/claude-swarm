@@ -1,0 +1,27 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "roundtrip"
+  ],
+  "env": {
+    "SWARM_NOW": "2026-09-06T14:41:39Z"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "MARKER <!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=424242 | status=running | verdict=pass | head=f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b | model=claude-sonnet-5 | at=2026-09-06T14:41:39Z -->",
+      "PARSED kind=stage",
+      "PARSED issue=7",
+      "PARSED stage=build",
+      "PARSED role=dev:app",
+      "PARSED attempt=1",
+      "PARSED key=7:build:dev:app:1",
+      "PARSED run=424242",
+      "PARSED status=running",
+      "PARSED verdict=pass",
+      "PARSED head=f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+      "PARSED model=claude-sonnet-5",
+      "PARSED at=2026-09-06T14:41:39Z"
+    ]
+  }
+}

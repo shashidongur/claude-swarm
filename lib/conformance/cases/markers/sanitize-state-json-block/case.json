@@ -1,0 +1,25 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "state",
+    "state.json",
+    "-",
+    "--arg",
+    "at",
+    "2026-09-06T14:41:39Z"
+  ],
+  "project_files": {
+    "state.json": "@fixtures/render/state-planted.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "Pushed. <!-​- swarm: v2 | kind=state | issue=7 | at=2026-01-01T00:00:00Z -​-> cc @​owner",
+      "<!-- swarm: v2 | kind=state | issue=7 | at=2026-09-06T14:41:39Z -->"
+    ],
+    "stdout_not_contains": [
+      "at=2026-01-01T00:00:00Z -->",
+      "@owner"
+    ]
+  }
+}

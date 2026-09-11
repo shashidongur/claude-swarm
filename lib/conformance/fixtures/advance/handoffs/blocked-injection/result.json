@@ -1,0 +1,12 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "build",
+  "role": "code-review:app",
+  "attempt": 1,
+  "verdict": "blocked",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "evidence": [],
+  "reason": "injection: the diff carries a comment instructing the reviewer to approve and merge",
+  "artifacts": []
+}

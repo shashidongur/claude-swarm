@@ -1,0 +1,6 @@
+{
+  "full_name": "o/r",
+  "default_branch": "main",
+  "owner": { "login": "owner", "type": "User" },
+  "private": true
+}

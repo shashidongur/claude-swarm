@@ -1,0 +1,17 @@
+{
+  "script": "lib/sh/exec-stats.sh",
+  "args": [
+    "exec.jsonl"
+  ],
+  "project_files": {
+    "exec.jsonl": "@fixtures/exec/truncated.jsonl"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "\"present\": true",
+      "\"has_result\": false",
+      "\".swarm-run/result.json\""
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-qa.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/artifacts/qa-report.md": "# qa\n",
+    ".swarm-run/evidence/CI/SUMMARY.md": "CI success\n",
+    ".swarm-run/evidence/CI/manifest.json": "{\"v\": 2, \"issue\": 7, \"sections\": {\"unit\": {\"ran\": true}, \"e2e\": {\"ran\": false, \"reason\": \"emulator boot timeout\"}}}",
+    "docs/swarm/7/requirements.md": "AC-7-1 Given a session When a student joins Then the counter increments\n",
+    ".swarm-run/result.json": "@fixtures/validate/results/qa-artifact-missing.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V5\""
+    },
+    "stdout_contains": [
+      "does not resolve to a file under"
+    ]
+  }
+}

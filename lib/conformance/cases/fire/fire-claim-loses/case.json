@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/fire.sh",
+  "args": [
+    "7",
+    "build",
+    "code-review:app",
+    "7:build:code-review:app:1",
+    "watchdog"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "ISSUE": "7"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!workflow run *",
+      "!PUT *"
+    ],
+    "stdout_contains": [
+      "already claimed by another writer"
+    ],
+    "state_after": {
+      "next.fired_by": 2,
+      "next.fired_run_id": null
+    }
+  }
+}

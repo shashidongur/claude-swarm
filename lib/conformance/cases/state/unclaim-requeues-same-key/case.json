@@ -1,0 +1,27 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-unclaim",
+    "--arg",
+    "key",
+    "7:build:dev:app:1",
+    "--arg",
+    "run_id",
+    "2"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:build:dev:app:1",
+      "next.fired_at": null,
+      "next.fired_run_id": null,
+      "dispatches.1.status": "cancelled-pending"
+    }
+  }
+}

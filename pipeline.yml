@@ -1,0 +1,401 @@
+# claude-swarm pipeline v2 — routing data (spec §2, §13, §16.1.2).
+#
+# This file is the source; pipeline.json is generated from it (yq -o=json | jq -S) and
+# committed, and the dispatcher reads only the JSON. Conformance (lib/conformance/run.sh
+# pipeline) checks the two agree, that every role has a file under .claude/agents/, that
+# every rework/verdict edge names a legal target and that `must_differ_from` tiers differ.
+#
+# Nothing here names a project, a lane, a framework, a platform or an issue number: lane
+# names, workflow names, commands and paths come from the project's .github/swarm.yml.
+# Placeholders "<lane>" and "<attempt>" are expanded by the dispatcher at runtime.
+
+v: 2
+
+models:
+  tiers: { cheap: claude-haiku-4-5, default: claude-sonnet-5, strong: claude-opus-5 }
+  critic_tier_for: { cheap: default, default: strong, strong: default }
+  retry_tier_for: { cheap: cheap, default: default, strong: default }   # the retry never escalates cost
+
+# Project config may lower any of these, never raise them (config.sh enforces it).
+limits:
+  rework_budget: 5
+  runaway_per_hour: 10
+  cost_usd_per_issue: 75
+  runner_minutes_month: 1500
+  usd_month: 200
+  question_rounds: 2
+  critic_rework: 1
+  pr_lines: 800
+  pr_files: 25
+  open_prs: 3
+  pushes_per_pr_per_day: 10
+  evidence_fires_per_issue: 2
+  ratelimit_backoff_minutes: 180
+
+# Built-in protected paths (G29a), merged with the project's protected_paths.
+protected_paths:
+  - ".github/**"
+  - ".swarm/**"
+  - ".swarm-run/**"
+  - ".claude/**"
+  - "**/.claude/**"
+  - "CLAUDE.md"
+  - ".mcp.json"
+  - ".claude-plugin/**"
+  - "**/*.pem"
+  - "**/*.p8"
+  - "**/*.key"
+  - ".env*"
+  - "**/*.keystore"
+  # A scanner's own ignore file is the gate's configuration: adding one turns a red
+  # finding green without touching the finding. None of these usually exists, so a new
+  # one is an ordinary added file with no diff signal unless it is named here.
+  - ".trivyignore"
+  - ".trivyignore.yaml"
+  - "trivy.yaml"
+  - "trivy.yml"
+  - "osv-scanner.toml"
+  - ".osv-detector.yaml"
+  - ".npmrc"
+  - "**/.npmrc"
+  - ".snyk"
+
+# begin.sh restores these in the working tree from the merge base with the default branch (§13.2).
+restore_from_base: [".claude", "CLAUDE.md", ".mcp.json", ".claude-plugin"]
+
+# Tool classes (§13.2). `allowed`/`disallowed` are passed verbatim as --allowedTools /
+# --disallowedTools; Write/Edit are confined by the PreToolUse path hook to `write_roots`.
+classes:
+  read:
+    permissions: read
+    allowed: "Read,Glob,Grep,LS,TodoWrite,Write,Edit,Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git status:*),Bash(git fetch:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(jq:*),Bash(yq:*),Bash(node:*),Bash(npm test:*),Bash(npm run:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh run view:*),Bash(gh run list:*),Bash(gh api repos/*/issues/*:*),Bash(gh search:*),Bash(date:*),Bash(mkdir:*)"
+    disallowed: ""
+    write_roots: [".swarm-run/artifacts", ".swarm-run/result.json"]
+  write:
+    permissions: write
+    allowed: "Read,Glob,Grep,LS,TodoWrite,Write,Edit,MultiEdit,Bash"
+    disallowed: "Bash(git push --force*),Bash(git push -f*),Bash(git push origin main*),Bash(git push origin HEAD:main*),Bash(git push origin HEAD:refs/heads/main*),Bash(gh pr merge*),Bash(gh pr review*),Bash(gh secret*),Bash(gh repo edit*),Bash(gh workflow*),Bash(gh label*),Bash(gh issue edit*),Bash(gh issue close*),Bash(gh api -X PATCH*),Bash(gh api -X PUT*),Bash(gh api -X DELETE*),Bash(gh api --method*),Bash(rm -rf .git*)"
+    write_roots: [".", ".swarm-run/artifacts", ".swarm-run/result.json"]
+  critic:
+    permissions: read
+    allowed: "Read,Glob,Grep,LS,TodoWrite,Write,Edit,Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git status:*),Bash(git fetch:*),Bash(git rev-parse:*),Bash(git ls-files:*),Bash(ls:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(grep:*),Bash(rg:*),Bash(jq:*),Bash(yq:*),Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh run view:*),Bash(gh run list:*),Bash(gh api repos/*/issues/*:*),Bash(gh search:*),Bash(date:*),Bash(mkdir:*)"
+    disallowed: ""
+    write_roots: [".swarm-run/critic.json"]
+
+# Files under .swarm-run/ no role may write (the path hook's SWARM_DENY).
+deny_paths:
+  - ".swarm-run/brief.md"
+  - ".swarm-run/state.json"
+  - ".swarm-run/pipeline.json"
+  - ".swarm-run/config.json"
+  - ".swarm-run/settings.json"
+  - ".swarm-run/evidence/**"
+  - ".swarm-run/validation.json"
+  - ".swarm-run/previous-attempt.md"
+
+# ERE patterns the Bash PreToolUse hook refuses (§9.6, §13.2). Documented as bypassable;
+# G29 and G35 are the perimeter.
+bash_deny:
+  - "pulls/[0-9]+/merge"
+  - "--method"
+  - "-X ?(PUT|PATCH|DELETE|POST)"
+  - "push .*:(refs/heads/)?(main|master|swarm/state)"
+  - "push .*\\+"
+  - "push --force"
+  - "push -f\\b"
+  - "curl|wget .*api\\.github\\.com"
+  - "git -C \\.swarm"
+  - "\\.swarm/lib"
+  - "\\$RUNNER_TEMP|claude-execution-output"
+  - "(^|[;&|] *)(env|printenv)( |$)"
+  - "/proc/self/environ"
+
+critic_defaults: { turns: 40, timeout: 15 }
+
+emoji:
+  triage: "🔎"
+  analyst: "🎯"
+  ux: "🎨"
+  a11y: "♿"
+  architect: "📐"
+  threat-model: "🛡️"
+  planner: "🗺️"
+  test-writer: "🧪"
+  dev: "🔨"
+  code-review: "🔍"
+  qa: "✅"
+  security: "🔐"
+  compliance: "📋"
+  release: "🚀"
+  retro: "📓"
+  critic: "⚖️"
+  dispatch: "🧭"
+  gate: "🛎️"
+  watchdog: "🐕"
+
+# Stages in execution order. Per role: tier, class, --max-turns, step timeout (minutes),
+# artifacts it must produce under .swarm-run/artifacts/, earlier artifacts it reads (fenced
+# into the brief), memory files it is given, its critic slot ("none" or a rubric), and the
+# closed verdict vocabulary the validator accepts.
+stages:
+  - name: triage
+    label: swarm:triage
+    on_short: run
+    gate: none
+    roles:
+      - name: triage
+        tier: cheap
+        class: read
+        turns: 40
+        timeout: 10
+        artifacts: [triage.json]
+        reads: []
+        memory: [conventions.md, decisions.md]
+        critic: none
+        verdicts: [pass, duplicate, blocked]
+
+  - name: requirements
+    label: swarm:requirements
+    on_short: run
+    gate: { name: requirements, on_short: skip, reject_to: analyst }
+    roles:
+      - name: analyst
+        tier: default
+        class: read
+        turns: 80
+        timeout: 25
+        artifacts: [requirements.md]
+        reads: [triage.json]
+        memory: [conventions.md, decisions.md, preferences.md]
+        critic: { rubric: requirements, threshold: 70, on_short: skip }
+        verdicts: [pass, question, blocked]
+        can_escalate_path: true
+
+  - name: design
+    label: swarm:design
+    on_short: skip
+    gate: none
+    roles:
+      - name: ux
+        tier: default
+        class: read
+        turns: 80
+        timeout: 25
+        artifacts: [design.md]
+        reads: [requirements.md]
+        memory: [conventions.md, preferences.md]
+        critic: none
+        verdicts: [pass, blocked]
+      - name: a11y
+        tier: default
+        class: read
+        turns: 50
+        timeout: 15
+        artifacts: [a11y.md]
+        reads: [requirements.md, design.md]
+        memory: [conventions.md]
+        critic: { rubric: design, threshold: 65, on_short: skip, enabled: false }
+        verdicts: [pass, rework, blocked]
+        rework_to: ux
+        rework_max: 1
+
+  - name: architecture
+    label: swarm:architecture
+    on_short: skip
+    gate: { name: architecture, on_short: skip, reject_to: architect }
+    roles:
+      - name: architect
+        tier: strong
+        class: read
+        turns: 120
+        timeout: 40
+        artifacts: [adr.md, openapi.yaml, migration-plan.md, flags.md, rollback.md]
+        reads: [requirements.md, design.md]
+        memory: [conventions.md, decisions.md, adrs/INDEX.md, gotchas/INDEX.md]
+        critic: none
+        verdicts: [pass, blocked]
+      - name: threat-model
+        tier: default
+        class: read
+        turns: 60
+        timeout: 20
+        artifacts: [threat-model.md]
+        reads: [requirements.md, adr.md, openapi.yaml, migration-plan.md]
+        memory: [conventions.md]
+        # tier pinned: critic_tier_for[default] would be strong, the architect's own tier (§13.1: default, must differ)
+        critic: { rubric: architecture, threshold: 70, on_short: skip, tier: default, must_differ_from: architect, rework_to: architect }
+        verdicts: [pass, rework, blocked]
+        rework_to: architect
+        rework_max: 1
+
+  - name: build
+    label: swarm:build
+    on_short: run
+    gate: none
+    roles:
+      - name: planner
+        tier: default
+        class: read
+        turns: 60
+        timeout: 20
+        on_short: skip
+        artifacts: [plan.md]
+        reads: [requirements.md, design.md, adr.md, openapi.yaml, migration-plan.md, flags.md]
+        memory: [conventions.md, gotchas/INDEX.md]
+        critic: { rubric: plan, threshold: 60, enabled: false }
+        verdicts: [pass, blocked]
+        creates_subissues: true
+      - name: test-writer
+        tier: default
+        class: write
+        turns: 150
+        timeout: 45
+        artifacts: [test-plan.md, pr-body.md]
+        reads: [requirements.md, plan.md, openapi.yaml, design.md]
+        memory: [conventions.md, gotchas/INDEX.md, preferences.md]
+        critic: none
+        verdicts: [pass, blocked]
+        opens_pr: true
+        evidence_after: ci
+        ci_on_failure: continue
+      - name: dev
+        tier: default
+        class: write
+        turns: 250
+        timeout: 75
+        per_lane: true
+        artifacts: []
+        reads: [requirements.md, plan.md, adr.md, openapi.yaml, migration-plan.md, flags.md, test-plan.md, design.md]
+        memory: [conventions.md, gotchas/INDEX.md, preferences.md]
+        specialist: true
+        critic: none
+        verdicts: [pass, blocked]
+        evidence_after: ci
+        ci_on_failure: "rework:dev:<lane>"
+      - name: code-review
+        tier: strong
+        class: read
+        turns: 80
+        timeout: 25
+        per_lane: true
+        must_differ_from: dev
+        artifacts: ["review-<lane>-a<attempt>.md"]
+        reads: [requirements.md, plan.md, adr.md, openapi.yaml, test-plan.md]
+        memory: [conventions.md, preferences.md]
+        critic: none
+        verdicts: [pass, rework, blocked]
+        rework_to: "dev:<lane>"
+        requires_ci: success
+
+  - name: test
+    label: swarm:test
+    on_short: run
+    gate: none
+    evidence_before: { workflow: test, on_short: skip, when: walkthrough_when, on_failure: run_role, max_fires: evidence_fires_per_issue }
+    roles:
+      - name: qa
+        tier: default
+        class: read
+        turns: 80
+        timeout: 30
+        artifacts: [qa-report.md]
+        reads: [requirements.md, test-plan.md, plan.md]
+        memory: [conventions.md, gotchas/INDEX.md]
+        critic: { rubric: report, threshold: 65, enabled: false }
+        verdicts: [pass, rework, blocked]
+        rework_to: "dev:<lane>"
+        requires_ci: success
+        requires_evidence: success
+
+  - name: security
+    label: swarm:security
+    on_short: run
+    gate: none
+    evidence_before: { workflow: security, on_short: skip, on_failure: run_role, max_fires: evidence_fires_per_issue }
+    roles:
+      - name: security
+        tier: default
+        class: read
+        turns: 60
+        timeout: 20
+        on_short: when_scan_changed
+        artifacts: [security-report.md]
+        reads: [threat-model.md, adr.md]
+        memory: [conventions.md]
+        critic: none
+        verdicts: [pass, rework, blocked]
+        rework_to: "dev:<lane>"
+        requires_scan: success
+      - name: compliance
+        tier: strong
+        class: read
+        turns: 60
+        timeout: 20
+        on_short: sensitive_only
+        artifacts: [compliance.md]
+        reads: [requirements.md, adr.md, openapi.yaml, migration-plan.md, threat-model.md, security-report.md]
+        memory: [conventions.md, decisions.md]
+        critic: none
+        verdicts: [pass, rework, blocked]
+        rework_to: "dev:<lane>"
+
+  - name: release
+    label: swarm:release
+    on_short: run
+    gate: { name: release, kind: merge, reject_to: analyst-feedback }
+    roles:
+      - name: release
+        tier: default
+        class: write
+        turns: 80
+        timeout: 25
+        artifacts: [release.md, pr-body.md]
+        reads: [requirements.md, qa-report.md, security-report.md, compliance.md, a11y.md]
+        memory: [preferences.md]
+        critic: { rubric: release, threshold: 70, on_short: run, job: separate }
+        verdicts: [pass, blocked]
+        lands_pending: true
+
+  - name: retro
+    label: swarm:retro
+    on_short: run
+    gate: none
+    trigger: merged
+    once_per_merge: true
+    roles:
+      - name: retro
+        tier: default
+        class: read
+        turns: 60
+        timeout: 20
+        artifacts: [postmortem.md]
+        reads: [requirements.md, adr.md, qa-report.md, release.md]
+        memory: [MEMORY.md, postmortems/INDEX.md, adrs/INDEX.md]
+        critic: none
+        verdicts: [pass, blocked]
+        writes_memory: pr
+
+paths:
+  full: [triage, requirements, design, architecture, build, test, security, release, retro]
+  short: [triage, requirements, build, test, security, release, retro]
+
+# Memory globs loaded inside <untrusted> fences (§11.1); everything else is curated.
+memory_fenced: ["gotchas/auto/**", "postmortems/**", "runs/**"]
+
+# What advance does with a verdict, per role (data, not code). "*" = any role.
+verdict_edges:
+  "*.pass": next
+  "*.blocked": "block:agent-output"          # a reason starting "injection:" becomes block:injection
+  "triage.duplicate": "park:duplicate"
+  "analyst.question": "gate:question"
+  "a11y.rework": "rework:ux"
+  "threat-model.rework": "rework:architect"
+  "code-review.rework": "rework:dev:<lane>"
+  "qa.rework": "rework:{result.rework_to}"
+  "security.rework": "rework:{result.rework_to}"
+  "compliance.rework": "rework:{result.rework_to}"
+
+# Which rework edges consume the shared budget (G7) and which reset it.
+edges:
+  free_rework: [owner-reject, owner-redo]
+  budgeted: [code-review, qa, security, compliance, a11y, threat-model, critic, ci-red]

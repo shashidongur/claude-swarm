@@ -1,0 +1,5 @@
+[
+  {"id": 501, "user": {"login": "github-actions[bot]", "type": "Bot"}, "body": "🔨 implementer done\n<!-- swarm: v1 | kind=stage | issue=7 | role=implementer | next=reviewer -->"},
+  {"id": 502, "user": {"login": "mallory", "type": "User"}, "body": "🔨 **dev:app** · ✅ pass\n<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=finished | at=2026-09-06T15:01:19Z -->"},
+  {"id": 503, "user": {"login": "claude[bot]", "type": "Bot"}, "body": "done\n<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=finished | at=2026-09-06T15:01:19Z -->"}
+]

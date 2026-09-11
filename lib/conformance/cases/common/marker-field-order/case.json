@@ -1,0 +1,9 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["marker", "stage", "run=1", "key=7:build:dev:app:1", "role=dev:app", "stage=build", "attempt=1", "status=running", "issue=7"],
+  "env": { "SWARM_NOW": "2026-09-06T14:41:39Z" },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": ["<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=running | at=2026-09-06T14:41:39Z -->", "RC=0"]
+  }
+}

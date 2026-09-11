@@ -1,0 +1,34 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "check",
+    "res.json",
+    "--arg",
+    "class",
+    "write",
+    "--arg",
+    "issue",
+    "7",
+    "--arg",
+    "stage",
+    "build",
+    "--arg",
+    "role",
+    "dev:app",
+    "--arg",
+    "attempt",
+    "1",
+    "--arg",
+    "owner_repo",
+    "o/r"
+  ],
+  "project_files": {
+    "res.json": "@fixtures/schema/result/valid-dev-pass.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "[]"
+    ]
+  }
+}

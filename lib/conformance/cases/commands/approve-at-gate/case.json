@@ -1,0 +1,37 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false"
+    },
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~gate-approve",
+      "POST repos/o/r/issues/7/comments",
+      "~approved by owner",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:build:planner:2\"",
+      "~\"reason=resume\""
+    ],
+    "state_after": {
+      "status": "queued",
+      "stage": "build",
+      "next.role": "planner",
+      "next.key": "7:build:planner:2",
+      "next.fired_run_id": 9011,
+      "stages.architecture.approved.by": "owner",
+      "stages.architecture.approved.comment_id": 501,
+      "totals.wakeups": 3
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "env": {
+    "SC_BASE_FILES": "app/src/__tests__/a.test.ts=it.failing('adds capacity', () => {\\n  expect(capacityLabel).toBe('12 seats');\\n});\\n\napp/src/a.ts=export const capacityLabel = 'x';\\n",
+    "SC_FILES": "app/src/a.ts=export const capacityLabel = '12 seats';\\n"
+  },
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-dev-app.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "@fixtures/validate/results/dev-pass-src-only.json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V9\""
+    },
+    "stdout_contains": [
+      "pin-marker count did not decrease"
+    ]
+  }
+}

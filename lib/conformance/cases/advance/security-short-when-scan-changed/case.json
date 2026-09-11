@@ -1,0 +1,33 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:test:qa:1",
+    "SC_PATH": "short",
+    "SC_LANES": "[\"api\"]",
+    "SC_HANDOFF": "qa-pass",
+    "SC_STATE_PATCH": ".evidence.seen[.head].CI.pull_request = {run_id: 55, conclusion: \"success\", at: \"2026-09-06T14:58:00Z\", url: \"https://github.com/o/r/actions/runs/55\"}",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "workflow run swarm-dispatch.yml",
+      "~7:security:security:1"
+    ],
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:security:security:1"
+    },
+    "stdout_contains": [
+      "PROBE: advance exit 0"
+    ]
+  }
+}

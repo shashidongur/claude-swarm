@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "read",
+    "7"
+  ],
+  "env": {
+    "SWARM_STATE_KEY": ""
+  },
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "::error::SWARM_STATE_KEY is empty"
+    ]
+  }
+}

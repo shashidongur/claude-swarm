@@ -1,0 +1,5 @@
+{
+  "v": 2, "issue": 7, "repo": "o/r", "stage": "build", "status": "running",
+  "current": { "role": "dev:app", "attempt": 1, "key": "7:build:dev:app:1", "run_id": 424242 },
+  "log": []
+}

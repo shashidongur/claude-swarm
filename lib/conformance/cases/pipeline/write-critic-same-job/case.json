@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "write-critic-separate",
+    "--mutate",
+    ".stages[7].roles[0].critic.job = \"same\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: write-critic-separate — write-class role release (stage release) has a critic without job: separate"
+    ]
+  }
+}

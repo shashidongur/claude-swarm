@@ -1,0 +1,20 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "pending-clear",
+    "--arg",
+    "file",
+    "not-staged.md"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "changed nothing — not written"
+    ],
+    "calls": [
+      "!PUT *"
+    ]
+  }
+}

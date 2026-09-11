@@ -1,0 +1,13 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "env": {
+    "SWARM_BASH_DENY": "^rm -rf /\n^ls"
+  },
+  "stdin": "{\"tool_input\":{\"command\":\"ls -la\"}}",
+  "expect": {
+    "exit": 2,
+    "stdout_contains": [
+      "/^ls/"
+    ]
+  }
+}

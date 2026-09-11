@@ -1,0 +1,29 @@
+{
+  "script": "lib/sh/evidence.sh",
+  "args": [
+    "fire",
+    "7",
+    "test",
+    "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+    "7:test:evidence:1"
+  ],
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "ISSUE": "7",
+    "CONFIG_JSON": "config.json"
+  },
+  "project_files": {
+    "config.json": "@fixtures/config/user-owned.json",
+    ".github/workflows/swarm-dispatch.yml": "name: Swarm dispatch\non:\n  workflow_run:\n    workflows: [CI]\n"
+  },
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "workflow run walkthrough"
+    ],
+    "stdout_contains": [
+      "::warning::evidence workflow \"walkthrough\" is not in swarm-dispatch.yml workflow_run.workflows"
+    ]
+  }
+}

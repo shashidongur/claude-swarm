@@ -1,0 +1,16 @@
+[
+  {
+    "number": 7,
+    "title": "Live session capacity",
+    "state": "closed",
+    "labels": [
+      {
+        "name": "swarm:retro"
+      }
+    ],
+    "user": {
+      "login": "reporter",
+      "type": "User"
+    }
+  }
+]

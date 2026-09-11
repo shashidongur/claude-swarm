@@ -1,0 +1,42 @@
+[
+  {
+    "number": 7,
+    "title": "Live session capacity",
+    "state": "open",
+    "labels": [
+      {
+        "name": "swarm:build"
+      },
+      {
+        "name": "swarm:blocked"
+      },
+      {
+        "name": "blocked:auth"
+      }
+    ],
+    "user": {
+      "login": "reporter",
+      "type": "User"
+    }
+  },
+  {
+    "number": 8,
+    "title": "Other",
+    "state": "open",
+    "labels": [
+      {
+        "name": "swarm:build"
+      },
+      {
+        "name": "swarm:blocked"
+      },
+      {
+        "name": "blocked:auth"
+      }
+    ],
+    "user": {
+      "login": "reporter",
+      "type": "User"
+    }
+  }
+]

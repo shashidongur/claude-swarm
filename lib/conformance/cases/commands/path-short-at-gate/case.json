@@ -1,0 +1,33 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 path",
+      "POST repos/o/r/issues/7/comments",
+      "~path short by owner",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:build:test-writer:1\""
+    ],
+    "state_after": {
+      "status": "queued",
+      "path": "short",
+      "path_source": "owner",
+      "stage": "build",
+      "next.role": "test-writer",
+      "stages.design.status": "skipped",
+      "stages.architecture.status": "skipped",
+      "gate": null
+    }
+  }
+}

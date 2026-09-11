@@ -1,0 +1,21 @@
+{
+  "script": "lib/sh/watchdog.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "POST repos/o/r/issues/7/comments",
+      "~🐕 **watchdog** · @owner, #7 has been waiting at the `architecture` gate since 2026-09-02T10:00:00Z (4 days)",
+      "~kind=watchdog | issue=7 | gate=architecture | topic=gate-reminder",
+      "!workflow run *"
+    ]
+  }
+}

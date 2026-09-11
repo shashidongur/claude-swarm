@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/markers/markers-probe.sh",
+  "args": [
+    "get",
+    "key"
+  ],
+  "stdin": "<!-- swarm: v1 | kind=stage | issue=56 | next=reviewer -->\n<!-- swarm: v2 | kind=stage | issue=7 | key=7:build:dev:app:1 | at=2026-09-06T14:41:39Z -->\n",
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "VALUE=[7:build:dev:app:1]"
+    ]
+  }
+}

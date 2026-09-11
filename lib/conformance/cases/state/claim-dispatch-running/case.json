@@ -1,0 +1,44 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-running",
+    "--arg",
+    "key",
+    "7:build:code-review:app:1",
+    "--arg",
+    "run_id",
+    "424242",
+    "--arg",
+    "base_sha",
+    "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+    "--arg",
+    "model",
+    "claude-opus-5"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 dispatch-running"
+    ],
+    "state_after": {
+      "status": "running",
+      "next": null,
+      "current.key": "7:build:code-review:app:1",
+      "current.run_id": 424242,
+      "current.role": "code-review:app",
+      "current.attempt": 1,
+      "current.activity_from": "2026-09-06T15:00:00Z",
+      "current.fired_run_id": 424242,
+      "dispatches.2.status": "running",
+      "dispatches.2.run_id": 424242,
+      "dispatches.2.model_requested": "claude-opus-5",
+      "log.1.event": "claim"
+    }
+  }
+}

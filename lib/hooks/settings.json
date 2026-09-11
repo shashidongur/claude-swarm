@@ -1,0 +1,1 @@
+{"hooks":{"PreToolUse":[{"matcher":"Write|Edit|MultiEdit|NotebookEdit","hooks":[{"type":"command","command":".swarm/lib/hooks/guard-path.sh"}]},{"matcher":"Bash","hooks":[{"type":"command","command":".swarm/lib/hooks/guard-bash.sh"}]}]}}

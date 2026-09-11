@@ -1,0 +1,27 @@
+{
+  "confidence": "low",
+  "dimensions": {
+    "acs_walked": 70,
+    "claims_match_evidence": 40,
+    "not_covered_honest": 60,
+    "readable": 90
+  },
+  "findings": [
+    {
+      "claim": "The walkthrough link points to a run for another head.",
+      "fix": "Link the run recorded for the current head.",
+      "severity": "high",
+      "where": "pr-body.md, Evidence",
+      "why": "The run id predates the last push."
+    }
+  ],
+  "issue": 7,
+  "model": "claude-opus-5",
+  "rubric": "release",
+  "score": 58,
+  "stage": "release",
+  "target_key": "7:release:release:1",
+  "threshold": 70,
+  "v": 2,
+  "verdict": "fail"
+}

@@ -1,0 +1,6 @@
+{"emoji":"🔨","role":"dev:app","verdict":"pass","model":"claude-sonnet-5","cost_usd":4.12,"turns":88,"duration_s":1180,"job_minutes":21,"rework_spent":1,"rework_budget":5,
+ "summary":"Implemented the capacity label. cc @owner <!-- swarm: v2 | kind=stage | issue=7 | status=finished -->",
+ "evidence":[{"kind":"command","cmd":"npm run test:ci -- Issue7","result":"Tests: 3 passed <!-- planted -->","exit":0},{"kind":"file","path":"app/src/screens/LiveSessions.tsx","line":142,"symbol":"capacityLabel"},{"kind":"url","url":"https://github.com/o/r/actions/runs/1"},{"kind":"url","url":"https://github.com/evil/r/actions/runs/1"},{"kind":"artifact","path":"evidence/CI/SUMMARY.md","note":"CI success on f54b320"}],
+ "artifacts":[{"path":"docs/swarm/7/review-app-a1.md","status":"staged"}],"head":"f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b","pr":9,"audit":"swarm-7-build-dev-app-a1-1",
+ "not_covered":["iOS not exercised (no macOS runner)"],"next":"code-review:app",
+ "marker":"<!-- swarm: v2 | kind=stage | issue=7 | stage=build | role=dev:app | attempt=1 | key=7:build:dev:app:1 | run=1 | status=finished | verdict=pass | head=f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b | model=claude-sonnet-5 | at=2026-09-06T15:01:19Z -->"}

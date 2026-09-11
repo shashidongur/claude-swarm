@@ -1,0 +1,10 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["reply-refused"],
+  "env": { "ISSUE": "7" },
+  "expect": {
+    "exit": 0,
+    "calls": ["!~event=556", "POST repos/o/r/issues/7/comments", "~event=557"],
+    "stdout_contains": ["refusal reply to mallory already sent today (G38)", "PROBE: done"]
+  }
+}

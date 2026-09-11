@@ -1,0 +1,21 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "write",
+    "7",
+    "hands-off"
+  ],
+  "env": {
+    "SWARM_STATE_RACE_HOOK": "\"$SWARM_ROOT/lib/sh/state.sh\" write 7 log --arg event again --arg note \"n$RANDOM$RANDOM\" >/dev/null"
+  },
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "CAS conflict 5 on hands-off",
+      "::error::state #7: 5 CAS conflicts on hands-off"
+    ],
+    "state_after": {
+      "flags.hands_off": false
+    }
+  }
+}

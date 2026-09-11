@@ -1,0 +1,24 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "env": {
+    "SC_SYMLINK": ".swarm-run/artifacts/review-app-a1.md=../../README.md"
+  },
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-code-review-app.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "@fixtures/validate/results/code-review-pass.json",
+    "app/src/screens/LiveSessions.tsx": "export const session = load();\nexport const seats = 12;\nexport const capacityLabel = `${seats} seats`;\n"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"V2\""
+    },
+    "stdout_contains": [
+      "does not resolve to a regular file"
+    ]
+  }
+}

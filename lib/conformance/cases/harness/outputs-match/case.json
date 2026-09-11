@@ -1,0 +1,9 @@
+{
+  "script": "lib/conformance/fixtures/harness/harness-probe.sh",
+  "args": ["outputs"],
+  "expect": {
+    "exit": 0,
+    "outputs": { "go": "true", "reason": "hello world", "multi": "line one\nline two", "json": {"a": 1, "b": 2}, "issue": "7" },
+    "stdout_contains": ["PROBE: outputs written"]
+  }
+}

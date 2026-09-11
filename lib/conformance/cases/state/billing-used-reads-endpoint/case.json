@@ -1,0 +1,17 @@
+{
+  "script": "lib/conformance/fixtures/state/state-probe.sh",
+  "args": [
+    "billing"
+  ],
+  "env": {
+    "SWARM_TOKEN": "github_pat_fakefakefakefakefakefake"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: with token: 1234",
+      "SWARM_TOKEN unset",
+      "PROBE: done"
+    ]
+  }
+}

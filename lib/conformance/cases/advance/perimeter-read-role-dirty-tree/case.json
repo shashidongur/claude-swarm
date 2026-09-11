@@ -1,0 +1,32 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:code-review:app:1",
+    "SC_HANDOFF": "code-review-app-pass",
+    "SC_BRANCH_FILES": "app/src/moved.ts=1\n",
+    "RUN_READ_RESULT": "success",
+    "RUN_WRITE_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~block",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "perimeter"
+    },
+    "stdout_contains": [
+      "moved during a read-class run"
+    ]
+  }
+}

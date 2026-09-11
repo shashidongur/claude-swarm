@@ -1,0 +1,16 @@
+{
+  "script": "lib/sh/state.sh",
+  "args": [
+    "init-branch",
+    "o/r"
+  ],
+  "expect": {
+    "exit": 0,
+    "calls": [
+      "!POST *"
+    ],
+    "stdout_contains": [
+      "swarm/state exists on o/r"
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "script": "lib/sh/config.sh",
+  "args": ["load", "--out", "config.json", "--file", "swarm.yml"],
+  "project_files": { "swarm.yml": "@fixtures/config/raised-limit.yml" },
+  "expect": { "exit": 4, "stdout_contains": ["config: limits.cost_usd_per_issue=500 raises the swarm limit 75"], "files": { "config.json": "absent" } }
+}

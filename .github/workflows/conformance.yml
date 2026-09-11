@@ -1,0 +1,120 @@
+# Conformance of the swarm itself (spec §16.1.1, §16.1.4). Runs on the branches the
+# stubs may point at. Nothing here needs a secret or a GitHub token: the harness runs
+# every script against the fake gh (lib/sh/gh-shim.sh).
+#
+#   lint     actionlint (with shellcheck) over the dispatcher and the two workflow
+#            templates; shellcheck over every script and hook — both pinned by docker
+#            image, not by whatever the runner ships
+#   harness  pipeline.json == pipeline.yml; the ~110 harness cases (lib/conformance/run.sh);
+#            the routing table of lib/ROUTING.md re-rendered from pipeline.json and
+#            diffed; the portability grep; every JSON-schema fixture through ajv
+#
+# actionlint cannot resolve the inputs of a reusable workflow in another repository, so
+# the templates' `uses: …/dispatch.yml@v2` is checked for shape only — expected.
+
+name: Conformance
+
+on:
+  push:
+    branches: [v2, main]
+  pull_request:
+    branches: [v2, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: conformance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: actionlint (dispatcher + templates)
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12 -color \
+            .github/workflows/dispatch.yml \
+            .github/workflows/conformance.yml \
+            templates/swarm-dispatch.yml \
+            templates/swarm-probe.yml
+
+      - name: shellcheck (scripts, hooks, conformance)
+        run: |
+          docker run --rm -v "$PWD:/mnt" -w /mnt koalaman/shellcheck:v0.10.0 -x -S warning \
+            lib/sh/*.sh lib/hooks/*.sh lib/conformance/*.sh
+
+  harness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Tool versions
+        run: |
+          jq --version; yq --version; openssl version; python3 --version; node --version
+          python3 -c 'import yaml; print("PyYAML", yaml.__version__)'
+
+      # The dispatcher reads only the JSON; the YAML is the source. They must agree.
+      - name: pipeline.json equals pipeline.yml
+        run: |
+          yq -o=json . pipeline.yml | jq -S . > "$RUNNER_TEMP/from-yaml.json"
+          jq -S . pipeline.json > "$RUNNER_TEMP/committed.json"
+          diff -u "$RUNNER_TEMP/from-yaml.json" "$RUNNER_TEMP/committed.json"
+
+      - name: Harness cases
+        run: lib/conformance/run.sh
+
+      # The stage table of lib/ROUTING.md is rendered from pipeline.json (§2, §16.1.4);
+      # an edit to one without the other fails here.
+      - name: Routing table matches pipeline.json
+        run: |
+          lib/conformance/render-routing.sh \
+            | diff -u - <(sed -n '/<!-- routing-table -->/,/<!-- \/routing-table -->/p' lib/ROUTING.md)
+
+      - name: Portability grep
+        run: lib/conformance/portability.sh
+
+      # Every schema against its fixtures: valid-* must pass, invalid-* must fail; the
+      # committed pipeline.json against its own schema.
+      - name: JSON schemas (ajv)
+        run: |
+          set -uo pipefail
+          npm install --no-save --silent ajv-cli@5 >/dev/null
+          AJV="npx --no-install ajv-cli"
+          rc=0
+          for schema in lib/schema/*.schema.json; do
+            x=$(basename "$schema" .schema.json)
+            dir="lib/conformance/fixtures/schema/$x"
+            [ -d "$dir" ] || { echo "::warning::no fixtures for $x"; continue; }
+            for f in "$dir"/valid-*.json; do
+              [ -f "$f" ] || continue
+              if $AJV validate --spec=draft7 --errors=text -s "$schema" -d "$f" >/dev/null 2>&1; then
+                echo "ok      $f"
+              else
+                echo "::error::$f should validate against $x"; $AJV validate --spec=draft7 --errors=text -s "$schema" -d "$f" || true; rc=1
+              fi
+            done
+            for f in "$dir"/invalid-*.json; do
+              [ -f "$f" ] || continue
+              if $AJV validate --spec=draft7 --errors=text -s "$schema" -d "$f" >/dev/null 2>&1; then
+                echo "::error::$f should NOT validate against $x"; rc=1
+              else
+                echo "ok      $f (rejected)"
+              fi
+            done
+          done
+          if $AJV validate --spec=draft7 --errors=text -s lib/schema/pipeline.schema.json -d pipeline.json; then
+            echo "ok      pipeline.json"
+          else
+            echo "::error::pipeline.json does not match lib/schema/pipeline.schema.json"; rc=1
+          fi
+          exit $rc

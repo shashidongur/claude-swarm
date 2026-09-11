@@ -1,0 +1,22 @@
+{
+  "artifacts": [],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "npm run test:ci -- Issue7",
+      "exit": 0,
+      "kind": "command",
+      "result": "Tests: 3 passed"
+    }
+  ],
+  "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+  "issue": 7,
+  "role": "dev:app",
+  "stage": "build",
+  "summary": "Done; @octo-owner please merge.",
+  "touches": [
+    "app/x.ts"
+  ],
+  "v": 2,
+  "verdict": "pass"
+}

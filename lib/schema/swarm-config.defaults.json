@@ -1,0 +1,66 @@
+{
+  "v": 2,
+  "approvers": {
+    "default": [],
+    "requirements": [],
+    "architecture": [],
+    "release": [],
+    "confidence": []
+  },
+  "reporter_may_answer": true,
+  "require_model_map": false,
+  "default_branch": "main",
+  "branch_prefix": "claude/issue-",
+  "state_branch": "swarm/state",
+  "artifacts_dir": "docs/swarm",
+  "requirements_doc": "REQS.md",
+  "requirement_id_pattern": "^(FR|NFR)-[A-Z]+-[0-9]+$",
+  "pin_marker": "it.failing(",
+  "test_paths": [
+    "**/__tests__/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "protected_paths": [],
+  "gate_manifests": [],
+  "gate_blocks": [],
+  "gate_scripts": [
+    "test:ci",
+    "test",
+    "lint",
+    "typecheck",
+    "type-check"
+  ],
+  "delete_merged_branches": true,
+  "lanes": {},
+  "evidence": {
+    "ci": "CI"
+  },
+  "walkthrough_when": [],
+  "contract_command": null,
+  "sensitive_paths": [],
+  "limits": {
+    "rework_budget": 5,
+    "runaway_per_hour": 10,
+    "cost_usd_per_issue": 75,
+    "runner_minutes_month": 1500,
+    "usd_month": 200,
+    "question_rounds": 2,
+    "critic_rework": 1,
+    "pr_lines": 800,
+    "pr_files": 25,
+    "open_prs": 3,
+    "pushes_per_pr_per_day": 10,
+    "evidence_fires_per_issue": 2,
+    "ratelimit_backoff_minutes": 180
+  },
+  "watchdog": {
+    "gate_reminder_days": 3,
+    "queued_refire_minutes": 30,
+    "evidence_timeout_minutes": 120,
+    "running_stall_minutes": 20
+  },
+  "memory": {
+    "path": null
+  }
+}

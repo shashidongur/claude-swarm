@@ -1,0 +1,34 @@
+{
+  "script": "lib/conformance/fixtures/advance/scenario.sh",
+  "fixtures": [
+    "advance/gh"
+  ],
+  "env": {
+    "KEY": "7:build:dev:api:1",
+    "SC_HANDOFF": "dev-api-pass",
+    "SC_MAIN_FILES": "api/package.json={\"name\":\"api\",\"scripts\":{\"test:ci\":\"run-tests --ci\",\"lint\":\"eslint .\"},\"testRunner\":{\"testMatch\":[\"**/*.test.ts\"]}}\n",
+    "SC_BRANCH_FILES": "api/package.json={\"name\":\"api\",\"scripts\":{\"test:ci\":\"echo skip\",\"lint\":\"eslint .\"},\"testRunner\":{\"testMatch\":[\"**/*.test.ts\"]}}\napi/src/capacity.ts=export const c = 1;\n",
+    "SC_RESULT_PATCH": ".touches = [\"api/package.json\", \"api/src/capacity.ts\"]",
+    "RUN_WRITE_RESULT": "success",
+    "RUN_READ_RESULT": "skipped",
+    "ROLE_OUTCOME": "success",
+    "BEGIN_OUTCOME": "success",
+    "VALID": "true"
+  },
+  "expect": {
+    "exit": 0,
+    "state_issue": 7,
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~block",
+      "!workflow run *"
+    ],
+    "state_after": {
+      "status": "blocked",
+      "blocked.reason": "perimeter"
+    },
+    "stdout_contains": [
+      "api/package.json: scripts.test:ci"
+    ]
+  }
+}

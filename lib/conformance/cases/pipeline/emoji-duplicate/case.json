@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "emoji-unique",
+    "--mutate",
+    ".emoji.qa = \"🔎\""
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: emoji-unique — emoji 🔎 is shared by qa, triage"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "env": {
+    "SC_BASE_FILES": "docs/swarm/7/review-app-a1.md=# review\\n",
+    "SC_FILES": "docs/swarm/7/release.md=# Release\\n\ndocs/swarm/7/pr-body.md=Closes #7\\n\\nSwarm-Issue: #7\\n",
+    "SC_PR_VIEW": "1"
+  },
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-release.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "@fixtures/validate/results/release-pass.json",
+    ".swarm-run/artifacts/release.md": "# Release\n",
+    ".swarm-run/artifacts/pr-body.md": "Closes #7\n\nSwarm-Issue: #7\n",
+    ".swarm-run/evidence/CI/manifest.json": "{\"v\": 2, \"issue\": 7, \"sections\": {\"unit\": {\"ran\": true}, \"coverage\": {\"ran\": true}}}",
+    "docs/swarm/7/requirements.md": "AC-7-1 Given a session When a student joins Then the counter increments\n"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "true"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"ok\": true"
+    }
+  }
+}

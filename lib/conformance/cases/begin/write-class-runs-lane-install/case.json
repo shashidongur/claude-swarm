@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/begin/scenario.sh",
+  "env": {
+    "KEY": "7:build:dev:app:1",
+    "SC_CONFIG": "fixtures/begin/config-install.json"
+  },
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "PROBE: begin exit 0",
+      "PROBE: installed.flag exists"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "dispatch-queued",
+    "--arg",
+    "stage",
+    "test",
+    "--arg",
+    "role",
+    "qa",
+    "--arg",
+    "from_key",
+    "7:build:dev:api:1"
+  ],
+  "expect": {
+    "exit": 5,
+    "stdout_contains": [
+      "precondition: from_key 7:build:dev:api:1 is neither current.key"
+    ]
+  }
+}

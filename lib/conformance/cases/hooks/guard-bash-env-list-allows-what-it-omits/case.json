@@ -1,0 +1,10 @@
+{
+  "script": "lib/hooks/guard-bash.sh",
+  "env": {
+    "SWARM_BASH_DENY": "^rm -rf /"
+  },
+  "stdin": "{\"tool_input\":{\"command\":\"git push --force origin x\"}}",
+  "expect": {
+    "exit": 0
+  }
+}

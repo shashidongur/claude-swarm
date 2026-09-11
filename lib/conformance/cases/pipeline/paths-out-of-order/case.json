@@ -1,0 +1,14 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "paths-contain",
+    "--mutate",
+    ".paths.full = [\"triage\",\"retro\",\"build\"]"
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "FAIL: paths-contain — path full is not in stage order"
+    ]
+  }
+}

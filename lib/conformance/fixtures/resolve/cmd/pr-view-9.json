@@ -1,0 +1,12 @@
+{
+  "number": 9,
+  "title": "feat(FR-LIV-03): live session capacity (#7)",
+  "state": "OPEN",
+  "isDraft": false,
+  "baseRefName": "main",
+  "headRefName": "claude/issue-7-live-session-capacity",
+  "headRefOid": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+  "body": "Closes #7\n\nSwarm-Issue: #7",
+  "url": "https://github.com/o/r/pull/9",
+  "files": []
+}

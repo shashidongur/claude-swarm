@@ -1,0 +1,20 @@
+{
+  "script": "lib/conformance/fixtures/validate/scenario.sh",
+  "project_files": {
+    ".swarm-run/state.json": "@fixtures/validate/state-code-review-app.json",
+    ".swarm-run/config.json": "@fixtures/config/user-owned.json",
+    ".swarm-run/result.json": "{not json"
+  },
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "ok": "false"
+    },
+    "files": {
+      ".swarm-run/validation.json": "\"check\": \"schema\""
+    },
+    "stdout_contains": [
+      "not valid JSON"
+    ]
+  }
+}

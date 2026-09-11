@@ -1,0 +1,41 @@
+{
+  "artifacts": [
+    "release.md",
+    "pr-body.md"
+  ],
+  "attempt": 1,
+  "evidence": [
+    {
+      "cmd": "gh pr ready 9",
+      "exit": 0,
+      "kind": "command",
+      "result": "marked ready"
+    },
+    {
+      "kind": "url",
+      "url": "https://github.com/o/r/actions/runs/1"
+    }
+  ],
+  "head": "f54b320c1e3d4a5b6c7d8e9f0a1b2c3d4e5f6a7b",
+  "issue": 7,
+  "not_covered": [
+    "emulator boot timeout",
+    "no baseline images",
+    "no OpenAPI spec at docs/openapi.yaml; DAST not run"
+  ],
+  "refs": [
+    "AC-7-1",
+    "AC-7-2",
+    "AC-7-3",
+    "AC-7-4"
+  ],
+  "role": "release",
+  "stage": "release",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "touches": [
+    "docs/swarm/7/release.md",
+    "docs/swarm/7/review-app-a1.md"
+  ],
+  "v": 2,
+  "verdict": "pass"
+}

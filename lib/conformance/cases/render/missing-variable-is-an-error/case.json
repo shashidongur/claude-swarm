@@ -1,0 +1,19 @@
+{
+  "script": "lib/sh/render.sh",
+  "args": [
+    "refused",
+    "out.md",
+    "--arg",
+    "reason",
+    "x"
+  ],
+  "expect": {
+    "exit": 1,
+    "stdout_contains": [
+      "missing template variable: marker"
+    ],
+    "files": {
+      "out.md": "absent"
+    }
+  }
+}

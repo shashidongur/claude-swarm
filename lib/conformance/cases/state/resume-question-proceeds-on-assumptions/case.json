@@ -1,0 +1,28 @@
+{
+  "script": "lib/sh/state.sh",
+  "env": {
+    "SWARM_NOW": "2026-09-06T15:00:00Z"
+  },
+  "args": [
+    "write",
+    "7",
+    "resume",
+    "--arg",
+    "mode",
+    "question",
+    "--arg",
+    "by",
+    "octo-owner"
+  ],
+  "expect": {
+    "exit": 0,
+    "state_after": {
+      "status": "queued",
+      "stage": "requirements",
+      "next.key": "7:requirements:analyst:2",
+      "owner_reason.kind": "answer",
+      "owner_reason.text": "no answer; proceed on stated assumptions",
+      "gate": null
+    }
+  }
+}

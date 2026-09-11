@@ -1,0 +1,12 @@
+[
+  {
+    "number": 1,
+    "title": "swarm control",
+    "state": "closed",
+    "labels": [
+      {
+        "name": "swarm:control"
+      }
+    ]
+  }
+]

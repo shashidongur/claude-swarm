@@ -1,0 +1,25 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "requirements",
+  "role": "analyst",
+  "attempt": 1,
+  "verdict": "pass",
+  "summary": "User stories and acceptance criteria for the capacity feature, grounded in the requirements document.",
+  "evidence": [
+    {
+      "kind": "file",
+      "path": "REQS.md",
+      "line": 1,
+      "symbol": "FR-LIV-03"
+    }
+  ],
+  "artifacts": [
+    "requirements.md"
+  ],
+  "not_covered": [],
+  "refs": [
+    "FR-LIV-03",
+    "AC-7-1"
+  ]
+}

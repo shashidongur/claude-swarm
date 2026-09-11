@@ -1,0 +1,6 @@
+{
+  "script": "lib/conformance/fixtures/harness/common-probe.sh",
+  "args": ["stub_file"],
+  "env": { "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main" },
+  "expect": { "exit": 0, "stdout_contains": ["swarm-dispatch.yml\nRC=0"] }
+}

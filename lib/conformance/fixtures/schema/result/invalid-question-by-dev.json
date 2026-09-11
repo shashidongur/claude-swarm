@@ -1,0 +1,16 @@
+{
+  "attempt": 1,
+  "issue": 7,
+  "questions": [
+    {
+      "q": "Which screen should show the capacity counter first?",
+      "to": "reporter"
+    }
+  ],
+  "reason": "Unclear which screen shows the counter.",
+  "role": "dev:app",
+  "stage": "build",
+  "summary": "Handoff a colleague needs: what was done, what was checked, what is left.",
+  "v": 2,
+  "verdict": "question"
+}

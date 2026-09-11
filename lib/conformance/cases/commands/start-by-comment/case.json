@@ -1,0 +1,36 @@
+{
+  "script": "lib/sh/resolve.sh",
+  "env": {
+    "WORKFLOW_REF": "o/r/.github/workflows/swarm-dispatch.yml@refs/heads/main",
+    "SWARM_NOW": "2026-09-06T15:00:00Z",
+    "OWNER": "owner"
+  },
+  "fixtures": [
+    "config-user-owned",
+    "resolve"
+  ],
+  "expect": {
+    "exit": 0,
+    "outputs": {
+      "go": "false"
+    },
+    "calls": [
+      "PUT repos/o/r/contents/issues/7.json",
+      "~swarm #7 create",
+      "POST repos/o/r/issues/7/comments",
+      "~kind=state",
+      "POST repos/o/r/issues/7/comments",
+      "~kind=reply | issue=7 | event=501",
+      "workflow run swarm-dispatch.yml",
+      "~\"key=7:triage:triage:1\""
+    ],
+    "state_issue": 7,
+    "state_after": {
+      "status": "queued",
+      "next.key": "7:triage:triage:1",
+      "path_source": "triage",
+      "log.0.event": "start",
+      "log.0.by": "owner"
+    }
+  }
+}

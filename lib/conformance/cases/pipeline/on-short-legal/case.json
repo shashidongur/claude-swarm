@@ -1,0 +1,12 @@
+{
+  "script": "lib/conformance/fixtures/pipeline/pipeline-probe.sh",
+  "args": [
+    "on-short-legal"
+  ],
+  "expect": {
+    "exit": 0,
+    "stdout_contains": [
+      "OK: on-short-legal"
+    ]
+  }
+}

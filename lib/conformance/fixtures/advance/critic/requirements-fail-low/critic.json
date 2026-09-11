@@ -1,0 +1,27 @@
+{
+  "v": 2,
+  "issue": 7,
+  "stage": "requirements",
+  "target_key": "@KEY",
+  "rubric": "requirements",
+  "model": "claude-opus-5",
+  "score": 58,
+  "threshold": 70,
+  "dimensions": {
+    "grounded": 58,
+    "complete": 58,
+    "testable": 58,
+    "scoped": 58
+  },
+  "findings": [
+    {
+      "severity": "high",
+      "where": "requirements.md AC-7-5",
+      "claim": "The capacity limit is invented.",
+      "why": "No requirement id backs the number 12.",
+      "fix": "Cite the requirement or mark it an assumption."
+    }
+  ],
+  "verdict": "fail",
+  "confidence": "low"
+}
