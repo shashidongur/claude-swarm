@@ -629,13 +629,18 @@ cmd_month_totals() {
     # tripped earlier and more often than the real spend warranted. Records folded out of
     # dispatches[] (the 60-record cap) are no longer attributable to a month and are left
     # out; the issue's own totals still carry them.
+    #
+    # Minutes are clamped at zero per record. A stored negative is always a measurement
+    # fault, never a real span, and one poisoned record would otherwise drag the whole
+    # month below the brake and keep it unreachable — state files written before the
+    # advance.sh zero-date fix carry exactly that.
     jq -c --arg m "$month" '
       select(type == "object")
       | ([(.dispatches // [])[] | select(((.at // "")[0:7]) == $m)]) as $d
       | select((($d | length) > 0) or ((.created_at // "")[0:7] == $m))
       | {issue,
-         runner_minutes: ([$d[] | .job_minutes // 0] | add // 0 | floor),
-         overhead_minutes: ([$d[] | .overhead_minutes // 0] | add // 0 | floor),
+         runner_minutes: ([$d[] | .job_minutes // 0 | if . < 0 then 0 else . end] | add // 0 | floor),
+         overhead_minutes: ([$d[] | .overhead_minutes // 0 | if . < 0 then 0 else . end] | add // 0 | floor),
          cost_usd: ([$d[] | .cost_usd // 0] | add // 0)}' "$docf" >> "$sum"
     n=$((n + 1))
   done <<< "$paths"

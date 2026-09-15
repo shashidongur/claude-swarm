@@ -452,10 +452,20 @@ fi
 # ── 7. the record ───────────────────────────────────────────────────────────────
 
 # gh's --jq takes no --arg: the raw jobs JSON is reduced locally (a job still running —
-# this one — is measured up to now)
+# this one — is measured up to now).
+#
+# `gh run view --json jobs` reports an absent timestamp as "0001-01-01T00:00:00Z", never
+# null: a skipped job carries it on both fields, and a job still running — which the
+# advance job measuring itself always is — carries it on completedAt. So `// $now` never
+# fired and `start - year-1` came out around -1.07e9 minutes. That went straight into
+# totals.overhead_minutes, and because month-totals adds runner + overhead the monthly
+# figure went negative and the minutes brake could never trip. A zero date means absent
+# on either field, and a negative span is clamped: no job ends before it starts.
 MINUTES=$(gh run view -R "$REPO" "$RUN_ID" --json jobs 2>/dev/null | jq -c --arg now "$(now)" '
-  [ .jobs[]? | select(.startedAt != null)
-    | {name, m: (((((.completedAt // $now) | fromdateiso8601) - (.startedAt | fromdateiso8601)) / 60) | ceil)} ]
+  def stamp: if . == null then null elif startswith("0001-") then null else . end;
+  [ .jobs[]? | {name, s: (.startedAt | stamp), c: (.completedAt | stamp)}
+    | select(.s != null)
+    | {name, m: (((((.c // $now) | fromdateiso8601) - (.s | fromdateiso8601)) / 60) | ceil | if . < 0 then 0 else . end)} ]
   | {role: ([.[] | select(.name | test("^run-")) | .m] | add // 0), overhead: ([.[] | select(.name | test("^run-") | not) | .m] | add // 0)}' 2>/dev/null)
 [ -n "$MINUTES" ] && printf '%s' "$MINUTES" | jq -e . >/dev/null 2>&1 || MINUTES='{"role":0,"overhead":0}'
 RETRY_RAN=0
