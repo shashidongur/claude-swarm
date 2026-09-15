@@ -1,0 +1,20 @@
+{
+  "script": "lib/sh/collect-audit.sh",
+  "env": {
+    "EXEC": "role-exec.json",
+    "RETRY_EXEC": "retry-exec.json"
+  },
+  "project_files": {
+    "role-exec.json": "@fixtures/exec/healthy.json",
+    "retry-exec.json": "@fixtures/exec/healthy.json",
+    ".swarm-run/result.json": "{\"v\":2}\n"
+  },
+  "expect": {
+    "exit": 0,
+    "files": {
+      ".swarm-run/execution.json.gz": "exists",
+      ".swarm-run/retry-execution.json.gz": "exists",
+      ".swarm-run/audit/execution.json.gz": "exists"
+    }
+  }
+}

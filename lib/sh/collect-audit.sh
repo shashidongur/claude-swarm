@@ -100,6 +100,15 @@ gzip_redacted "${RETRY_EXEC:-}" "$OUT/retry-execution.json.gz"
 gzip_redacted "${CRITIC_EXEC:-}" "$OUT/critic-execution.json.gz"
 perimeter > "$OUT/perimeter.txt"
 
+# The handoff artifact excludes audit/ — that bundle is uploaded separately, on its own
+# retention — but advance reads the run's cost, turns and duration out of the execution
+# file, and `find_exec` searches $RUN_DIR before $RUN_DIR/audit. With the only copy
+# inside audit/, advance never saw one and every stage recorded $0.00, 0 turns, 0m00s,
+# which also left the per-issue cost cap with nothing to count. The critic's file has
+# been placed outside audit/ all along (below) — this is the same move for the role's.
+gzip_redacted "${EXEC:-}" "$RUN_DIR/execution.json.gz"
+gzip_redacted "${RETRY_EXEC:-}" "$RUN_DIR/retry-execution.json.gz"
+
 if [ -f "$RUN_DIR/critic.json" ] || { [ -n "${CRITIC_EXEC:-}" ] && [ -f "$CRITIC_EXEC" ]; }; then
   mkdir -p "$RUN_DIR/critic"
   copy_redacted "$RUN_DIR/critic.json" "$RUN_DIR/critic/critic.json"
