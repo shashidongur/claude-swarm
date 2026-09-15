@@ -539,6 +539,19 @@ brief=$(tmpf .brief) || die "begin: cannot create a temporary file"
   printf -- '- artifacts you must produce under .swarm-run/artifacts/: %s\n' "$(jq -r '(.artifacts // []) | if length == 0 then "(none declared — your deliverable is the pushed branch)" else join(", ") end' "$slice")"
   printf -- '- committed artifacts of this issue live under %s/%s/ on the branch\n' "$ARTIFACTS_DIR" "$ISSUE"
   printf -- '- result.json fields for this role: %s\n' "$(result_fields)"
+  # The V3/V4/V5 rules are stated here rather than left in OUTPUT-CONTRACT.md: the
+  # first analyst run cited "finding 229 twenty-one controls declare disabled" against a
+  # line whose file held that text across two different lines, and the stage blocked. The
+  # substance was right and the quote was invented, which is exactly what V3 exists to
+  # catch — but a role cannot honour a rule it was never shown.
+  printf -- '- evidence[] is checked by the validator, and a stage whose evidence fails is blocked:\n'
+  printf -- '    kind=file      copy `symbol` out of the file verbatim — one real substring of one\n'
+  printf -- '                   real line, within 20 lines of `line`. It is matched with `grep -nF`,\n'
+  printf -- '                   so a paraphrase, a tidied-up quote, or two lines stitched into one\n'
+  printf -- '                   all fail. Before you write it: `grep -nF "<symbol>" <path>` must\n'
+  printf -- '                   print a line. If it prints nothing, you have not quoted the file.\n'
+  printf -- '    kind=command   `cmd` must be a command you actually ran in this run.\n'
+  printf -- '    kind=artifact  `path` must resolve under .swarm-run/evidence/.\n'
   printf -- '- allowed verdicts: %s\n' "$(jq -r '(.role.verdicts // ["pass","blocked"]) | join(", ")' "$slice")"
   printf -- '- turn cap: you have %s turns; write result.json by turn %s\n' "$MAX_TURNS" "$((MAX_TURNS - 5))"
   printf -- '- pin marker: `%s` · test paths: %s\n' "$(C '.pin_marker')" "$(jq -r '(.test_paths // []) | join(", ")' "$cfg")"
