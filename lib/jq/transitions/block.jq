@@ -1,12 +1,12 @@
 # block — a terminal wait-state (§5): swarm:blocked + blocked:<reason>. `fire` keeps
 # `next` with its fire fields reset so /swarm resume re-fires it; `stalled` leaves
 # `current` untouched so a re-run or a finalize can still finish the record.
-#   --arg reason agent-output|budget|runaway|evidence|stalled|fire|injection|duplicate|conflict|bad-handoff|perimeter|auth|model
+#   --arg reason agent-output|role-stopped|budget|runaway|evidence|stalled|fire|injection|duplicate|conflict|bad-handoff|perimeter|auth|model
 #   [--arg detail <≤ 600 chars, already redacted>] [--arg comment_id N] [--arg from_key K]
 include "_lib";
 state_pre
 | (need("reason")) as $r
-| pre($r | IN("agent-output", "budget", "runaway", "evidence", "stalled", "fire", "injection", "duplicate", "conflict", "bad-handoff", "perimeter", "auth", "model"); "unknown block reason \($r)")
+| pre($r | IN("agent-output", "role-stopped", "budget", "runaway", "evidence", "stalled", "fire", "injection", "duplicate", "conflict", "bad-handoff", "perimeter", "auth", "model"); "unknown block reason \($r)")
 | pre(.status | IN("done", "dropped") | not; "status is \(.status)")
 | pre((has_arg("from_key") | not) or (.current.key == arg("from_key")); "current.key is \(.current.key // "-"), not \(opt("from_key"; ""))")
 | .blocked = { reason: $r, detail: (opt("detail"; "") | tostring | .[0:600]), at: ts,

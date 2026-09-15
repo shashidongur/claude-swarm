@@ -103,7 +103,7 @@ projection:** `swarm:hands-off`, `swarm:control`, `swarm:halt`, `swarm:halt-pipe
 | `status = gate`, `gate.name = G` | `swarm:gate:<G>` (requirements, architecture, release, question, confidence, budget) |
 | `status = evidence` | `swarm:waiting:evidence` |
 | `status = queued` or `routing` | (no label; the state header says "queued — fired <at>, run <id or 'not yet started'>" / "routing") |
-| `status = blocked` | `swarm:blocked` + one `blocked:<reason>` (agent-output, budget, runaway, evidence, stalled, fire, injection, duplicate, conflict, bad-handoff, perimeter, auth, model) |
+| `status = blocked` | `swarm:blocked` + one `blocked:<reason>` (agent-output, role-stopped, budget, runaway, evidence, stalled, fire, injection, duplicate, conflict, bad-handoff, perimeter, auth, model) |
 | `status = parked` | `swarm:parked` |
 | `status = dropped` | `swarm:dropped` (stage label removed) |
 | `status = done` | `swarm:done` (stage label removed) |

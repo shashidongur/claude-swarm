@@ -53,7 +53,7 @@ order written there); the swarm never names them.
 |---|---|
 | `pass` | the next role in the stage; then the stage's `evidence_after` wait (CI on the pushed head), then the stage's gate, then the next stage on the path (firing its `evidence_before` workflow first when configured) |
 | `rework` | the role's `rework_to` target at attempt+1 — fixed in `pipeline.yml` for `a11y` (→ `ux`), `threat-model` (→ `architect`) and `code-review` (→ `dev:<lane>`); named by the role in `result.rework_to` for `qa`, `security`, `compliance` (must be a lane of this issue) |
-| `blocked` | `swarm:blocked` + `blocked:agent-output`; a `reason` starting `injection:` is `blocked:injection` instead |
+| `blocked` | `swarm:blocked` + `blocked:role-stopped`; a `reason` starting `injection:` is `blocked:injection` instead. Distinct from `blocked:agent-output`, which means no valid result came back at all |
 | `question` | analyst only: `swarm:gate:question`, the questions posted to the issue author; their next plain comment resumes the analyst |
 | `duplicate` | triage only: `swarm:parked` + `blocked:duplicate`, the duplicates named in a comment |
 

@@ -30,7 +30,7 @@
 #              role's field); rework_max per source role → proceeds as pass with a ⚠
 #   question   question comment (D15) + gate-enter question (records the comment id)
 #   duplicate  block duplicate (swarm:blocked + blocked:duplicate; /swarm resume proceeds)
-#   blocked    block injection (reason starts "injection:") or agent-output
+#   blocked    block injection (reason starts "injection:") or role-stopped
 # Every fire goes through fire.sh (claim, verify; blocked:fire + exit 1 on failure);
 # every queue passes G8 (known role), G6 (runaway), G30 (cost cap → gate budget), G31
 # (monthly brake before a write-role dispatch → gate budget).
@@ -835,7 +835,7 @@ route_blocked() {
   reason=$(R '.reason' | head -c 600)
   case $reason in
     injection:*) block injection "$reason" "blocked:injection — $reason; a human reads the input" ;;
-    *) block agent-output "${reason:-$ROLE returned blocked without a reason}" "blocked:agent-output — ${reason:-no reason}; /swarm resume re-runs $CUR_ROLE at attempt $(( $(SD '.current.attempt' 1) + 1 ))" ;;
+    *) block role-stopped "${reason:-$ROLE returned blocked without a reason}" "blocked:role-stopped — ${reason:-no reason}; /swarm resume re-runs $CUR_ROLE at attempt $(( $(SD '.current.attempt' 1) + 1 ))" ;;
   esac
 }
 

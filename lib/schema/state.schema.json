@@ -122,6 +122,7 @@
       "type": "string",
       "enum": [
         "agent-output",
+        "role-stopped",
         "budget",
         "runaway",
         "evidence",

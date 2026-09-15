@@ -60,7 +60,9 @@ Labels are a **projection** of the signed state file, written only by the dispat
     swarm:blocked + blocked:<reason>                                          stopped; always says why
     swarm:parked | swarm:dropped | swarm:done
 
-`blocked:*` reasons: `agent-output`, `budget`, `runaway`, `evidence`, `stalled`, `fire`,
+`blocked:*` reasons: `agent-output` (no valid result came back), `role-stopped` (a valid
+result whose verdict is `blocked` — the role did the work and says it cannot go on),
+`budget`, `runaway`, `evidence`, `stalled`, `fire`,
 `injection`, `duplicate`, `conflict`, `bad-handoff`, `perimeter`, `auth`, `model`.
 Metadata from triage: `bug` / `feature` / `chore`, `size:S|M|L|XL`, `area:<lane>|both`,
 `prio:P0..P3`; `swarm:short` marks the path.

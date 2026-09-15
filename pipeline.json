@@ -724,7 +724,7 @@
   ],
   "v": 2,
   "verdict_edges": {
-    "*.blocked": "block:agent-output",
+    "*.blocked": "block:role-stopped",
     "*.pass": "next",
     "a11y.rework": "rework:ux",
     "analyst.question": "gate:question",

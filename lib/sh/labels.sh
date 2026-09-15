@@ -98,6 +98,7 @@ cmd_install() {
   create swarm:lane              C2E0C6 "tracking sub-issue of a swarm issue; never dispatched"
   create swarm:hands-off         C2E0C6 "the swarm ignores this issue until the label is removed by hand"
   create blocked:agent-output    B60205 "a role produced no valid result; /swarm resume"
+  create blocked:role-stopped    B60205 "a role finished and reported it cannot proceed; read the reason, then /swarm resume"
   create blocked:budget          B60205 "rework budget exhausted; /swarm redo <stage> resets it"
   create blocked:runaway         B60205 "too many dispatches in one hour; /swarm resume"
   create blocked:bad-handoff     B60205 "unknown stage/role, or the swarm's own configuration is broken"

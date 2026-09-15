@@ -385,7 +385,7 @@ memory_fenced: ["gotchas/auto/**", "postmortems/**", "runs/**"]
 # What advance does with a verdict, per role (data, not code). "*" = any role.
 verdict_edges:
   "*.pass": next
-  "*.blocked": "block:agent-output"          # a reason starting "injection:" becomes block:injection
+  "*.blocked": "block:role-stopped"          # a reason starting "injection:" becomes block:injection
   "triage.duplicate": "park:duplicate"
   "analyst.question": "gate:question"
   "a11y.rework": "rework:ux"

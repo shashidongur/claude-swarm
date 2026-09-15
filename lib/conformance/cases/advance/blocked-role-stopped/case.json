@@ -24,7 +24,7 @@
     ],
     "state_after": {
       "status": "blocked",
-      "blocked.reason": "agent-output",
+      "blocked.reason": "role-stopped",
       "dispatches.0.verdict": "blocked"
     }
   }
