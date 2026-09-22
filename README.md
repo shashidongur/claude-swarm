@@ -9,8 +9,10 @@ agents record how that codebase actually works and how you want work done in it.
 sequential roles, three human gates, one deterministic dispatcher — and a language
 model never writes a mention, a label, a marker or a handoff.
 
-Branch `v2` is the pipeline described here; `main` is v1 (mention-driven) and stays
-runnable. `PLAYBOOK.md` is the policy; `pipeline.yml` is the routing data.
+This pipeline is on both `main` and `v2`; projects pin `dispatch.yml@v2` (or a full
+sha). Work lands on `v2` first and `main` follows, so `v2` is what a project runs. v1
+(the mention-driven pipeline) is retired. `PLAYBOOK.md` is the policy; `pipeline.yml`
+is the routing data.
 
 ---
 
@@ -136,11 +138,12 @@ the App token can merge a PR or push a workflow file — gate 3 is detective eit
 
 | | |
 |---|---|
-| v1 (mention-driven, `main`) | ran one issue end to end; stalled silently twice on handoffs — the reason v2 exists |
+| v1 (mention-driven) | retired; ran one issue end to end and stalled silently twice on handoffs — the reason v2 exists |
 | v2 spec | 17 sections, three adversarial reviews applied; `memory/_swarm-itself/v2-design.md` |
-| v2 dispatcher, scripts, roles, conformance | on branch `v2` |
+| v2 dispatcher, scripts, roles, conformance | on `v2`, merged to `main` |
 | Probe on the first project | runs 1–4 done (`memory/_swarm-itself/v2-probe-results.md`): R1–R4, R5a, R6, R30 answered; R5b not exercisable (a hard kill leaves no execution file — tolerated); R28/R29 deferred to switch-on, measured with `templates/swarm-probe.yml`'s `write` job once the stub is on the default branch |
-| First project switched on | not yet |
+| First project switched on | `shashidongur/meipadam` — stub on the default branch, labels installed, all three secrets set |
+| First runs | two issues reached a role and blocked; the four defects they exposed (negative overhead, zero cost metrics, a role-reported block read as an agent failure, an unstated evidence rule) are fixed |
 
 ### What to expect per month
 
